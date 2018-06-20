@@ -1,0 +1,21 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+env:
+    - DOCUMENTER_DEBUG=true
+    - TRAVIS_REPO_SLUG="github.com/TAJD/sail_route.jl.git"
+    - TRAVIS_PULL_REQUEST="false"
+    - TRAVIS_OS_NAME="osx"
+os:
+  - linux
+  - osx
+julia:
+  - 0.6
+  - nightly
+notifications:
+  email: false
+env:
+   - PYTHON=""
+after_success:
+  - julia -e 'Pkg.add("Documenter")'
+  - julia -e 'Pkg.clone(pwd())'
+  - julia -e 'Pkg.test("sail_route")'
