@@ -1,0 +1,5 @@
+ENV["TRAVIS_REPO_SLUG"] = "github.com/TAJD/sail_route.jl.git"
+ENV["TRAVIS_PULL_REQUEST"] = "false"
+ENV["TRAVIS_OS_NAME"] = "osx"
+ENV["TRAVIS_JULIA_VERSION"] = "nightly"
+ENV["TRAVIS_BRANCH"]="master"

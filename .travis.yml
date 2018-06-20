@@ -1,21 +1,17 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
-env:
-    - DOCUMENTER_DEBUG=true
-    - TRAVIS_REPO_SLUG="github.com/TAJD/sail_route.jl.git"
-    - TRAVIS_PULL_REQUEST="false"
-    - TRAVIS_OS_NAME="osx"
 os:
   - linux
   - osx
 julia:
   - 0.6
-  - nightly
 notifications:
   email: false
-env:
-   - PYTHON=""
+before_script:
+  - export PATH=$HOME/.local/bin:$PATH
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
-  - julia -e 'Pkg.clone(pwd())'
-  - julia -e 'Pkg.test("sail_route")'
+- julia -e 'cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
