@@ -1,0 +1,22 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+env:
+    global:
+        - DOCUMENTER_DEBUG=true
+os:
+  - linux
+  - osx
+julia:
+  - 0.6
+  - nightly
+matrix:
+  allow_failures:
+    - julia: 0.6
+notifications:
+  email: false
+env:
+   - PYTHON=""
+after_success:
+  - julia -e 'Pkg.add("Documenter")'
+  - julia -e 'Pkg.clone(pwd())'
+  - julia -e 'Pkg.test("sail_route")'

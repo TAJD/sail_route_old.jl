@@ -5,8 +5,8 @@
 
 
 
-<a id='Main.sail_route.awa-Tuple{Any,Any,Any}' href='#Main.sail_route.awa-Tuple{Any,Any,Any}'>#</a>
-**`Main.sail_route.awa`** &mdash; *Method*.
+<a id='sail_route.awa-Tuple{Any,Any,Any}' href='#sail_route.awa-Tuple{Any,Any,Any}'>#</a>
+**`sail_route.awa`** &mdash; *Method*.
 
 
 
@@ -27,4 +27,7 @@ isapprox(0.6669807044553968, c_awa, rtol=3)
 
 true
 ```
+
+
+<a target='_blank' href='https://github.com/TAJD/sail_route.jl/blob/c15e40ddfd81f634e6146cd00e5cb35768285783/src/performance/aerodynamics.jl#L3-L19' class='documenter-source'>source</a><br>
 
