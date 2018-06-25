@@ -1,6 +1,5 @@
 # sail_route.jl
 
-
 <p align="center">
   <a href="https://travis-ci.org/TAJD/sail_route.jl">
     <img src="https://travis-ci.org/TAJD/sail_route.jl.svg?branch=master">
@@ -16,4 +15,4 @@
 
 ## Documentation
 
-- [**DEVELOPMENT**][https://tajd.github.io/sail_route.jl/]
+- [**DEVELOPMENT**](https://tajd.github.io/sail_route.jl/)

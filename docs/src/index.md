@@ -1,4 +1,5 @@
-# sail_route documentation
+
+Sailing craft route optimisation written in the Julia programming language.
 
 ```@meta
 CurrentModule = sail_route
