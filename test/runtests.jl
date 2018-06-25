@@ -4,6 +4,7 @@
 
 using sail_route
 
-using Test
+
+using Base.Test
 print("starting tests")
 @time include("aerodynamics.jl")
