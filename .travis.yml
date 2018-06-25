@@ -14,4 +14,5 @@ script:
   - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
-- julia -e 'cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'cd(Pkg.dir("sail_route")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
