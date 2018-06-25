@@ -1,0 +1,10 @@
+        - push!(LOAD_PATH,"./src/")
+        - 
+        5 module sail_route
+        - 
+        - 
+        - # include("scenarios/comparison.jl")
+        - include("performance/aerodynamics.jl")
+        - 
+        - end
+        - 
