@@ -18,12 +18,10 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION xarray
-  - conda env list
-  - echo $HOME
-  - julia -e "ENV["PYTHON"] = "$HOME/miniconda/envs/test-environment""
-  - julia -e "Pkg.build("PyCall")"
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e "ENV["PYTHON"] = "$HOME/miniconda/envs/test-environment""
+  - julia -e "Pkg.build("PyCall")"
   - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
