@@ -11,7 +11,7 @@ before_script:
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
-  - julia -e "Conda.add("xarray")"
+  - julia -e "using Conda; Conda.add("xarray")"
   - julia -e 'Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
