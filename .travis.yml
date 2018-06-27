@@ -19,7 +19,7 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
   - conda info -a
-  - conda install --path /Users/travis/.julia/v0.6/Conda/deps/usr xarray
+  - conda install -p $HOME/.julia/v0.6/Conda/deps/usr xarray
   - julia -e 'Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
