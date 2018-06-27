@@ -15,4 +15,4 @@
 
 ## Documentation
 
-- [**DEVELOPMENT**](https://tajd.github.io/sail_route.jl/)
+Documentation may be found [here](https://tajd.github.io/sail_route.jl/)
