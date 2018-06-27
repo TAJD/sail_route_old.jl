@@ -21,8 +21,9 @@ install:
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
-  - julia -e ""
-  - julia -e
+  - julia -e "println(ENV["HOME"])"
+  - julia -e "using PyCall; println(ENV["PYTHON"])"
+  - julia -e "println(ENV["HOME"]*"/miniconda/envs/test-environment")"
   - julia -e "using PyCall; ENV["PYTHON"] = ENV["HOME"]*"/miniconda/envs/test-environment"; Pkg.build("PyCall") "
   - julia -e 'Pkg.test("sail_route")'
 after_success:
