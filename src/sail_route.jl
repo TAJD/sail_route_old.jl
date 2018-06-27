@@ -1,6 +1,6 @@
 push!(LOAD_PATH,"./src/")
 
-using PyCall
+using Conda, PyCall
 
 module sail_route
 

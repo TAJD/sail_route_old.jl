@@ -23,7 +23,7 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
   - export CONDA_JL_HOME=$HOME/miniconda/envs/test-environment
-  - julia -e "Pkg.build("Conda"); Pkg.build("PyCall")"
+  - julia -e "using PyCall; Pkg.build("Conda"); Pkg.build("PyCall")"
   - julia -e 'Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
