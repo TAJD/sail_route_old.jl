@@ -20,7 +20,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION xarray
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes -e 'Pkg.clone(pwd());
+  - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
   - julia -e "ENV["PYTHON"] = "$HOME/miniconda/envs/test-environment""
   - julia -e "Pkg.build("PyCall")"
   - julia -e 'Pkg.test("sail_route")'
