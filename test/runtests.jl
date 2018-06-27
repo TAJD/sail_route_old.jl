@@ -10,3 +10,4 @@ using Base.Test
 print("starting tests")
 @time include("aerodynamics.jl")
 @time include("comparison.jl")
+@time include("route.jl")
