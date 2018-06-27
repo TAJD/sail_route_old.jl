@@ -1,7 +1,7 @@
 push!(LOAD_PATH,"./src/")
 
 # include("/Users/thomasdickson/Documents/sail_route.jl/src/sail_route.jl")
-# include("/home/thomas/sail_route.jl/src/sail_route.jl") # must be commented out
+# include(ENV["HOME"]*"/sail_route.jl/src/sail_route.jl") # must be commented out
 
 using sail_route
 
