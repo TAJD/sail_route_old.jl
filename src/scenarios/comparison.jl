@@ -1,3 +1,5 @@
+using JuMP, Cbc
+
 """
     kantorovich_distance(ν, μ)
 
@@ -14,7 +16,7 @@ julia> kantorovich_distance(mu, nu)
 """
 function kantorovich_distance(ν, μ)
     n = length(ν)
-    m = Model(optimizer=CbcSolver())
+    m = Model(solver=CbcSolver())
     @variable(m, p[1:n, 1:n] >= 0)
     @objective(m, Min, sum(p[i, j] for i in 1:n for j in 1:n if i != j))
     for k in 1:n
