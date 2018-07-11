@@ -19,10 +19,10 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
   - conda info -a
-  - conda install -p $HOME/.julia/v0.6/Conda/deps/usr xarray pyproj shapely
-  - conda install -p $HOME/.julia/v0.6/Conda/deps/usr -c conda-forge esmpy
+  - source activate $HOME/.julia/v0.6/Conda/deps/usr
+  - conda install xarray pyproj shapely
+  - conda install -c conda-forge esmpy basemap
   - pip install xesmf
-  - conda install -p $HOME/.julia/v0.6/Conda/deps/usr -c conda-forge basemap
   - julia -e 'Pkg.test("sail_route")'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
