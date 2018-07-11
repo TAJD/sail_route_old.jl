@@ -1,5 +1,7 @@
 using PyCall
-push!(PyVector(pyimport("sys")["path"]), "")
+# unshift!(PyVector(pyimport("sys")["path"]), ENV["HOME"]*"/.julia/v0.6/sail_route.jl/src/route")
+unshift!(PyVector(pyimport("sys")["path"]), ENV["HOME"]*"/Documents/sail_route.jl/src/")
+@pyimport pydomain as pd
 
 """
     haversine(lon1, lat1, lon2, lat2)
