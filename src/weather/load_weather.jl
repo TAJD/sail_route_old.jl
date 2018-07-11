@@ -1,6 +1,4 @@
 using PyCall
+unshift!(PyVector(pyimport("sys")["path"]), ENV["HOME"]*"/sail_route/src/weather/")
 
-@pyimport numpy as np
-@pyimport xarray as xr
-
-println(xr.DataArray([[2, 3, 4], [5, 6, 7]]))
+@pyimport load_weather as lw
