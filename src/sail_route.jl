@@ -4,6 +4,7 @@ using Conda, PyCall
 
 module sail_route
 
+include("route/domain.jl")
 include("scenarios/comparison.jl")
 include("performance/aerodynamics.jl")
 include("performance/polar.jl")
