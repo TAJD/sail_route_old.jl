@@ -1,5 +1,5 @@
 using PyCall
-@pyimport xarray
+pushfirst!(PyVector(pyimport("sys")["path"]), "")
 
 """
     haversine(lon1, lat1, lon2, lat2)
