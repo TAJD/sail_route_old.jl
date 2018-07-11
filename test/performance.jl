@@ -1,5 +1,5 @@
 @testset "Test sailing craft performance functions" begin
-    path = ENV["HOME"]*"/.julia/v0.6//sail_route.jl/src/data/first40_orgi.csv"
+    path = ENV["HOME"]*"/.julia/v0.6/sail_route.jl/src/data/first40_orgi.csv"
     twa, tws, perf = sail_route.load_file(path)
     @test twa[2] ≈ 60.0 atol=0.0
     @test tws[2] ≈ 8.0 atol=0.0
