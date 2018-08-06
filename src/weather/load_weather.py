@@ -7,9 +7,8 @@ thomas.dickson@soton.ac.uk
 25/05/2018
 """
 
-import os
-import sys
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xesmf as xe
 
@@ -97,42 +96,27 @@ def change_area_values(array, value, lon1, lat1, lon2, lat2):
     return array
 
 
+def sample_weather_scenario():
+    """
+    Generate a weather scenario with known values for the wind condition.
+    """
+    times = pd.date_range('1/1/2000', periods=72, freq='6H')
+    latitude = np.linspace(0, 10, 11)
+    longitude = np.linspace(0, 10, 11)
+    array = np.empty((72, 11, 11))
+    wsp_vals = np.full((72, 11, 11), 10.0)
+    wdi_vals = np.full((72, 11, 11), 0.0)
+    # print(times.shape, latitude.shape, longitude.shape, array.shape)
+    wisp = xr.DataArray(wsp_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    widi = xr.DataArray(wdi_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    return wisp, widi
+
+
 if __name__ == '__main__':
-    sys.path.append(os.path.abspath("/home/td7g11/pyroute/sail_route/route/"))
-    from grid_locations import return_co_ords
-
-    def haversine(lon1, lat1, lon2, lat2):
-        """
-        Calculate the great circle distance between two points.
-
-        Return the value in km.
-        """
-        lon1, lat1, lon2, lat2 = np.radians(np.array([lon1, lat1, lon2, lat2]))
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = np.sin((dlat)/2)**2 + np.cos(lat1) * np.cos(lat2) * \
-            np.sin((dlon)/2)**2
-        dist = 6371 * 2 * np.arcsin(np.sqrt(a)) * 0.5399565
-        bearing = np.rad2deg(np.arctan2(dlat, dlon))
-        return dist, bearing
-    # start = Location(-2.3700, 50.256)
-    # finish = Location(-61.777, 17.038)
-    start_long = -2.37
-    start_lat = 50.256
-    finish_long = -61.777
-    finish_lat = 17.083
-    n_ranks = 10
-    n_nodes = 10
-    dist, bearing = haversine(start_long, start_lat, finish_long,
-                              finish_lat)
-    node_distance = 2000*dist/n_nodes
-    longs, lats, land = return_co_ords(start_long, finish_long,
-                                       start_lat, finish_lat,
-                                       n_ranks, n_nodes, dist)
-    weather_path = "/home/td7g11/pyroute/analysis/asv_transat/2016_jan_march.nc"
-    # look_in_netcdf(weather_path)
-    # rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = process_era5_weather(weather_path, longs, lats)
-    wisp = load_dataset(weather_path, 'wind')
-    print(wisp.mean())
-    wisp = change_area_values(wisp, 10.0, 300, 20, 350, 60)
-    print(wisp.mean())
+    sample_weather_scenario()
