@@ -7,7 +7,7 @@ unshift!(PyVector(pyimport("sys")["path"]), "")
 
 Calculate the haversine distance and bearing. Distance is in nm.
 """
-function haversine(lon1, lat1, lon2, lat2)
+function haversine(lon1::Float64, lat1::Float64, lon2::Float64, lat2::Float64)
     R = 6372.8  # Earth radius in kilometers
 
     dLat = deg2rad(lat2 - lat1)
@@ -31,7 +31,7 @@ end
 Return the co-ordinates of each point across the discretized domain.
 """
 function co_ordinates(start_long, finish_long, start_lat, finish_lat,
-                      n_ranks, n_nodes, dist)
+                      n_ranks::Int, n_nodes::Int, dist)
     x, y, land = pd.return_co_ords(start_long, finish_long, start_lat,
                                    finish_lat, n_ranks, n_nodes,
                                    dist)
@@ -48,6 +48,5 @@ end
 
 
 function min_angle(a, b)
-    # np.absolute((x - y + 180) % 360 - 180)
     abs(mod(a - b + 180, 360) - 180)
 end

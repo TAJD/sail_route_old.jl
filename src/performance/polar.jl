@@ -55,3 +55,34 @@ Return interpolated performance.
 function perf_interp(itp, twa, tws)
     return itp[twa, tws]
 end
+
+
+function h(cudi::Float64, cusp::Float64, bearing::Float64)
+    cusp*sin(deg2rad(cudi-bearing))
+end
+
+
+function current(polar, cudi::Float64, cusp::Float64, widi::Float64,
+    wisp::Float64, bearing::Float64, heading::Float64)
+    vs = perf_interp(polar, min_angle(widi, heading), wisp)
+    return (acos(h(cudi, cusp, bearing)/vs)*180/π - bearing)
+end
+
+
+"""
+correct_speed(polar, cudi, cusp, widi, wisp, bearing)
+
+Identify corrected speed for routing.
+"""
+function correct_speed(polar, cudi::Float64, cusp::Float64, widi::Float64,
+          wisp::Float64, bearing::Float64)
+    h1 = 0.0
+    h2 = current(polar, cudi, cusp, widi, wisp, bearing, h1)
+    while h2 - h1 > 0.1
+        h1 = h2
+        h2 = current(polar, cudi, cusp, widi, wisp, bearing, h1)
+    end
+    bearing = bearing + h2
+    @inbounds vs = perf_interp(polar, min_angle(widi, bearing), wisp)
+    return vs + cusp
+end

@@ -103,10 +103,10 @@ def sample_weather_scenario():
     times = pd.date_range('1/1/2000', periods=72, freq='6H')
     latitude = np.linspace(0, 10, 11)
     longitude = np.linspace(0, 10, 11)
-    array = np.empty((72, 11, 11))
     wsp_vals = np.full((72, 11, 11), 10.0)
     wdi_vals = np.full((72, 11, 11), 0.0)
-    # print(times.shape, latitude.shape, longitude.shape, array.shape)
+    cusp_vals = np.full((72, 11, 11), 0.0)
+    cudi_vals = np.full((72, 11, 11), 0.0)
     wisp = xr.DataArray(wsp_vals, dims=['time', 'lon_b', 'lat_b'],
                         coords={'time': times,
                                 'lon_b': longitude,
@@ -115,7 +115,15 @@ def sample_weather_scenario():
                         coords={'time': times,
                                 'lon_b': longitude,
                                 'lat_b': latitude})
-    return wisp, widi
+    cusp = xr.DataArray(cusp_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    cudi = xr.DataArray(cudi_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    return wisp, widi, cusp, cudi
 
 
 if __name__ == '__main__':

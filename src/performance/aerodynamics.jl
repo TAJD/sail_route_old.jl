@@ -17,6 +17,6 @@ isapprox(0.6669807044553968, c_awa, rtol=3)
 true
 ```
 """
-function awa(twa, v_s, v_t)
+function awa(twa::Float64, v_s::Float64, v_t::Float64)
     return atan(sind(twa)/(cosd(twa) + v_s/v_t))
 end
