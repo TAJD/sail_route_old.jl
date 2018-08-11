@@ -1,5 +1,5 @@
 using PyCall
-unshift!(PyVector(pyimport("sys")["path"]), "")
+pushfirst!(PyVector(pyimport("sys")["path"]), "")
 @pyimport src.route.pydomain as pd
 
 """
@@ -18,8 +18,8 @@ function haversine(lon1::Float64, lat1::Float64, lon2::Float64, lat2::Float64)
     lon2 = deg2rad(lon2)
     a = sin(dLat/2)^2 + cos(lat1)*cos(lat2)*sin(dLon/2)^2
     c = 2*asin(sqrt(a))
-    theta = atan2(sin(dLon)*cos(lat2),
-                  cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(dLon))
+    theta = atan(sin(dLon)*cos(lat2),
+                 cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(dLon))
     theta = (rad2deg(theta) + 360) % 360
     return R*c*0.5399565, theta
 end
@@ -47,6 +47,6 @@ function output()
 end
 
 
-function min_angle(a, b)
-    abs(mod(a - b + 180, 360) - 180)
+function min_angle(a::Float64, b::Float64)
+    abs(mod(a - b + 180.0, 360.0) - 180.0)
 end

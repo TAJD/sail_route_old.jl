@@ -28,10 +28,10 @@ Load the file specified by path.
 """
 function load_file(path)
     df = CSV.read(path, delim=';', datarow=1)
-    perf = Array{Float64}(df[2:end, 2:end])
-    tws = Array{Float64}(df[1, 2:end])
+    perf = convert(Array{Float64}, df[2:end, 2:end])
+    tws = convert(Array{Float64}, df[1, 2:end])
     twa = map(x->parse(Float64, x), df[2:end, 1])
-    return twa, squeeze(tws, 1), perf
+    return twa, dropdims(tws, dims=1), perf
 end
 
 

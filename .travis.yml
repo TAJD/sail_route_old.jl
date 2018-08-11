@@ -3,7 +3,7 @@ language: julia
 os:
   - osx
 julia:
-  - 0.6
+  - 0.7
 notifications:
   email: false
 before_script:

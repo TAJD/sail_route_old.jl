@@ -9,9 +9,8 @@ end
 
 function route_solve(lon1, lon2, lat1, lat2, x_nodes, y_nodes, y_dist, wisp, widi, cusp, cudi, polar, start)
     x, y, land = co_ordinates(lon1, lon2, lat1, lat2, x_nodes, y_nodes, y_dist)
-    empty = zeros(x)
-    earliest_times = fill!(empty, Inf)
-    prev_node = zeros(x)
+    earliest_times = fill(Inf, size(x))
+    prev_node = zero(x)
     node_indices = reshape(1:length(x), size(x)) 
     arrival_time = Inf
     @simd for idx in 1:size(x)[2]
@@ -34,6 +33,7 @@ function route_solve(lon1, lon2, lat1, lat2, x_nodes, y_nodes, y_dist, wisp, wid
             @inbounds tt = earliest_times[idy, idx] + d/correct_speed(polar, cd_int, cs_int, wd_int, ws_int, b)
             if earliest_times[idy+1, idx] > tt
                 earliest_times[idy+1, idx] = tt
+                prev_node[idy+1, idx] = node_indices[idy, idx]
             end
         end
     end
@@ -48,8 +48,9 @@ function route_solve(lon1, lon2, lat1, lat2, x_nodes, y_nodes, y_dist, wisp, wid
         @inbounds tt = earliest_times[end, idx] + d/correct_speed(polar, cd_int, cs_int, wd_int, ws_int, b)
         if arrival_time > tt
             arrival_time = tt
+            final_node = node_indices[end, idx]
         end
-    end    
+    end
     return arrival_time, earliest_times
 end
 

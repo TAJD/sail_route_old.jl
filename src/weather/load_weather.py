@@ -127,4 +127,4 @@ def sample_weather_scenario():
 
 
 if __name__ == '__main__':
-    sample_weather_scenario()
+    print(sample_weather_scenario())
