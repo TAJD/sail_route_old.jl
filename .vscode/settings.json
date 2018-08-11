@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/Users/thomasdickson/anaconda3/envs/routing/bin/python",
+    "python.pythonPath": "/Users/thomasdickson/miniconda3/envs/routing/bin/python",
     "julia.executablePath": "julia"
 }
