@@ -1,0 +1,14 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "sail_route documentation\n\n\n#\n\n\nsail_route.awa\n \u2014 \nMethod\n.\n\n\nawa(twa, v_s, v_t)\n\n\n\n\nCalculate the apparent wind angle given true wind angle, boat speed and wind speed.\n\n\nExample\n\n\nusing sail_route\nc_awa = sail_route.awa(60, 3.086, 5.144)\nisapprox(0.6669807044553968, c_awa, rtol=3)\n\n# output\n\ntrue\n\n\n\n\nsource",
+            "title": "Home"
+        },
+        {
+            "location": "/#sail_route-documentation",
+            "text": "#  sail_route.awa  \u2014  Method .  awa(twa, v_s, v_t)  Calculate the apparent wind angle given true wind angle, boat speed and wind speed.  Example  using sail_route\nc_awa = sail_route.awa(60, 3.086, 5.144)\nisapprox(0.6669807044553968, c_awa, rtol=3)\n\n# output\n\ntrue  source",
+            "title": "sail_route documentation"
+        }
+    ]
+}
