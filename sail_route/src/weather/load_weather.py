@@ -107,6 +107,8 @@ def sample_weather_scenario():
     wdi_vals = np.full((72, 11, 11), 0.0)
     cusp_vals = np.full((72, 11, 11), 0.0)
     cudi_vals = np.full((72, 11, 11), 0.0)
+    wadi_vals = np.full((72, 11, 11), 0.0)
+    wahi_vals = np.full((72, 11, 11), 0.0)
     wisp = xr.DataArray(wsp_vals, dims=['time', 'lon_b', 'lat_b'],
                         coords={'time': times,
                                 'lon_b': longitude,
@@ -123,7 +125,15 @@ def sample_weather_scenario():
                         coords={'time': times,
                                 'lon_b': longitude,
                                 'lat_b': latitude})
-    return wisp, widi, cusp, cudi
+    wahi = xr.DataArray(cusp_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    wadi = xr.DataArray(cudi_vals, dims=['time', 'lon_b', 'lat_b'],
+                        coords={'time': times,
+                                'lon_b': longitude,
+                                'lat_b': latitude})
+    return wisp, widi, cusp, cudi, wahi, wadi
 
 
 if __name__ == '__main__':
