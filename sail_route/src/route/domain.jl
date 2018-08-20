@@ -4,10 +4,6 @@ using PyCall
 loader = machinery.SourceFileLoader("pydomain",ENV["HOME"]*"/sail_route.jl/sail_route/src/route/pydomain.py")
 pd = loader[:load_module]("pydomain")
 
-
-
-@pyimport importlib.machinery as machinery
-
 """
     haversine(lon1, lat1, lon2, lat2)
 

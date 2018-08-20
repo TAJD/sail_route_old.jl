@@ -1,5 +1,7 @@
 
 using CSV, Interpolations, DataFrames
+include(ENV["HOME"]*"/sail_route.jl/sail_route/src/performance/failure_model/failure.jl")
+
 
 """
     Performance(twa, tws, boat_perf)
@@ -13,11 +15,11 @@ Arguments:
 - boat_perf: Dierckx 2D spline instance.
 
 """
-mutable struct Performance
-    twa
-    tws
-    boat_perf
+struct Performance
+    polar::Interpolations.GriddedInterpolation{}
     uncertainty::Float64
+    acceptable_failure::Float64
+    failure_model
 end
 
 
@@ -70,19 +72,43 @@ end
 
 
 """
-correct_speed(polar, cudi, cusp, widi, wisp, bearing)
+cost_function(performance, cudi::Float64, cusp::Float64,
+                       widi::Float64, wisp::Float64,
+                       wadi::Float64, wahi::Float64,
+                       bearing::Float64)
 
-Identify corrected speed for routing.
+
+Calculate the correct speed of the sailing craft given the failure model and environmental conditions.
 """
-function correct_speed(polar, cudi::Float64, cusp::Float64, widi::Float64,
-          wisp::Float64, bearing::Float64)
-    h1 = 0.0
-    h2 = current(polar, cudi, cusp, widi, wisp, bearing, h1)
-    while h2 - h1 > 0.1
-        h1 = h2
-        h2 = current(polar, cudi, cusp, widi, wisp, bearing, h1)
+function cost_function(performance::Performance,
+                       cudi::Float64, cusp::Float64,
+                       widi::Float64, wisp::Float64,
+                       wadi::Float64, wahi::Float64,
+                       bearing::Float64)
+    if performance.acceptable_failure == 1.0
+        h1 = 0.0
+        h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+        while h2 - h1 > 0.1
+            h1 = h2
+            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+        end
+        bearing = bearing + h2
+        @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
+        return vs + cusp
+    else 
+        pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
+        if pf < performance.acceptable_failure
+            return Inf
+        else
+            h1 = 0.0
+            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+            while h2 - h1 > 0.1
+                h1 = h2
+                h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+            end
+            bearing = bearing + h2
+            @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
+            return vs + cusp
+        end
     end
-    bearing = bearing + h2
-    @inbounds vs = perf_interp(polar, min_angle(widi, bearing), wisp)
-    return vs + cusp
 end
