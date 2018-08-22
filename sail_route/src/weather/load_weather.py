@@ -69,7 +69,7 @@ def process_era5_weather(path_nc, longs, lats):
     """Return era5 weather data."""
     wisp = load_dataset(path_nc, 'wind')
     widi = load_dataset(path_nc, 'dwi')
-    wh = load_dataset(path_nc, 'shts')
+    wh = load_dataset(path_nc, 'swh')
     wd = load_dataset(path_nc, 'mdts')
     wp = load_dataset(path_nc, 'mpts')
     rg_wisp = regrid_data(wisp, longs[:, 0], lats[0, :])
@@ -78,6 +78,15 @@ def process_era5_weather(path_nc, longs, lats):
     rg_wd = regrid_data(wd, longs[:, 0], lats[0, :])
     rg_wp = regrid_data(wp, longs[:, 0], lats[0, :])
     return rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp
+
+
+def retrieve_era5_weather(path_nc):
+    wisp = load_dataset(path_nc, 'wind')
+    widi = load_dataset(path_nc, 'dwi')
+    wh = load_dataset(path_nc, 'swh')
+    wd = load_dataset(path_nc, 'mdts')
+    wp = load_dataset(path_nc, 'mpts')
+    return wisp, widi, wh, wd, wp
 
 
 def change_area_values(array, value, lon1, lat1, lon2, lat2):
@@ -137,4 +146,10 @@ def sample_weather_scenario():
 
 
 if __name__ == '__main__':
-    print(sample_weather_scenario())
+    path = "/mainfs/home/td7g11/weather_data/transat_weather/2016_april.nc"
+    look_in_netcdf(path)
+    rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
+    print(rg_wisp['longitude'])
+    print(rg_wisp['latitude'])
+    print(rg_wisp['time'])
+    print(rg_wisp.interp(longitude=-16.9, latitude=57.24, number=1, method="nearest"))

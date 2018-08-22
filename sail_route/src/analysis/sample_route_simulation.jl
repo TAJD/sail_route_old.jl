@@ -13,7 +13,7 @@ using Dates
 function run_sample_simulation()
     twa, tws, perf = load_file(boat_performance)
     polar = setup_interpolation(tws, twa, perf)
-    sample_perf = Performance(polar, 0.0, 1.0, load_env_failure_model())
+    sample_perf = Performance(polar, 0.0, 1.0, 0.0)
     sample_route = Route(0.0, 1.0, 5.0, 5.0, 10, 10)
     d_an, b_an = haversine(sample_route.lon1, sample_route.lat1, sample_route.lon2, sample_route.lat2)
     time_an = d_an/perf_interp(polar, min_angle(0.0, 90.0), 10.0)

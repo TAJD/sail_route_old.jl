@@ -59,13 +59,13 @@ function perf_interp(itp, twa, tws)
 end
 
 
-function h(cudi::Float64, cusp::Float64, bearing::Float64)
+function h(cudi::AbstractFloat, cusp::AbstractFloat, bearing::AbstractFloat)
     cusp*sin(deg2rad(cudi-bearing))
 end
 
 
-function current(polar, cudi::Float64, cusp::Float64, widi::Float64,
-    wisp::Float64, bearing::Float64, heading::Float64)
+function current(polar, cudi::AbstractFloat, cusp::AbstractFloat, widi::AbstractFloat,
+    wisp::AbstractFloat, bearing::AbstractFloat, heading::AbstractFloat)
     vs = perf_interp(polar, min_angle(widi, heading), wisp)
     return (acos(h(cudi, cusp, bearing)/vs)*180/π - bearing)
 end
@@ -81,9 +81,9 @@ cost_function(performance, cudi::Float64, cusp::Float64,
 Calculate the correct speed of the sailing craft given the failure model and environmental conditions.
 """
 function cost_function(performance::Performance,
-                       cudi::Float64, cusp::Float64,
-                       widi::Float64, wisp::Float64,
-                       wadi::Float64, wahi::Float64,
+                       cudi::AbstractFloat, cusp::AbstractFloat,
+                       widi::AbstractFloat, wisp::AbstractFloat,
+                       wadi::AbstractFloat, wahi::AbstractFloat,
                        bearing::Float64)
     if performance.acceptable_failure == 1.0
         h1 = 0.0

@@ -1,0 +1,12 @@
+sample_weather
+min_angle (generic function with 1 method)
+route_solve (generic function with 1 method)
+cost_function
+"/home/td7g11/sail_route.jl/sail_route/src/data/first40_orgi.csv"
+run_sample_simulation
+Analytical distance is 59.83 nm
+Analytical bearing is 89.96 deg
+Analytical time is 7.56370 hrs
+Start time 2000-01-01T00:00:00
+Estimated time: 7.56370 hrs
+passed
