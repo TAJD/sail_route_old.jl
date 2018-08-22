@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#SBATCH --time=1:00:00
+#SBATCH --nodes=2
+
+export PATH="/scratch/td7g11/julia/julia-1.0.0/bin/:${PATH}"
+
+cd $HOME/sail_route.jl/development
+
+julia < "run_weather_route.jl" > output

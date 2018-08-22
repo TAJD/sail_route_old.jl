@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#SBATCH --time=1:00:00
+#SBATCH --nodes=2
+
+export PATH="/scratch/td7g11/julia/julia-1.0.0/bin/:${PATH}"
+
+cd $HOME/sail_route.jl/sail_route/src/analysis
+
+julia < "sample_route_simulation.jl" > output
+
+
