@@ -31,7 +31,7 @@ def load_dataset(path_nc, var):
 def regrid_data(ds, longs, lats):
     """Regrid dataset to new longs and lats."""
     ds_out = xr.Dataset({'lat': (['lat_b'], lats),
-                         'lon': (['lon_b'], longs), })
+                         'lon': (['lon_b'], longs)})
     regridder = xe.Regridder(ds, ds_out, 'patch', reuse_weights=True)
     ds0 = regridder(ds)
     ds0.coords['lat_b'] = ('lat_b', ds0['lat'].values)

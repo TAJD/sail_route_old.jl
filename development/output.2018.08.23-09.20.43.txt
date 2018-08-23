@@ -1,0 +1,112 @@
+"Running a single weather scenario.\n\n1. Load weather data\n2. Specify performance\n3. Specify route parameters\n4. Set off simulation.\n5. Save results of simulation.\n"
+regrid_data (generic function with 1 method)
+min_angle (generic function with 1 method)
+route_solve
+"/home/td7g11/sail_route.jl/sail_route/src/data/first40_orgi.csv"
+"/home/td7g11/weather_data/transat_weather/2016_april.nc"
+3
+Route(-6.486, -59.883, 61.48, -1.76, 3, 3)
+2016-04-01T04:00:00
+"Experiment with using simd for parallization"
+(PyObject <xarray.DataArray 'wind' (time: 186, number: 10, latitude: 95, longitude: 129)>
+[22794300 values with dtype=float32]
+Coordinates:
+  * longitude  (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+  * latitude   (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+  * number     (number) int32 0 1 2 3 4 5 6 7 8 9
+  * time       (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+    lat        (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+    lon        (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+Attributes:
+    units:      m s**-1
+    long_name:  10 metre wind speed, PyObject <xarray.DataArray 'dwi' (time: 186, number: 10, latitude: 95, longitude: 129)>
+[22794300 values with dtype=float32]
+Coordinates:
+  * longitude  (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+  * latitude   (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+  * number     (number) int32 0 1 2 3 4 5 6 7 8 9
+  * time       (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+    lat        (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+    lon        (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+Attributes:
+    units:      degrees
+    long_name:  10 metre wind direction, PyObject <xarray.DataArray 'swh' (time: 186, number: 10, latitude: 95, longitude: 129)>
+[22794300 values with dtype=float32]
+Coordinates:
+  * longitude  (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+  * latitude   (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+  * number     (number) int32 0 1 2 3 4 5 6 7 8 9
+  * time       (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+    lat        (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+    lon        (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+Attributes:
+    units:      m
+    long_name:  Significant height of combined wind waves and swell, PyObject <xarray.DataArray 'mdts' (time: 186, number: 10, latitude: 95, longitude: 129)>
+[22794300 values with dtype=float32]
+Coordinates:
+  * longitude  (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+  * latitude   (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+  * number     (number) int32 0 1 2 3 4 5 6 7 8 9
+  * time       (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+    lat        (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+    lon        (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+Attributes:
+    units:      degrees
+    long_name:  Mean direction of total swell, PyObject <xarray.DataArray 'mpts' (time: 186, number: 10, latitude: 95, longitude: 129)>
+[22794300 values with dtype=float32]
+Coordinates:
+  * longitude  (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+  * latitude   (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+  * number     (number) int32 0 1 2 3 4 5 6 7 8 9
+  * time       (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+    lat        (latitude) float32 70.5 69.75 69.0 68.25 67.5 66.75 66.0 ...
+    lon        (longitude) float32 -85.5 -84.75 -84.0 -83.25 -82.5 -81.75 ...
+Attributes:
+    units:      s
+    long_name:  Mean period of total swell)
+1165.1273204519398
+([-30.1152 -30.1152 -30.1152; -43.2379 -43.2379 -43.2379; -52.2624 -52.2624 -52.2624], [48.3481 48.3389 48.3297; 32.419 32.4073 32.3956; 15.5051 15.4917 15.4784], Bool[false false false; false false false; false false false])
+PyObject <xarray.DataArray 'wind' (time: 186, number: 10, lat_b: 3, lon_b: 3)>
+array([[[[13.288181, ..., 10.335787],
+         ...,
+         [10.218717, ...,  9.96925 ]],
+
+        ...,
+
+        [[13.58613 , ..., 10.129465],
+         ...,
+         [10.054179, ..., 10.098235]]],
+
+
+       ...,
+
+
+       [[[10.706146, ...,  2.989591],
+         ...,
+         [ 7.28373 , ...,  4.550746]],
+
+        ...,
+
+        [[10.760266, ...,  2.87148 ],
+         ...,
+         [ 7.403251, ...,  4.763448]]]])
+Coordinates:
+    lon      (lon_b) float64 -30.12 -43.24 -52.26
+    lat      (lat_b) float64 48.35 32.42 15.51
+  * time     (time) datetime64[ns] 2016-04-01 2016-04-01T04:00:00 ...
+  * number   (number) int32 0 1 2 3 4 5 6 7 8 9
+  * lat_b    (lat_b) float64 48.35 32.42 15.51
+  * lon_b    (lon_b) float64 -30.12 -43.24 -52.26
+Attributes:
+    regrid_method:  patch
+BenchmarkTools.Trial: 
+  memory estimate:  3.47 KiB
+  allocs estimate:  88
+  --------------
+  minimum time:     1.048 ms (0.00% GC)
+  median time:      1.226 ms (0.00% GC)
+  mean time:        1.269 ms (0.00% GC)
+  maximum time:     70.296 ms (0.00% GC)
+  --------------
+  samples:          3919
+  evals/sample:     1

@@ -22,3 +22,9 @@ function load_era5_weather(path_nc)
     wisp, widi, wh, wd, wp = w[:retrieve_era5_weather](path_nc)
     return wisp, widi, wh, wd, wp
 end
+
+
+function regrid_data(ds, longs, lats)
+    return w[:regrid_data](ds, longs, lats)
+end
+

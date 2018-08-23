@@ -49,6 +49,6 @@ function output()
 end
 
 
-function min_angle(a::AbstractFloat, b::AbstractFloat)
+function min_angle(a, b)
     abs(mod(a - b + 180.0, 360.0) - 180.0)
 end

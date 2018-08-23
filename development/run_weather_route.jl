@@ -19,12 +19,25 @@ using BenchmarkTools
 using Printf
 using Dates
 
-twa, tws, perf = load_file(boat_performance)
-polar = setup_interpolation(tws, twa, perf)
-sample_perf = Performance(polar, 0.0, 1.0, 0.0)
-sample_route = Route(-6.486, -59.883, 61.48, -1.76, 10, 10)
-start_time = Dates.DateTime(2016, 4, 1, 2, 0, 0)
-wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
-arrival_time, earliest_times = route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi)
-println("The arrival time is $(arrival_time)")
-println(earliest_times)
+__precompile__()
+
+twa, tws, perf = load_file(boat_performance);
+polar = setup_interpolation(tws, twa, perf);
+sample_perf = Performance(polar, 0.0, 1.0, 0.0);
+nodes = 1240
+sample_route = Route(-6.486, -59.883, 61.48, -1.76, nodes, nodes)
+start_time = Dates.DateTime(2016, 4, 1, 4, 0, 0)
+wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data);
+# y_dist = haversine(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2)[1]/(sample_route.y_nodes+1);
+# x, y, land = co_ordinates(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2,
+#                           sample_route.x_nodes, sample_route.y_nodes, y_dist);
+# wisp_int = regrid_data(wisp, x[:, 1], y[:, 1])
+# @benchmark wisp_int[:sel](time=start_time, lon_b=x[1, 1], lat_b=y[1, 1], number=0, method="nearest")[:data][1]
+# @benchmark wisp[:interp](time=start_time, longitude=x[1, 1], latitude=y[1, 1], number=1, method="nearest")[:data][1]
+# w = wisp_int[:sel](time=start_time, lon_b=x[1, 1], lat_b=y[1, 1], number=0, method="nearest")[:data][1]
+# println(w)
+# println(wisp_int[:data][1])
+t = @benchmark route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi)
+println("Single weather routing")
+println("Experiments with varying numbers of nodes")
+dump(t)
