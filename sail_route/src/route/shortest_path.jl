@@ -1,6 +1,6 @@
 using Dates
 
-"""Convert hours in float to hours and minutes."""
+"""Convert hours in float to the nearest 4 hour interval."""
 function convert_time(old_time::Float64)
     # h = floor(old_time)
     # m = floor((old_time - h)*60)
@@ -107,7 +107,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
     prev_node = zero(x)
     node_indices = reshape(1:length(x), size(x)) 
     arrival_time = Inf
-    @simd for idx in 1:size(x)[2]
+    for idx in 1:size(x)[2]
         if land[1, idx] == true
             earliest_times[1, idx] = Inf
         else
@@ -117,56 +117,52 @@ function route_solve(route::Route, performance, start_time::DateTime,
             wadi_int = wadi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
             wahi_int = wahi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
             @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
-            if speed != Inf
-                earliest_times[1, idx] = d/speed
-            else
-                earliest_times[1, idx] = Inf
-            end
+            earliest_times[1, idx] = d/speed
         end
     end
-
+    println(size(x)[1]-1)
     for idy in 1:size(x)[1]-1
-        @simd for idx in 1:size(x)[2]
-            if land[idy, idx] == true
-                earliest_times[idy, idx] = Inf
+        for idx1 in 1:size(x)[2]
+            println(idy, " ", idx1, " ", land[idy, idx1], " ", earliest_times[idy, idx1])
+            if land[idy, idx1] == true
+                earliest_times[idy+1, idx1] = Inf
             else
-                t = start_time + convert_time(earliest_times[idy, idx])
-                @inbounds d, b = haversine(x[idy, idx], y[idy, idx], x[idy+1, idx], y[idy+1, idx])
-                ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-                wd_int = widi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-                wadi_int = wadi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-                wahi_int = wahi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-                @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
-                if speed != Inf
-                    tt = earliest_times[idy, idx] + d/speed
-                    if earliest_times[idy+1, idx] > tt
-                        earliest_times[idy+1, idx] = tt
-                        prev_node[idy+1, idx] = node_indices[idy, idx]
+                if isinf(earliest_times[idy, idx1]) == false
+                    t = start_time + convert_time(earliest_times[idy, idx1])
+                    ws_int = wisp[:sel](time=start_time, lon_b=x[idy+1, idx1], lat_b=y[idy+1, idx1], number=0, method="nearest")[:data][1]
+                    wd_int = widi[:sel](time=start_time, lon_b=x[idy+1, idx1], lat_b=y[idy+1, idx1], number=0, method="nearest")[:data][1]
+                    wadi_int = wadi[:sel](time=start_time, lon_b=x[idy+1, idx1], lat_b=y[idy+1, idx1], number=0, method="nearest")[:data][1]
+                    wahi_int = wahi[:sel](time=start_time, lon_b=x[idy+1, idx1], lat_b=y[idy+1, idx1], number=0, method="nearest")[:data][1]
+                    for idx2 in 1:size(x)[2]
+                        @inbounds d, b = haversine(x[idy, idx1], y[idy, idx1], x[idy+1, idx2], y[idy+1, idx2])
+                        @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
+                        # println(idx2, " ", d, " ", b, " ", wd_int, " ", ws_int, " ", speed)
+                        tt = earliest_times[idy, idx1] + d/speed
+                        if earliest_times[idy+1, idx2] > tt
+                            earliest_times[idy+1, idx2] = tt
+                            prev_node[idy+1, idx2] = node_indices[idy, idx1]
+                        end
                     end
                 end
             end
         end
     end
-
     for idx in 1:size(x)[2]
-        if land[end, idx] == true
-            earliest_times[end, idx] = Inf
-        else
+        if isinf(earliest_times[end, idx]) == false
             @inbounds d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
             t = start_time + convert_time(earliest_times[end, idx])
-            ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-            wd_int = widi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-            wadi_int = wadi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
-            wahi_int = wahi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0, method="nearest")[:data][1]
+            ws_int = wisp[:sel](time=t, lon_b=x[end, idx], lat_b=y[end, idx], number=0, method="nearest")[:data][1]
+            wd_int = widi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end, idx], number=0, method="nearest")[:data][1]
+            wadi_int = wadi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end, idx], number=0, method="nearest")[:data][1]
+            wahi_int = wahi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end, idx], number=0, method="nearest")[:data][1]
             @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
-            if speed != Inf 
-                tt = earliest_times[end, idx] + d/speed
-                if arrival_time > tt
-                    arrival_time = tt
-                    final_node = node_indices[end, idx]
-                end
+            # println(d, " ", b, " ", wd_int, " ", ws_int, " ", speed)
+            tt = earliest_times[end, idx] + d/speed
+            if arrival_time > tt
+                arrival_time = tt
+                final_node = node_indices[end, idx]
             end
         end
     end
-    return arrival_time
+    return arrival_time, earliest_times[end, :]
 end

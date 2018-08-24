@@ -10,4 +10,4 @@ cd $HOME/sail_route.jl/development
 current_time=$(date "+%Y.%m.%d-%H.%M.%S")
 fname=output.$current_time.txt
 
-julia < "run_weather_route.jl" > $fname
+julia < "run_weather_route_test.jl" > $fname

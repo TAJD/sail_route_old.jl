@@ -16,10 +16,11 @@ Arguments:
 
 """
 struct Performance
-    polar::Interpolations.GriddedInterpolation{}
+    # polar::Interpolations.GriddedInterpolation{}
+    polar
     uncertainty::Float64
     acceptable_failure::Float64
-    failure_model
+    # failure_model
 end
 
 
@@ -44,7 +45,8 @@ Return interpolation object.
 """
 function setup_interpolation(tws, twa, perf)
     knots = (twa, tws)
-    itp = interpolate(knots, perf, Gridded(Linear()))
+    # itp = interpolate(knots, perf, Gridded(Linear()))
+    itp = LinearInterpolation(knots, perf, extrapolation_bc = Interpolations.Linear())
     return itp
 end
 
@@ -52,10 +54,10 @@ end
 """
     perf_interp(itp, twa, tws)
 
-Return interpolated performance.
+Return interpolated performance. Convert from ms to knots here.
 """
-function perf_interp(itp, twa, tws)
-    return itp[twa, tws]
+function perf_interp(performance, twa, tws)
+    return performance.polar[twa, tws*1.9438444924574]*performance.uncertainty + 0.000001
 end
 
 
@@ -117,16 +119,17 @@ function cost_function(performance::Performance,
                        widi, wisp,
                        wadi, wahi,
                        bearing)
-    if performance.acceptable_failure == 1.0
-        @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
-        return vs
-    else 
-        pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
-        if pf < performance.acceptable_failure
-            return Inf
-        else
-            @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
-            return vs
-        end
-    end
+    # if performance.acceptable_failure == 1.0
+    #     @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp)
+    #     return vs
+    # else 
+    #     pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
+    #     if pf > performance.acceptable_failure
+    #         return Inf
+    #     else
+    #         @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp)
+    #         return vs
+    #     end
+    # end
+    return perf_interp(performance, min_angle(widi, bearing), wisp)
 end
