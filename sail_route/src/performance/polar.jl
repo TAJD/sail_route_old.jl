@@ -16,11 +16,18 @@ Arguments:
 
 """
 struct Performance
+<<<<<<< HEAD
     # polar::Interpolations.GriddedInterpolation{}
     polar
     uncertainty::Float64
     acceptable_failure::Float64
     # failure_model
+=======
+    polar::Interpolations.GriddedInterpolation{}
+    uncertainty::Float64
+    acceptable_failure::Float64
+    failure_model
+>>>>>>> a23a8fe58083f463a8cc08d83436ce4d4e0fdcf1
 end
 
 
