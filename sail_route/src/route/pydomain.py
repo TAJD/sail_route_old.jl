@@ -67,4 +67,4 @@ def return_co_ords(start_long, finish_long, start_lat, finish_lat,
     g = np.reshape(grid, (1, -1))
     x = np.reshape(g[0][::2], (n_ranks, n_nodes))
     y = np.reshape(g[0][1::2], (n_ranks, n_nodes))
-    return np.around(x, decimals=4), np.around(y, decimals=4), np.array(land)
+    return np.around(x, decimals=6), np.around(y, decimals=6), np.array(land)

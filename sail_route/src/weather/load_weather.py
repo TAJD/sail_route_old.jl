@@ -39,6 +39,18 @@ def regrid_data(ds, longs, lats):
     return ds0
 
 
+def load_cluster(path_nc, longs, lats, var):
+    """Load cluster data."""
+    with xr.open_dataset(path_nc) as ds:
+            ds.coords['lat'] = ('latitude', ds['latitude'].values)
+            ds.coords['lon'] = ('longitude', ds['longitude'].values)
+            ds.swap_dims({'longitude': 'lon', 'latitude': 'lat'})
+    x = xr.DataArray(longs, dims='lon')
+    y = xr.DataArray(lats, dims='lat')
+    ds = ds.to_array(var)
+    return ds.interp(longitude=x, latitude=y)
+
+
 def process_wind(path_nc, longs, lats):
     """
     Return wind speed and direction data.

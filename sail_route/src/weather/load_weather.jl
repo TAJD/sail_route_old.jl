@@ -10,6 +10,11 @@ function sample_weather()
     return wisp, widi, cusp, cudi, wahi, wadi
 end
 
+function load_dataset(path_nc, var)
+    ds_var = w[:load_dataset](path_nc, var)
+    return ds_var
+end
+
 
 "Return the wave height and direction and the wind speed and direction from an ERA5 weather file."
 function process_era5_weather(path_nc, longs, lats)
@@ -28,3 +33,8 @@ function regrid_data(ds, longs, lats)
     return w[:regrid_data](ds, longs, lats)
 end
 
+
+function load_cluster(path_nc, longs, lats, var)
+    ds = w[:load_cluster](path_nc, longs, lats, var)
+    return ds
+end
