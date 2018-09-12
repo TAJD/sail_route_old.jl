@@ -277,5 +277,5 @@ function route_solve(route::Route, performance,
             end
         end
     end
-    return arrival_time, earliest_times[end, :]
+    return arrival_time
 end

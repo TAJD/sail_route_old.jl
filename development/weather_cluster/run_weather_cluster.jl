@@ -3,8 +3,6 @@ include(ENV["HOME"]*"/sail_route.jl/sail_route/src/route/domain.jl")
 include(ENV["HOME"]*"/sail_route.jl/sail_route/src/route/shortest_path.jl")
 include(ENV["HOME"]*"/sail_route.jl/sail_route/src/performance/polar.jl")
 
-using PyCall
-@pyimport xarray as xr
 
 function run_routes_time_dependent()
     lon1 = -11.5
@@ -45,7 +43,6 @@ function run_routes_average_conditions()
     east_to_west = Route(lon2, lon1, lat2, lat1, nodes, nodes)
     sp = route_solve(east_to_west, sample_perf, cluster1_wisp, cluster1_widi)
     println(sp)
-    # east_to_west = Route(lon2, lon1, lat2, lat1, nodes, nodes)
 end
 
 run_routes_average_conditions()

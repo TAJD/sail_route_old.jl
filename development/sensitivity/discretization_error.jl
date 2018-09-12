@@ -157,5 +157,5 @@ function GCI_calc(value_1, value_2, value_3, h1, h2, h3)
     gci_fine_21, gci_coarse_21 = gci(ratio_21, e21a, ooc)
     gci_fine_32, gci_coarse_32 = gci(ratio_32, e32a, ooc)
     ratio = asymptotic_ratio(gci_fine_21, gci_fine_32, ratio_21, ooc)
-    return gci_fine_21, ratio
+    return abs(gci_fine_21)
 end
