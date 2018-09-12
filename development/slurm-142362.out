@@ -1,0 +1,30 @@
+Running SLURM prolog script on red043.cluster.local
+===============================================================================
+Job started on Wed Sep 12 13:07:39 BST 2018
+Job ID          : 142362
+Job name        : submit_multiple
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 1
+Num of tasks    : 1
+Hosts allocated : red043
+Job Output Follows ...
+===============================================================================
+==============================================================================
+Running epilogue script on red043.
+
+Submit time  : 2018-09-12T13:07:39
+Start time   : 2018-09-12T13:07:39
+End time     : 2018-09-12T13:38:27
+Elapsed time : 00:30:48 (Timelimit=20:00:00)
+
+Job ID: 142362
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Cores: 1
+CPU Utilized: 00:30:28
+CPU Efficiency: 98.92% of 00:30:48 core-walltime
+Memory Utilized: 4.79 GB
+

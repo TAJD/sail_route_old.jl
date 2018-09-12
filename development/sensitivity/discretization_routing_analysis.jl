@@ -23,7 +23,12 @@ function disc_routing_analysis(lon2, lon1, lat2, lat1, perf, cluster_wisp, clust
 end
 
 
-function test_routing_analysis_cluster()
+function generate_performance_uncertainty_samples(polar, params)
+    unc_perf = [Performance(polar, i, 1.0) for i in params]
+end
+
+
+function test_discretized_analysis_cluster()
     lon1 = -11.5
     lat1 = 47.67
     lon2 = -77.67
@@ -38,4 +43,27 @@ function test_routing_analysis_cluster()
     println(results)
 end
 
-@time test_routing_analysis_cluster()
+
+function test_performance_unc_analysis_cluster()
+    lon1 = -11.5
+    lat1 = 47.67
+    lon2 = -77.67
+    lat2 = 25.7
+    boat_performance = ENV["HOME"]*"/sail_route.jl/sail_route/src/data/first40_orgi.csv"
+    twa, tws, perf = load_file(boat_performance)
+    polar = setup_interpolation(tws, twa, perf)
+    cluster1_wisp = ENV["HOME"]*"/weather_cluster/test1_wisp.nc"
+    cluster1_widi = ENV["HOME"]*"/weather_cluster/test1_widi.nc"
+    params = [i for i in LinRange(0.9, 1.1, 400)]
+    perfs = generate_performance_uncertainty_samples(polar, params)
+    results = [disc_routing_analysis(lon2, lon1, lat2, lat1, perf, cluster1_wisp, cluster1_widi) for perf in perfs]
+    println(results)
+    times = [i[1] for i in results]
+    unc = [i[2] for i in results]
+    df = DataFrame(perf=params, t=times, u=unc)
+    time = Dates.format(Dates.now(), "HH:MM:SS")
+    save_path = ENV["HOME"]*"/sail_route.jl/development/sensitivity/results_"*time
+    CSV.write(save_path, df)
+end
+
+@time test_performance_unc_analysis_cluster()

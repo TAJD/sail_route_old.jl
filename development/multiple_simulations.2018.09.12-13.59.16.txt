@@ -1,0 +1,12 @@
+load_cluster (generic function with 1 method)
+min_angle (generic function with 1 method)
+route_solve
+cost_function (generic function with 2 methods)
+GCI_calc
+"/home/td7g11/sail_route.jl/sail_route/src/data/first40_orgi.csv"
+"/home/td7g11/weather_data/transat_weather/2016_april.nc"
+disc_routing_analysis
+generate_performance_uncertainty_samples (generic function with 1 method)
+test_discretized_analysis_cluster (generic function with 1 method)
+test_performance_unc_analysis_cluster (generic function with 1 method)
+Tuple{Float64,Float64}[(421.055, 0.393986), (378.95, 0.354588), (344.5, 0.322352)]
