@@ -248,7 +248,7 @@ function route_solve(route::Route, performance,
                                         method="nearest")[:data][1]
                     wd_int = widi[:sel](lon=x[idy, idx1], lat=y[idy, idx1],
                                         method="nearest")[:data][1]
-                    for idx2 in 1:size(x)[2]
+                    @simd for idx2 in 1:size(x)[2]
                         @inbounds d, b = haversine(x[idy, idx1], y[idy, idx1],
                                                    x[idy+1, idx2], y[idy+1, idx2])
                         @inbounds speed = cost_function(performance, wd_int, ws_int, 0.0, 0.0, b)
