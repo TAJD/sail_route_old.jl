@@ -22,8 +22,8 @@
     route_nodes = Array([20*i^2 for i in range(4; length=3, stop=2)])
     results = SharedArray{Float64}(length(route_nodes))
     routes = [Route(lon2, lon1, lat2, lat1, i, i) for i in route_nodes]
-    @sync @distributed for i in eachindex(routes)
-        results[i] = route_solve(routes[i], perf, cluster_wisp, cluster_widi)
+    for i in eachindex(routes)
+        results[i], sp = route_solve(routes[i], perf, cluster_wisp, cluster_widi)
     end
     gci_fine = GCI_calc(results[1], results[2], results[3], route_nodes[1], route_nodes[2], route_nodes[3])
     return Array([results[1], results[1]*gci_fine])

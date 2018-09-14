@@ -21,10 +21,21 @@ using Dates
 
 twa, tws, perf = load_file(boat_performance)
 polar = setup_interpolation(tws, twa, perf)
-sample_perf = Performance(polar, 0.0, 1.0, 0.0)
+sample_perf = Performance(polar, 1.0, 1.0)
 sample_route = Route(-6.486, -59.883, 61.48, -1.76, 10, 10)
 start_time = Dates.DateTime(2016, 4, 1, 2, 0, 0)
 wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
-arrival_time, earliest_times = route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi)
-println("The arrival time is $(arrival_time)")
-println(earliest_times)
+results = route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi)
+# for i in results
+#     println(i)
+# end
+@show arrival_time = results[1]
+pindx = results[2]
+indx = results[3]
+final_node = results[4]
+y_dist = haversine(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2)[1]/(sample_route.y_nodes+1)
+x, y, land = co_ordinates(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2,
+                          sample_route.x_nodes, sample_route.y_nodes, y_dist)
+
+@show sp = shortest_path(indx, pindx, [final_node])
+@show locs = get_locs(indx, sp, x, y)

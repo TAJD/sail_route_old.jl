@@ -40,11 +40,33 @@ function force_monotonic(array)
     end
 end
 
+
 """Identify the shortest path given arrays of locations and an array of the earliest time at each point."""
-function shortest_path(x, y, earliest_times)
-
-
+function shortest_path(indx, pindx, sp)
+    ix = findfirst(isequal(sp[end]), indx)
+    pix = pindx[ix]
+    append!(sp, pix)
+    if pix == 0.0
+        return Array(sp)
+    else
+        return shortest_path(indx, pindx, sp)
+    end
 end
+
+
+function get_locs(indx, sp, x_locs, y_locs)
+    X = []
+    Y = []
+    for k in sp[1:end-1]
+        idx = findfirst(isequal(k), indx)
+        x_locs[idx]
+        y_locs[idx]
+        append!(X, x_locs[idx])
+        append!(Y, y_locs[idx])
+    end
+    return Array(X), Array(Y) 
+end
+
 
 "Shortest path considering all weather conditions but no land."
 function route_solve(route::Route, performance, start_time::DateTime, 
@@ -116,7 +138,9 @@ function route_solve(route::Route, performance, start_time::DateTime,
             end
         end
     end
-    return arrival_time, earliest_times
+    sp = shortest_path(node_indices, prev_node, [final_node])
+    locs = get_locs(node_indices, sp, x, y)
+    return arrival_time, locs
 end
 
 
@@ -135,8 +159,9 @@ function route_solve(route::Route, performance, start_time::DateTime,
     wahi = regrid_data(wahi, x[:, 1], y[:, 1])
     earliest_times = fill(Inf, size(x))
     prev_node = zero(x)
-    node_indices = reshape(1:length(x), size(x)) 
+    node_indices = reshape(1:length(x), size(x))
     arrival_time = Inf
+    final_node = 0
     for idx in 1:size(x)[2]
         if land[1, idx] == true
             earliest_times[1, idx] = Inf
@@ -174,8 +199,6 @@ function route_solve(route::Route, performance, start_time::DateTime,
                                                    x[idy+1, idx2], y[idy+1, idx2])
                         @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int,
                                                         wahi_int, b)
-                        # println(idy, " ", idx1," to ", idy+1, " ", idx2)
-                        # println(d, " ", b, " ", wd_int, " ", ws_int, " ", speed)
                         tt = earliest_times[idy, idx1] + d/speed
                         if earliest_times[idy+1, idx2] > tt
                             earliest_times[idy+1, idx2] = tt
@@ -199,7 +222,6 @@ function route_solve(route::Route, performance, start_time::DateTime,
             wahi_int = wahi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=0,
                                   method="nearest")[:data][1]
             @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
-            # println(d, " ", b, " ", wd_int, " ", ws_int, " ", speed)
             tt = earliest_times[end, idx] + d/speed
             if tt < arrival_time
                 arrival_time = tt
@@ -207,7 +229,9 @@ function route_solve(route::Route, performance, start_time::DateTime,
             end
         end
     end
-    return arrival_time, earliest_times[end, :]
+    sp = shortest_path(node_indices, prev_node, [final_node])
+    locs = get_locs(node_indices, sp, x, y)
+    return arrival_time, locs
 end
 
 
@@ -277,5 +301,7 @@ function route_solve(route::Route, performance,
             end
         end
     end
-    return arrival_time
+    sp = shortest_path(node_indices, prev_node, [final_node])
+    locs = get_locs(node_indices, sp, x, y)
+    return arrival_time, locs
 end
