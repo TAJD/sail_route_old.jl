@@ -52,6 +52,7 @@ end
 
 
 function test_performance_unc_analysis_cluster()
+    addprocs(20)
     lon1 = -11.5
     lat1 = 47.67
     lon2 = -77.67
@@ -61,14 +62,13 @@ function test_performance_unc_analysis_cluster()
     polar = setup_interpolation(tws, twa, perf)
     cluster1_wisp = ENV["HOME"]*"/weather_cluster/test1_wisp.nc"
     cluster1_widi = ENV["HOME"]*"/weather_cluster/test1_widi.nc"
-    params = [i for i in LinRange(0.9, 1.1, 200)]
+    n = 100
+    params = [i for i in LinRange(0.9, 1.1, n)]
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64}(length(perfs), 2)
     @sync @distributed for i in eachindex(perfs)
         @show results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], cluster1_wisp, cluster1_widi)
-        # @show results[i, :] = Array([rand(), rand()])
     end
-    # results = @DArray [@show disc_routing_analysis(lon2, lon1, lat2, lat1, i, cluster1_wisp, cluster1_widi) for i in perfs]
     times = results[:, 1]
     unc = results[:, 2]
     df = DataFrame(perf=params, t=times, u=unc)

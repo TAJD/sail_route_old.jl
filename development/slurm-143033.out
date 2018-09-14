@@ -1,7 +1,7 @@
 Running SLURM prolog script on red057.cluster.local
 ===============================================================================
-Job started on Thu Sep 13 15:57:26 BST 2018
-Job ID          : 142974
+Job started on Thu Sep 13 18:51:53 BST 2018
+Job ID          : 143033
 Job name        : submit_multiple
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
@@ -11,25 +11,24 @@ Num of tasks    : 40
 Hosts allocated : red057
 Job Output Follows ...
 ===============================================================================
-slurmstepd: error: *** JOB 142974 ON red057 CANCELLED AT 2018-09-13T18:50:38 ***
 ==============================================================================
 Running epilogue script on red057.
 
-Submit time  : 2018-09-13T15:57:25
-Start time   : 2018-09-13T15:57:26
-End time     : 2018-09-13T18:50:38
-Elapsed time : 02:53:12 (Timelimit=20:00:00)
+Submit time  : 2018-09-13T18:51:53
+Start time   : 2018-09-13T18:51:53
+End time     : 2018-09-14T03:56:58
+Elapsed time : 09:05:05 (Timelimit=1-16:00:00)
 
-Job ID: 142974
+Job ID: 143033
 Cluster: i5
 User/Group: td7g11/mm
-State: CANCELLED (exit code 0)
+State: COMPLETED (exit code 0)
 Nodes: 1
 Cores per node: 40
-CPU Utilized: 10:13:50
+CPU Utilized: 18:46:39
 **** Please note that the CPU efficency of your job is less than 50% ****
 **** Ask the HPC team for advice -- if you need it
-**** CPU Efficiency: 8.86% of 4-19:28:00 core-walltime
+**** CPU Efficiency: 5.17% of 15-03:23:20 core-walltime
 
-Memory Utilized: 94.61 GB
+Memory Utilized: 163.35 GB
 
