@@ -1,13 +1,13 @@
-Running SLURM prolog script on red158.cluster.local
+Running SLURM prolog script on red113.cluster.local
 ===============================================================================
-Job started on Fri Sep 14 07:40:52 BST 2018
-Job ID          : 143151
-Job name        : submit_multiple
+Job started on Tue Sep 18 15:46:08 BST 2018
+Job ID          : 145025
+Job name        : submit_single_weather_route
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
 Num hosts       : 1
-Num cores       : 20
-Num of tasks    : 20
-Hosts allocated : red158
+Num cores       : 1
+Num of tasks    : 1
+Hosts allocated : red113
 Job Output Follows ...
 ===============================================================================

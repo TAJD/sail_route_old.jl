@@ -158,9 +158,10 @@ def sample_weather_scenario():
 
 
 if __name__ == '__main__':
-    path = "/mainfs/home/td7g11/weather_data/transat_weather/2016_april.nc"
+    path = "/mainfs/home/td7g11/weather_data/transat_weather/2016_march.nc"
     look_in_netcdf(path)
     rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
+    print(rg_wisp['number'])
     print(rg_wisp['longitude'])
     print(rg_wisp['latitude'])
     print(rg_wisp['time'])

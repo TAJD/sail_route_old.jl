@@ -1,0 +1,72 @@
+Running SLURM prolog script on red142.cluster.local
+===============================================================================
+Job started on Tue Sep 18 15:26:50 BST 2018
+Job ID          : 145000
+Job name        : submit_multiple
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 20
+Num of tasks    : 20
+Hosts allocated : red142
+Job Output Follows ...
+===============================================================================
+ERROR: PyError ($(Expr(:escape, :(ccall(#= /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'TypeError'>
+TypeError("can't pickle _thread.lock objects",)
+
+pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:60 [inlined]
+pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:64 [inlined]
+macro expansion at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:84 [inlined]
+__pycall!(::PyObject, ::Ptr{PyCall.PyObject_struct}, ::PyObject, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44
+_pycall!(::PyObject, ::PyObject, ::Tuple{PyObject}, ::Int64, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:22
+#pycall#87 at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:11 [inlined]
+pycall at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:83 [inlined]
+serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::PyObject) at /home/td7g11/.julia/packages/PyCall/rUul9/src/serialize.jl:18
+serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609
+serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+serialize at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609 [inlined]
+serialize_msg(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Distributed.CallMsg{:call}) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:90
+#invokelatest#1 at ./essentials.jl:686 [inlined]
+invokelatest at ./essentials.jl:685 [inlined]
+send_msg_(::Distributed.Worker, ::Distributed.MsgHeader, ::Distributed.CallMsg{:call}, ::Bool) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:182
+#remotecall#146 at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:134 [inlined]
+remotecall(::Function, ::Distributed.Worker) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:349
+#remotecall#147(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:361
+remotecall(::Function, ::Int64) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:361
+spawnat(::Int64, ::Function) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:15
+spawn_somewhere(::Function) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:17
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:46 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##29#30")){Performance,Float64,Float64,Float64,Float64,DateTime,PyObject,PyObject,PyObject,PyObject,SharedArray{Float64,2}},UnitRange{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] test_ens_analysis_time_dependent() at ./none:135
+ [5] top-level scope at none:0
+┌ Warning: Forcibly interrupting busy workers
+│   exception = rmprocs: pids [2] not terminated after 5.0 seconds.
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:1074
+┌ Warning: rmprocs: process 1 not removed
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:863
+==============================================================================
+Running epilogue script on red142.
+
+Submit time  : 2018-09-18T15:26:49
+Start time   : 2018-09-18T15:26:49
+End time     : 2018-09-18T15:28:02
+Elapsed time : 00:01:13 (Timelimit=1-16:00:00)
+
+Job ID: 145000
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 20
+CPU Utilized: 00:05:52
+**** Please note that the CPU efficency of your job is less than 50% ****
+**** Ask the HPC team for advice -- if you need it
+**** CPU Efficiency: 24.11% of 00:24:20 core-walltime
+
+Memory Utilized: 6.48 GB
+

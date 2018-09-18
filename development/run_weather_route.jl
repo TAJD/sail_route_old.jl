@@ -18,24 +18,31 @@ weather_data = ENV["HOME"]*"/weather_data/transat_weather/2016_april.nc"
 using BenchmarkTools
 using Printf
 using Dates
+using CSV
+using DataFrames
 
 twa, tws, perf = load_file(boat_performance)
 polar = setup_interpolation(tws, twa, perf)
 sample_perf = Performance(polar, 1.0, 1.0)
-sample_route = Route(-6.486, -59.883, 61.48, -1.76, 10, 10)
+lon1 = -11.5
+lat1 = 47.67
+lon2 = -77.67
+lat2 = 25.7
+n = 360 # won't interpolate well below this value
+sample_route = Route(lon1, lon2, lat1, lat2, n, n)
 start_time = Dates.DateTime(2016, 4, 1, 2, 0, 0)
 wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
-results = route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi)
-# for i in results
-#     println(i)
-# end
-@show arrival_time = results[1]
-pindx = results[2]
-indx = results[3]
-final_node = results[4]
-y_dist = haversine(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2)[1]/(sample_route.y_nodes+1)
-x, y, land = co_ordinates(sample_route.lon1, sample_route.lon2, sample_route.lat1, sample_route.lat2,
-                          sample_route.x_nodes, sample_route.y_nodes, y_dist)
-
-@show sp = shortest_path(indx, pindx, [final_node])
-@show locs = get_locs(indx, sp, x, y)
+times = zeros(10, 2)
+for i = LinRange(0, 9, 10)
+    results = route_solve(sample_route, sample_perf, start_time, wisp, widi, wadi, wahi, Int(i))
+    @show arrival_time = results[1]
+    results[i] = arrival_time
+    @show route = results[2]
+    name = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_transat_ens_number_"*repr(Int(i))
+    df = DataFrame(results[2])
+    CSV.write(name, df)
+    times[i, :] = Array([i, results[1]])
+end
+df_res = DataFrame(times)
+name1 = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_transat_ens_number_results"
+CSV.write(name1, df_res)
