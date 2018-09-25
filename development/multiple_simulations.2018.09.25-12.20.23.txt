@@ -1,0 +1,30 @@
+run_ensemble_weather_scenarios (generic function with 1 method)
+run_varied_performance (generic function with 1 method)
+      From worker 5:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [11236.7, 756.672]
+      From worker 9:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10387.5, 878.575]
+      From worker 6:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10986.6, 727.386]
+      From worker 3:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [8660.44, 4553.38]
+      From worker 4:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [11503.2, 767.513]
+      From worker 8:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10513.1, 690.742]
+      From worker 10:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10170.8, 752.302]
+      From worker 2:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [8777.39, 5319.57]
+      From worker 7:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10747.4, 689.935]
+      From worker 11:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [9031.35, 8876.52]
+df = DataFrame(perf=params, t=times, u=unc) = 10×3 DataFrame
+│ Row │ perf     │ t       │ u       │
+├─────┼──────────┼─────────┼─────────┤
+│ 1   │ 0.9      │ 8777.39 │ 5319.57 │
+│ 2   │ 0.922222 │ 8660.44 │ 4553.38 │
+│ 3   │ 0.944444 │ 11503.2 │ 767.513 │
+│ 4   │ 0.966667 │ 11236.7 │ 756.672 │
+│ 5   │ 0.988889 │ 10986.6 │ 727.386 │
+│ 6   │ 1.01111  │ 10747.4 │ 689.935 │
+│ 7   │ 1.03333  │ 10513.1 │ 690.742 │
+│ 8   │ 1.05556  │ 10387.5 │ 878.575 │
+│ 9   │ 1.07778  │ 10170.8 │ 752.302 │
+│ 10  │ 1.1      │ 9031.35 │ 8876.52 │
+      From worker 6:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10986.6, 727.386]
+      From worker 4:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [11503.2, 767.513]
+      From worker 8:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10513.1, 690.742]
+      From worker 10:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [10170.8, 752.302]
+      From worker 2:	results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time, wisp, widi, wadi, wahi, ens_number) = [8777.39, 5319.57]

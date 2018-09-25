@@ -43,8 +43,7 @@ Return interpolation object.
 """
 function setup_interpolation(tws, twa, perf)
     knots = (twa, tws)
-    # itp = interpolate(knots, perf, Gridded(Linear()))
-    itp = LinearInterpolation(knots, perf, extrapolation_bc = Interpolations.Linear())
+    itp = LinearInterpolation(knots, perf, extrapolation_bc=0.1)
     return itp
 end
 
@@ -55,7 +54,7 @@ end
 Return interpolated performance. Convert from ms to knots here.
 """
 function perf_interp(performance, twa, tws)
-    return performance.polar[twa, tws*1.9438444924574]*performance.uncertainty + 0.000001
+    return performance.polar(twa, tws*1.9438444924574)*performance.uncertainty + 0.000001
 end
 
 

@@ -69,7 +69,7 @@ function get_locs(indx, sp, x_locs, y_locs)
 end
 
 
-"Shortest path considering all weather conditions but no land."
+"Time dependent shortest path."
 function route_solve(route::Route, performance, start_time::DateTime, 
                      wisp::PyObject, widi::PyObject,
                      cusp::PyObject, cudi::PyObject,
@@ -81,8 +81,10 @@ function route_solve(route::Route, performance, start_time::DateTime,
     prev_node = zero(x)
     node_indices = reshape(1:length(x), size(x)) 
     arrival_time = Inf
-    @simd for idx in 1:size(x)[2]
-        @inbounds d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
+    # @simd for idx in 1:size(x)[2]
+    for idx in 1:size(x)[2]
+        # @inbounds d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
+        d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
         ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0)
         wd_int = widi[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
         cs_int = cusp[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
@@ -145,11 +147,11 @@ function route_solve(route::Route, performance, start_time::DateTime,
 end
 
 
-"Shortest path with no current but considering land."
+"Time dependent shortest path with no current."
 function route_solve(route::Route, performance, start_time::DateTime, 
                      wisp::PyObject, widi::PyObject,
                      wadi::PyObject, wahi::PyObject,
-                     ens_number)
+                     ens_number::Int)
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
     x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
                               route.x_nodes, route.y_nodes, y_dist)
@@ -164,7 +166,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
     node_indices = reshape(1:length(x), size(x))
     arrival_time = Inf
     final_node = 0
-    for idx in 1:size(x)[2]
+    @simd for idx in 1:size(x)[2]
         if land[1, idx] == true
             earliest_times[1, idx] = Inf
         else
@@ -196,7 +198,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
                                           number=ens_number, method="nearest")[:data][1]
                     wahi_int = wahi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
                                           number=ens_number, method="nearest")[:data][1]
-                    for idx2 in 1:size(x)[2]
+                    @simd for idx2 in 1:size(x)[2]
                         @inbounds d, b = haversine(x[idy, idx1], y[idy, idx1],
                                                    x[idy+1, idx2], y[idy+1, idx2])
                         @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int,
@@ -237,7 +239,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
 end
 
 
-"Shortest path for clustered weather scenarios. No current."
+"Mean weather conditions shortet path with no current."
 function route_solve(route::Route, performance, 
                      wisp::String, widi::String)
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)

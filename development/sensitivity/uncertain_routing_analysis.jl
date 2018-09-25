@@ -39,9 +39,6 @@ using Distributed
         locs = []
         for i in eachindex(routes)
             results[i], sp = route_solve(routes[i], perf, time, wisp, widi, wadi, wahi, ens_number)
-            # df = DataFrame(sp)
-            # name = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_transat_nodes_"*repr(i)*"_ens_number_"*repr(ens_number)
-            # CSV.write(name, df)
         end
         gci_fine = GCI_calc(results[1], results[2], results[3], route_nodes[1], route_nodes[2], 
                             route_nodes[3])
@@ -55,23 +52,69 @@ using Distributed
     end
 end
 
-function save_discretized_paths()
+function save_discretized_paths() # run discretized environment for transat
     lon1 = -11.5
     lat1 = 47.67
     lon2 = -77.67
     lat2 = 25.7
     start_time = Dates.DateTime(2016, 4, 1, 0, 0, 0)
-    boat_performance = ENV["HOME"]*"/sail_route.jl/sail_route/src/data/first40_orgi.csv"
     twa, tws, perf = load_file(boat_performance)
     polar = setup_interpolation(tws, twa, perf)
     sample_perf = Performance(polar, 1.0, 1.0)
     wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
     ens_number=0
-    route_nodes = Array([10*i^2 for i in range(4; length=3, stop=2)])
-    results = zeros(length(route_nodes))
+    route_nodes = Array([20*i^2 for i in range(4; length=3, stop=2)])
+    times = SharedArray{Float64}(length(route_nodes))
     routes = [Route(lon2, lon1, lat2, lat1, i, i) for i in route_nodes]
-    results = [route_solve(i, sample_perf, start_time, wisp, widi, wadi, wahi, ens_number) for i in routes]
-    paths = [i[2] for i in results]
+    @sync @distributed for i in eachindex(routes)
+        results = route_solve(routes[i], sample_perf, start_time, wisp, widi, wadi, wahi, ens_number)
+        save_path = ENV["HOME"]*"/sail_route.jl/development/sensitivity/path_"*repr(p)
+        df = DataFrame(results[2])
+        CSV.write(save_path, df)
+        times[i] = results[1]
+    end
+    print(times)
+end
+
+save_discretized_paths()
+
+
+function run_save_discretized_paths_poly()
+    boat_performance = ENV["HOME"]*"/pyroute/analysis/poly_data/data_dir/tongiaki_vpp.csv"
+    weather_data = ENV["HOME"]*"/weather_data/transat_weather/2016_april.nc" # change
+    save_path = ENV["HOME"]*"/development/polynesian/"
+    twa, tws, perf = load_file(boat_performance)
+    polar = setup_interpolation(tws, twa, perf)
+    sample_perf = Performance(polar, 1.0, 1.0)
+    ## Start locations
+    # Samoa (Upolu): Lat -13.917 Long -171.75
+    # Tonga (Vava'u/Tongatapu): Lat -21.21 Long -175.15
+    ## Finish locations
+    # Atiu, S. Cook Islands: Lat -19.59 Long -158.07
+    # Mo'orea, Society Islands: Lat -17.5333 Long -149.83333
+    lon1 = -13.917
+    lat1 = -171.75
+    lon2 = -19.59
+    lat2 = -158.07
+    route_nodes = Array([20*i^2 for i in range(4; length=3, stop=2)])
+    results = SharedArray{Float64}(length(route_nodes))
+    routes = [Route(lon1, lon2, lat1, lat2, i, i) for i in route_nodes]
+    start_time = Dates.DateTime(2016, 6, 1, 2, 0, 0) # change
+
+    @sync @distributed for i in eachindex(routes)
+        wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data) 
+        results = route_solve(routes[i], sample_perf, start_time, wisp, widi, wadi, wahi, 0)
+        @show arrival_time = results[1]
+        results[i] = arrival_time
+        @show route = results[2]
+        name = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_poly_disc_number_"*repr(Int(i))
+        df = DataFrame(results[2])
+        CSV.write(name, df)
+        times[Int(i)+1, :] = Array([i, results[1]])
+    end
+    df_res = DataFrame(times)
+    name1 = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_poly_disc_results"
+    CSV.write(name1, df_res)
 end
 
 

@@ -1,0 +1,71 @@
+Running SLURM prolog script on red068.cluster.local
+===============================================================================
+Job started on Tue Sep 25 12:20:23 BST 2018
+Job ID          : 148094
+Job name        : submit_multiple
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 10
+Num of tasks    : 10
+Hosts allocated : red068
+Job Output Follows ...
+===============================================================================
+Worker 3 terminated.
+Worker 5 terminated.
+Worker 9 terminated.
+ERROR: ProcessExitedException()
+worker_from_id(::Distributed.ProcessGroup, ::Int64) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:904
+worker_from_id at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:901 [inlined]
+#remotecall_fetch#152(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392
+call_on_owner at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392 [inlined]
+wait(::Future) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:486
+sync_end(::Array{Any,1}) at ./task.jl:213
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:268 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##16#18")){Float64,Float64,Float64,Float64,Int64,String,Array{Performance,1},SharedArray{Float64,2}},Base.OneTo{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] run_varied_performance() at ./none:91
+ [5] ##core#372() at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:293
+ [6] ##sample#373(::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:299
+ [7] #_run#19(::Bool, ::String, ::Base.Iterators.Pairs{Symbol,Integer,NTuple{4,Symbol},NamedTuple{(:samples, :evals, :gctrial, :gcsample),Tuple{Int64,Int64,Bool,Bool}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#371")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:327
+ [8] (::getfield(Base, Symbol("#inner#2")){Base.Iterators.Pairs{Symbol,Integer,NTuple{5,Symbol},NamedTuple{(:verbose, :samples, :evals, :gctrial, :gcsample),Tuple{Bool,Int64,Int64,Bool,Bool}}},typeof(BenchmarkTools._run),Tuple{BenchmarkTools.Benchmark{Symbol("##benchmark#371")},BenchmarkTools.Parameters}})() at ./none:0
+ [9] #invokelatest#1 at ./essentials.jl:690 [inlined]
+ [10] #invokelatest at ./none:0 [inlined]
+ [11] #run_result#16 at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:32 [inlined]
+ [12] #run_result at ./none:0 [inlined]
+ [13] #run#18(::Base.Iterators.Pairs{Symbol,Integer,NTuple{5,Symbol},NamedTuple{(:verbose, :samples, :evals, :gctrial, :gcsample),Tuple{Bool,Int64,Int64,Bool,Bool}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#371")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:46
+ [14] #run at ./none:0 [inlined] (repeats 2 times)
+ [15] #warmup#21 at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:79 [inlined]
+ [16] #warmup at ./none:0 [inlined]
+ [17] #tune!#23(::Bool, ::String, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#371")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:134
+ [18] tune! at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:134 [inlined] (repeats 2 times)
+ [19] top-level scope at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:214
+ERROR: UndefVarError: vp not defined
+Stacktrace:
+ [1] top-level scope at none:0
+┌ Warning: Forcibly interrupting busy workers
+│   exception = rmprocs: pids [7, 11] not terminated after 5.0 seconds.
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:1074
+┌ Warning: rmprocs: process 1 not removed
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:863
+==============================================================================
+Running epilogue script on red068.
+
+Submit time  : 2018-09-25T12:20:22
+Start time   : 2018-09-25T12:20:23
+End time     : 2018-09-25T13:24:47
+Elapsed time : 01:04:24 (Timelimit=20:00:00)
+
+Job ID: 148094
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 07:14:41
+CPU Efficiency: 67.50% of 10:44:00 core-walltime
+Memory Utilized: 166.70 GB
+

@@ -8,6 +8,8 @@ thomas.dickson@soton.ac.uk
 import os, sys, glob, re
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 
@@ -20,7 +22,7 @@ plt.rcParams['font.size'] = 16
 plt.rcParams['lines.linewidth'] = 2.0
 plt.rcParams['lines.markersize'] = 8
 plt.rcParams['legend.fontsize'] = 12
-plt.rcParams['text.usetex'] = True
+# plt.rcParams['text.usetex'] = True
 plt.rcParams['font.serif'] = "cm"
 plt.rcParams['text.latex.preamble'] = """\\usepackage{subdepth},
                                          \\usepackage{type1cm}"""
@@ -119,8 +121,11 @@ def plot_ensemble_results(lon1, lat1, lon2, lat2, df_paths, df_results, fname, f
     map.drawmeridians(meridians, labels=[0, 0, 0, 1])
     map.scatter(r_f_x, r_f_y, color='blue', s=50, label='Finish')
     for counter, value in enumerate(df_paths):
-        x, y = map(value["x1"].values, value["x2"].values)
-        map.plot(x, y, label="Ensemble {}, {:f} hrs".format(counter, df_results[counter]))
+        if df_results[counter] > 1500.0:
+            pass
+        else:
+            x, y = map(value["x1"].values, value["x2"].values)
+            map.plot(x, y, label="Ensemble {:d}, {:.2f} hrs".format(counter, df_results[counter]))
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
                ncol=5, fancybox=True, shadow=True, prop={'size': 6})
     plt.savefig(fname)
@@ -135,13 +140,13 @@ def plot_ensemble_weather_simulations_results():
     alist = glob.glob(dir_path+"/_route*")
     alist.sort(key=natural_keys)
     df_list = [pd.read_csv(i) for i in alist]
-    times = [417.6349510836086, 411.1519616538428, 416.7225335095536, 415.43665504229637, 410.02199303056454, 412.7209783033134, 416.16703271050164, 417.204454754556, 417.71980730920177, 426.33400184536436]
+    times = pd.read_csv(dir_path+"/route_transat_ens_number_results").values
     fname = dir_path+"/ensemble_routes_plot.png"
     lon1 = -11.5
     lat1 = 47.67
     lon2 = -77.67
     lat2 = 25.7
-    plot_ensemble_results(lon1, lat1, lon2, lat2, df_list, times, fname, fill=0.2)
+    plot_ensemble_results(lon1, lat1, lon2, lat2, df_list, times[:, 1], fname, fill=0.5)
 
     # create list of the dataframes
     # load the routing results

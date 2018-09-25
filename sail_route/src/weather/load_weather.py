@@ -84,11 +84,16 @@ def process_era5_weather(path_nc, longs, lats):
     wh = load_dataset(path_nc, 'swh')
     wd = load_dataset(path_nc, 'mdts')
     wp = load_dataset(path_nc, 'mpts')
-    rg_wisp = regrid_data(wisp, longs[:, 0], lats[0, :])
-    rg_widi = regrid_data(widi, longs[:, 0], lats[0, :])
-    rg_wh = regrid_data(wh, longs[:, 0], lats[0, :])
-    rg_wd = regrid_data(wd, longs[:, 0], lats[0, :])
-    rg_wp = regrid_data(wp, longs[:, 0], lats[0, :])
+    wisp_rg = wisp.copy(deep=True)
+    widi_rg = wisp.copy(deep=True)
+    wh_rg = wisp.copy(deep=True)
+    wd_rg = wisp.copy(deep=True)
+    wp_rg = wisp.copy(deep=True)
+    rg_wisp = regrid_data(wisp_rg, longs[:, 0], lats[0, :])
+    rg_widi = regrid_data(widi_rg, longs[:, 0], lats[0, :])
+    rg_wh = regrid_data(wh_rg, longs[:, 0], lats[0, :])
+    rg_wd = regrid_data(wd_rg, longs[:, 0], lats[0, :])
+    rg_wp = regrid_data(wp_rg, longs[:, 0], lats[0, :])
     return rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp
 
 
@@ -158,11 +163,11 @@ def sample_weather_scenario():
 
 
 if __name__ == '__main__':
-    path = "/mainfs/home/td7g11/weather_data/transat_weather/2016_march.nc"
+    path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_era20_may_wind.nc"
     look_in_netcdf(path)
-    rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
-    print(rg_wisp['number'])
-    print(rg_wisp['longitude'])
-    print(rg_wisp['latitude'])
-    print(rg_wisp['time'])
-    print(rg_wisp.interp(longitude=-16.9, latitude=57.24, number=1, method="nearest"))
+    # rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
+    # print(rg_wisp['number'])
+    # print(rg_wisp['longitude'])
+    # print(rg_wisp['latitude'])
+    # print(rg_wisp['time'])
+    # print(rg_wisp.interp(longitude=-16.9, latitude=57.24, number=1, method="nearest"))
