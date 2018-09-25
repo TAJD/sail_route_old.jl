@@ -41,6 +41,30 @@ end
 # end
 
 
+function run_discretized_routes()
+    boat_performance = ENV["HOME"]*"/sail_route.jl/sail_route/src/data/first40_orgi.csv"
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/1982/1982_polynesia.nc"
+    twa, tws, perf = load_file(boat_performance)
+    polar = setup_interpolation(tws, twa, perf)
+    sample_perf = Performance(polar, 1.0, 1.0)
+    lon1 = -171.75
+    lat1 = -13.917
+    lon2 = -158.07
+    lat2 = -19.59
+    n = 80 # won't interpolate well below 20 nodes
+    sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
+    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+    results = route_solve(sample_route, sample_perf, start_time,
+                          wisp, widi, wadi, wahi)
+    @show results
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/_80_nodes"
+    CSV.write(name, DataFrame(results[2]))
+end
+
+run_discretized_routes()
+
+
 function run_ensemble_weather_scenarios()
     boat_performance = ENV["HOME"]*"/sail_route.jl/sail_route/src/data/first40_orgi.csv"
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/1982/1982_era20_jan_march.nc"
@@ -60,7 +84,7 @@ function run_ensemble_weather_scenarios()
     # for i = 1
         wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
         results = route_solve(sample_route, sample_perf, start_time,
-                              wisp, widi, wadi, wahi, Int(i-1))
+                              wisp, widi, wadi, wahi)
         @show arrival_time = results[1]
         route = results[2]
         name = ENV["HOME"]*"/sail_route.jl/development/polynesian/_route_1982_ens_"*repr(Int(i))*"_nodes_"*repr(n)

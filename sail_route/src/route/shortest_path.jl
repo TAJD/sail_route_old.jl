@@ -5,7 +5,7 @@ using PyCall
 """Convert hours in float to the nearest 4 hour interval."""
 function convert_time(old_time::Float64)
     mm = round(old_time*60/320)
-    return Dates.Hour(mm*4)
+    return Dates.Hour(mm*3.0)
 end
 
 
@@ -147,11 +147,12 @@ function route_solve(route::Route, performance, start_time::DateTime,
 end
 
 
-"Time dependent shortest path with no current."
+"Time dependent shortest path with no current and ensemble selected."
 function route_solve(route::Route, performance, start_time::DateTime, 
                      wisp::PyObject, widi::PyObject,
                      wadi::PyObject, wahi::PyObject,
                      ens_number::Int)
+    tol = 0.01
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
     x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
                               route.x_nodes, route.y_nodes, y_dist)
@@ -166,20 +167,20 @@ function route_solve(route::Route, performance, start_time::DateTime,
     node_indices = reshape(1:length(x), size(x))
     arrival_time = Inf
     final_node = 0
-    @simd for idx in 1:size(x)[2]
+    for idx in 1:size(x)[2]
         if land[1, idx] == true
             earliest_times[1, idx] = Inf
         else
-            @inbounds d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
+            d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
             ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
-                                number=ens_number, method="nearest")[:data][1]
+                                number=ens_number, method="nearest", tolerance=tol)[:data][1]
             wd_int = widi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
-                                number=ens_number, method="nearest")[:data][1]
+                                number=ens_number, method="nearest", tolerance=tol)[:data][1]
             wadi_int = wadi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
-                                number=ens_number, method="nearest")[:data][1]
+                                number=ens_number, method="nearest", tolerance=tol)[:data][1]
             wahi_int = wahi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
-                                number=ens_number, method="nearest")[:data][1]
-            @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
+                                number=ens_number, method="nearest", tolerance=tol)[:data][1]
+            speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
             earliest_times[1, idx] = d/speed
         end
     end
@@ -191,18 +192,18 @@ function route_solve(route::Route, performance, start_time::DateTime,
                 if isinf(earliest_times[idy, idx1]) == false
                     t = start_time + convert_time(earliest_times[idy, idx1])
                     ws_int = wisp[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
-                                        number=ens_number, method="nearest")[:data][1]
+                                        number=ens_number, method="nearest", tolerance=tol)[:data][1]
                     wd_int = widi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
-                                        number=ens_number, method="nearest")[:data][1]
+                                        number=ens_number, method="nearest", tolerance=tol)[:data][1]
                     wadi_int = wadi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
-                                          number=ens_number, method="nearest")[:data][1]
+                                          number=ens_number, method="nearest", tolerance=tol)[:data][1]
                     wahi_int = wahi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
-                                          number=ens_number, method="nearest")[:data][1]
-                    @simd for idx2 in 1:size(x)[2]
-                        @inbounds d, b = haversine(x[idy, idx1], y[idy, idx1],
-                                                   x[idy+1, idx2], y[idy+1, idx2])
-                        @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int,
-                                                        wahi_int, b)
+                                          number=ens_number, method="nearest", tolerance=tol)[:data][1]
+                    for idx2 in 1:size(x)[2]
+                        d, b = haversine(x[idy, idx1], y[idy, idx1],
+                                         x[idy+1, idx2], y[idy+1, idx2])
+                        speed = cost_function(performance, wd_int, ws_int, wadi_int,
+                                              wahi_int, b)
                         tt = earliest_times[idy, idx1] + d/speed
                         if earliest_times[idy+1, idx2] > tt
                             earliest_times[idy+1, idx2] = tt
@@ -215,17 +216,108 @@ function route_solve(route::Route, performance, start_time::DateTime,
     end
     for idx in 1:size(x)[2]
         if isinf(earliest_times[end, idx]) == false
-            @inbounds d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
+            d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
+            t = start_time + convert_time(earliest_times[end, idx])
+            ws_int = wisp[:sel](time=t, lon_b=x[1, idx], lat_b=y[1, idx], number=ens_number,
+                                method="nearest", tolerance=tol)[:data][1]
+            wd_int = widi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+                                method="nearest", tolerance=tol)[:data][1]
+            wadi_int = wadi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+                                  method="nearest", tolerance=tol)[:data][1]
+            wahi_int = wahi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+                                  method="nearest", tolerance=tol)[:data][1]
+            speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
+            tt = earliest_times[end, idx] + d/speed
+            if tt < arrival_time
+                arrival_time = tt
+                final_node = node_indices[end, idx]
+            end
+        end
+    end
+    sp = shortest_path(node_indices, prev_node, [final_node])
+    locs = get_locs(node_indices, sp, x, y)
+    return arrival_time, locs
+end
+
+
+"Time dependent shortest path with no current and for single reanalysis."
+function route_solve(route::Route, performance, start_time::DateTime, 
+                     wisp::PyObject, widi::PyObject,
+                     wadi::PyObject, wahi::PyObject)
+    y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
+    x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
+                              route.x_nodes, route.y_nodes, y_dist)
+    x[:, 1] = force_monotonic(x[:, 1])
+    y[:, 1] = force_monotonic(y[:, 1])
+    wisp = regrid_data(wisp, x[:, 1], y[:, 1])
+    widi = regrid_data(widi, x[:, 1], y[:, 1])
+    wadi = regrid_data(wadi, x[:, 1], y[:, 1])
+    wahi = regrid_data(wahi, x[:, 1], y[:, 1])
+    earliest_times = fill(Inf, size(x))
+    prev_node = zero(x)
+    node_indices = reshape(1:length(x), size(x))
+    arrival_time = Inf
+    final_node = 0
+    for idx in 1:size(x)[2]
+        if land[1, idx] == true
+            earliest_times[1, idx] = Inf
+        else
+            d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
+            ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
+                                method="nearest")[:data][1]
+            wd_int = widi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
+                                method="nearest")[:data][1]
+            wadi_int = wadi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
+                                method="nearest")[:data][1]
+            wahi_int = wahi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
+                                method="nearest")[:data][1]
+            speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
+            earliest_times[1, idx] = d/speed
+        end
+    end
+    for idy in 1:size(x)[1]-1
+        for idx1 in 1:size(x)[2]
+            if land[idy, idx1] == true
+                earliest_times[idy+1, idx1] = Inf
+            else
+                if isinf(earliest_times[idy, idx1]) == false
+                    t = start_time + convert_time(earliest_times[idy, idx1])
+                    ws_int = wisp[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
+                                        method="nearest")[:data][1]
+                    wd_int = widi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
+                                        method="nearest")[:data][1]
+                    wadi_int = wadi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
+                                          method="nearest")[:data][1]
+                    wahi_int = wahi[:sel](time=t, lon_b=x[idy, idx1], lat_b=y[idy, idx1],
+                                          method="nearest")[:data][1]
+                    for idx2 in 1:size(x)[2]
+                        d, b = haversine(x[idy, idx1], y[idy, idx1],
+                                         x[idy+1, idx2], y[idy+1, idx2])
+                        speed = cost_function(performance, wd_int, ws_int, wadi_int,
+                                              wahi_int, b)
+                        tt = earliest_times[idy, idx1] + d/speed
+                        if earliest_times[idy+1, idx2] > tt
+                            earliest_times[idy+1, idx2] = tt
+                            prev_node[idy+1, idx2] = node_indices[idy, idx1]
+                        end
+                    end
+                end
+            end
+        end
+    end
+    for idx in 1:size(x)[2]
+        if isinf(earliest_times[end, idx]) == false
+            d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
             t = start_time + convert_time(earliest_times[end, idx])
             ws_int = wisp[:sel](time=t, lon_b=x[1, idx], lat_b=y[1, idx],
                                 method="nearest")[:data][1]
-            wd_int = widi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+            wd_int = widi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx],
                                 method="nearest")[:data][1]
-            wadi_int = wadi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+            wadi_int = wadi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx],
                                   method="nearest")[:data][1]
-            wahi_int = wahi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx], number=ens_number,
+            wahi_int = wahi[:sel](time=t, lon_b=x[end, idx], lat_b=y[end-1, idx],
                                   method="nearest")[:data][1]
-            @inbounds speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
+            speed = cost_function(performance, wd_int, ws_int, wadi_int, wahi_int, b)
             tt = earliest_times[end, idx] + d/speed
             if tt < arrival_time
                 arrival_time = tt

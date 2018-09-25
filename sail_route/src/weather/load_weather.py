@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xesmf as xe
+import glob, os
 
 
 def look_in_netcdf(path):
@@ -106,6 +107,15 @@ def retrieve_era5_weather(path_nc):
     return wisp, widi, wh, wd, wp
 
 
+def retrieve_era20_weather(path_nc):
+    wisp = load_dataset(path_nc, 'wind')
+    widi = load_dataset(path_nc, 'dwi')
+    wh = load_dataset(path_nc, 'swh')
+    wd = load_dataset(path_nc, 'mwd')
+    wp = load_dataset(path_nc, 'mwp')
+    return wisp, widi, wh, wd, wp
+
+
 def change_area_values(array, value, lon1, lat1, lon2, lat2):
     """
     Change the weather values in a given rectangular area.
@@ -162,8 +172,33 @@ def sample_weather_scenario():
     return wisp, widi, cusp, cudi, wahi, wadi
 
 
+def get_weather_files(dir_path):
+    return glob.glob(dir_path+"/*.nc")
+
+
+def concatenate_weather_files(dir_path):
+    """Concatenate all .nc files found in the directory set by path."""
+    # import all the files as datasets
+    fnames = get_weather_files(dir_path)
+    ds_list = []
+    for f in fnames:
+        with xr.open_dataset(f, engine='netcdf4') as ds:
+            ds_list.append(ds)
+    ds_main = xr.concat(ds_list, dim='time')
+    groups = ds_main.groupby('time')
+    return groups
+
+
+def aggregate_weather_files():
+    weather_path = os.path.dirname(os.path.realpath(__file__))
+    path = weather_path + "/polynesia_weather/1982/"
+    # get a list of all the files in a directory
+    ds_whole = concatenate_weather_files(path)
+    print(ds_whole.last())
+    ds_whole.last().to_netcdf(path+"1982_polynesia.nc")
+
 if __name__ == '__main__':
-    path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_era20_may_wind.nc"
+    path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_polynesia.nc"
     look_in_netcdf(path)
     # rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
     # print(rg_wisp['number'])

@@ -38,3 +38,10 @@ function load_cluster(path_nc, longs, lats, var)
     ds = w[:load_cluster](path_nc, longs, lats, var)
     return ds
 end
+
+
+function load_era20_weather(path_nc)
+    wisp, widi, wh, wd, wp = w[:retrieve_era20_weather](path_nc)
+    return wisp, widi, wh, wd, wp
+end
+

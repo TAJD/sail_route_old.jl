@@ -11,3 +11,95 @@ Num of tasks    : 10
 Hosts allocated : red068
 Job Output Follows ...
 ===============================================================================
+Worker 4 terminated.
+Worker 11 terminated.
+Worker 2 terminated.
+ERROR: ProcessExitedException()
+try_yieldto(::typeof(Base.ensure_rescheduled), ::Base.RefValue{Task}) at ./event.jl:196
+wait() at ./event.jl:255
+wait(::Condition) at ./event.jl:46
+take_buffered(::Channel{Any}) at ./channels.jl:353
+take!(::Channel{Any}) at ./channels.jl:306
+take!(::Distributed.RemoteValue) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:562
+#remotecall_fetch#149(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:375
+remotecall_fetch(::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:371
+#remotecall_fetch#152(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392
+call_on_owner at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392 [inlined]
+wait(::Future) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:486
+sync_end(::Array{Any,1}) at ./task.jl:213
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:268 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##16#18")){Float64,Float64,Float64,Float64,Int64,String,Array{Performance,1},SharedArray{Float64,2}},Base.OneTo{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] run_varied_performance() at ./none:91
+ [5] ##core#371() at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:293
+ [6] ##sample#372(::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:299
+ [7] sample at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:316 [inlined]
+ [8] #_lineartrial#20(::Int64, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:71
+ [9] _lineartrial(::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:63
+ [10] #invokelatest#1 at ./essentials.jl:686 [inlined]
+ [11] invokelatest at ./essentials.jl:685 [inlined]
+ [12] #lineartrial#17 at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:33 [inlined]
+ [13] lineartrial at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:33 [inlined]
+ [14] #tune!#23(::Bool, ::String, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:135
+ [15] tune! at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:134 [inlined] (repeats 2 times)
+ [16] top-level scope at none:0
+Worker 9 terminated.
+Worker 3 terminated.
+Worker 10 terminated.
+ERROR: ProcessExitedException()
+try_yieldto(::typeof(Base.ensure_rescheduled), ::Base.RefValue{Task}) at ./event.jl:196
+wait() at ./event.jl:255
+wait(::Condition) at ./event.jl:46
+take_buffered(::Channel{Any}) at ./channels.jl:353
+take!(::Channel{Any}) at ./channels.jl:306
+take!(::Distributed.RemoteValue) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:562
+#remotecall_fetch#149(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:375
+remotecall_fetch(::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:371
+#remotecall_fetch#152(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392
+call_on_owner at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392 [inlined]
+wait(::Future) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:486
+sync_end(::Array{Any,1}) at ./task.jl:213
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:268 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##16#18")){Float64,Float64,Float64,Float64,Int64,String,Array{Performance,1},SharedArray{Float64,2}},Base.OneTo{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] run_varied_performance() at ./none:91
+ [5] ##core#371() at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:293
+ [6] ##sample#372(::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:299
+ [7] #_run#19(::Bool, ::String, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:327
+ [8] _run(::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:321
+ [9] #invokelatest#1 at ./essentials.jl:686 [inlined]
+ [10] invokelatest at ./essentials.jl:685 [inlined]
+ [11] #run_result#16 at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:32 [inlined]
+ [12] run_result at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:32 [inlined]
+ [13] #run#18(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::BenchmarkTools.Benchmark{Symbol("##benchmark#370")}, ::BenchmarkTools.Parameters) at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:46
+ [14] run at /home/td7g11/.julia/packages/BenchmarkTools/dtwnm/src/execution.jl:46 [inlined] (repeats 2 times)
+ [15] top-level scope at none:0
+┌ Warning: Forcibly interrupting busy workers
+│   exception = rmprocs: pids [5, 8] not terminated after 5.0 seconds.
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:1074
+┌ Warning: rmprocs: process 1 not removed
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/cluster.jl:863
+==============================================================================
+Running epilogue script on red068.
+
+Submit time  : 2018-09-25T13:29:06
+Start time   : 2018-09-25T13:29:07
+End time     : 2018-09-25T15:08:32
+Elapsed time : 01:39:25 (Timelimit=20:00:00)
+
+Job ID: 148104
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 08:41:41
+CPU Efficiency: 52.47% of 16:34:10 core-walltime
+Memory Utilized: 166.80 GB
+
