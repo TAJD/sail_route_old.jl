@@ -246,7 +246,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
                      wadi::PyObject, wahi::PyObject)
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1) # in nm
     x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
-                              route.x_nodes, route.y_nodes, y_dist*1.852001*1000.0)
+                              route.x_nodes, route.y_nodes, y_dist)
     # x[:, 1] = force_monotonic(x[:, 1])
     # y[:, 1] = force_monotonic(y[:, 1])
     wisp = regrid_data(wisp, x[:, 1], y[:, 1])

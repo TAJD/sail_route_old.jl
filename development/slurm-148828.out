@@ -1,0 +1,43 @@
+Running SLURM prolog script on red207.cluster.local
+===============================================================================
+Job started on Wed Sep 26 11:19:20 BST 2018
+Job ID          : 148828
+Job name        : submit_single_weather_route
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 10
+Num of tasks    : 10
+Hosts allocated : red207
+Job Output Follows ...
+===============================================================================
+ERROR: MethodError: no method matching DataFrame(::Float64)
+Closest candidates are:
+  DataFrame(::Any, !Matched::DataStreams.Data.Schema, !Matched::Type{S}, !Matched::Bool; reference) where S at /home/td7g11/.julia/packages/DataFrames/utxEh/src/abstractdataframe/io.jl:295
+  DataFrame(!Matched::Array{Any,1}, !Matched::DataFrames.Index) at /home/td7g11/.julia/packages/DataFrames/utxEh/src/dataframe/dataframe.jl:87
+  DataFrame(; kwargs...) at /home/td7g11/.julia/packages/DataFrames/utxEh/src/dataframe/dataframe.jl:142
+  ...
+Stacktrace:
+ [1] run_discretized_routes() at ./none:65
+ [2] top-level scope at none:0
+==============================================================================
+Running epilogue script on red207.
+
+Submit time  : 2018-09-26T11:19:20
+Start time   : 2018-09-26T11:19:20
+End time     : 2018-09-26T11:24:48
+Elapsed time : 00:05:28 (Timelimit=20:00:00)
+
+Job ID: 148828
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:08:01
+**** Please note that the CPU efficency of your job is less than 50% ****
+**** Ask the HPC team for advice -- if you need it
+**** CPU Efficiency: 14.66% of 00:54:40 core-walltime
+
+Memory Utilized: 6.15 GB
+

@@ -54,19 +54,19 @@ function run_discretized_routes()
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    n = 240 # won't interpolate well below 20 nodes
+    n = 1280 # won't interpolate well below 20 nodes
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
     wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
     results = route_solve(sample_route, sample_perf, start_time,
                           wisp, widi, wadi, wahi)
     @show results[1]
-    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/_"*repr(n)*"_nodes"
-    CSV.write(name, DataFrame(results[2]))
-    path = ENV["HOME"]*"/sail_route.jl/development/polynesian/"
-    CSV.write(path*"earliest_times", DataFrame(results[3]))
-    CSV.write(path*"x_locs", DataFrame(results[4]))
-    CSV.write(path*"y_locs", DataFrame(results[5]))
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/_"*repr(n)*"_nodes_"
+    CSV.write(name*"route", DataFrame(results[2]))
+    CSV.write(name*"time", DataFrame(Array{Float64}([results[1]])))
+    CSV.write(name*"earliest_times", DataFrame(results[3]))
+    CSV.write(name*"x_locs", DataFrame(results[4]))
+    CSV.write(name*"y_locs", DataFrame(results[5]))
 end
 
 run_discretized_routes()

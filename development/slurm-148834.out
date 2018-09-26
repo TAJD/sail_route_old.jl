@@ -1,34 +1,35 @@
-Running SLURM prolog script on red081.cluster.local
+Running SLURM prolog script on red207.cluster.local
 ===============================================================================
-Job started on Wed Sep 26 10:09:19 BST 2018
-Job ID          : 148677
+Job started on Wed Sep 26 11:30:58 BST 2018
+Job ID          : 148834
 Job name        : submit_single_weather_route
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
 Num hosts       : 1
-Num cores       : 40
-Num of tasks    : 40
-Hosts allocated : red081
+Num cores       : 10
+Num of tasks    : 10
+Hosts allocated : red207
 Job Output Follows ...
 ===============================================================================
+ERROR: syntax: missing comma or ) in argument list
 ==============================================================================
-Running epilogue script on red081.
+Running epilogue script on red207.
 
-Submit time  : 2018-09-26T10:09:18
-Start time   : 2018-09-26T10:09:18
-End time     : 2018-09-26T10:29:00
-Elapsed time : 00:19:42 (Timelimit=20:00:00)
+Submit time  : 2018-09-26T11:30:58
+Start time   : 2018-09-26T11:30:58
+End time     : 2018-09-26T11:31:01
+Elapsed time : 00:00:03 (Timelimit=20:00:00)
 
-Job ID: 148677
+Job ID: 148834
 Cluster: i5
 User/Group: td7g11/mm
 State: COMPLETED (exit code 0)
 Nodes: 1
-Cores per node: 40
-CPU Utilized: 00:22:14
+Cores per node: 10
+CPU Utilized: 00:00:14
 **** Please note that the CPU efficency of your job is less than 50% ****
 **** Ask the HPC team for advice -- if you need it
-**** CPU Efficiency: 2.82% of 13:08:00 core-walltime
+**** CPU Efficiency: 46.67% of 00:00:30 core-walltime
 
-Memory Utilized: 14.18 GB
+Memory Utilized: 1.25 MB
 

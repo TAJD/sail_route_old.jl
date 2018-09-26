@@ -1,0 +1,133 @@
+Running SLURM prolog script on red210.cluster.local
+===============================================================================
+Job started on Wed Sep 26 11:32:50 BST 2018
+Job ID          : 148839
+Job name        : submit_multiple
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 10
+Num of tasks    : 10
+Hosts allocated : red210
+Job Output Follows ...
+===============================================================================
+┌ Error: Fatal error on process 2
+│   exception =
+│    PyError ($(Expr(:escape, :(ccall(#= /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'TypeError'>
+│    TypeError("can't pickle traceback objects",)
+│    
+│    Stacktrace:
+│     [1] pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:60 [inlined]
+│     [2] pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:64 [inlined]
+│     [3] macro expansion at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:84 [inlined]
+│     [4] __pycall!(::PyObject, ::Ptr{PyCall.PyObject_struct}, ::PyObject, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44
+│     [5] _pycall!(::PyObject, ::PyObject, ::Tuple{PyObject}, ::Int64, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:22
+│     [6] #pycall#87 at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:11 [inlined]
+│     [7] pycall at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:83 [inlined]
+│     [8] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::PyObject) at /home/td7g11/.julia/packages/PyCall/rUul9/src/serialize.jl:18
+│     [9] serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+│     [10] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609
+│     [11] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::CapturedException) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/clusterserialize.jl:208
+│     [12] serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+│     [13] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609
+│     [14] serialize_msg(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Distributed.ResultMsg) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:90
+│     [15] #invokelatest#1 at ./essentials.jl:686 [inlined]
+│     [16] invokelatest at ./essentials.jl:685 [inlined]
+│     [17] send_msg_(::Distributed.Worker, ::Distributed.MsgHeader, ::Distributed.ResultMsg, ::Bool) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:182
+│     [18] send_msg_now at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:130 [inlined]
+│     [19] send_msg_now(::Sockets.TCPSocket, ::Distributed.MsgHeader, ::Distributed.ResultMsg) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:125
+│     [20] deliver_result(::Sockets.TCPSocket, ::Symbol, ::Distributed.RRID, ::RemoteException) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:88
+│     [21] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:270 [inlined]
+│     [22] (::getfield(Distributed, Symbol("##111#113")){Distributed.CallMsg{:call_fetch},Distributed.MsgHeader,Sockets.TCPSocket})() at ./task.jl:259
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:92
+┌ Error: Fatal error on process 4
+│   exception =
+│    PyError ($(Expr(:escape, :(ccall(#= /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'TypeError'>
+│    TypeError("can't pickle traceback objects",)
+│    
+│    Stacktrace:
+│     [1] pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:60 [inlined]
+│     [2] pyerr_check at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:64 [inlined]
+│     [3] macro expansion at /home/td7g11/.julia/packages/PyCall/rUul9/src/exception.jl:84 [inlined]
+│     [4] __pycall!(::PyObject, ::Ptr{PyCall.PyObject_struct}, ::PyObject, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:44
+│     [5] _pycall!(::PyObject, ::PyObject, ::Tuple{PyObject}, ::Int64, ::Ptr{Nothing}) at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:22
+│     [6] #pycall#87 at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:11 [inlined]
+│     [7] pycall at /home/td7g11/.julia/packages/PyCall/rUul9/src/pyfncall.jl:83 [inlined]
+│     [8] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::PyObject) at /home/td7g11/.julia/packages/PyCall/rUul9/src/serialize.jl:18
+│     [9] serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+│     [10] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609
+│     [11] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::CapturedException) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/clusterserialize.jl:208
+│     [12] serialize_any(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:630
+│     [13] serialize(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Any) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Serialization/src/Serialization.jl:609
+│     [14] serialize_msg(::Distributed.ClusterSerializer{Sockets.TCPSocket}, ::Distributed.ResultMsg) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:90
+│     [15] #invokelatest#1 at ./essentials.jl:686 [inlined]
+│     [16] invokelatest at ./essentials.jl:685 [inlined]
+│     [17] send_msg_(::Distributed.Worker, ::Distributed.MsgHeader, ::Distributed.ResultMsg, ::Bool) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:182
+│     [18] send_msg_now at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:130 [inlined]
+│     [19] send_msg_now(::Sockets.TCPSocket, ::Distributed.MsgHeader, ::Distributed.ResultMsg) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/messages.jl:125
+│     [20] deliver_result(::Sockets.TCPSocket, ::Symbol, ::Distributed.RRID, ::RemoteException) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:88
+│     [21] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:270 [inlined]
+│     [22] (::getfield(Distributed, Symbol("##111#113")){Distributed.CallMsg{:call_fetch},Distributed.MsgHeader,Sockets.TCPSocket})() at ./task.jl:259
+└ @ Distributed /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/process_messages.jl:92
+Worker 2 terminated.
+ERROR: ProcessExitedException()
+try_yieldto(::typeof(Base.ensure_rescheduled), ::Base.RefValue{Task}) at ./event.jl:196
+wait() at ./event.jl:255
+wait(::Condition) at ./event.jl:46
+take_buffered(::Channel{Any}) at ./channels.jl:353
+take!(::Channel{Any}) at ./channels.jl:306
+take!(::Distributed.RemoteValue) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:562
+#remotecall_fetch#149(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:375
+remotecall_fetch(::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:371
+#remotecall_fetch#152(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392
+call_on_owner at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392 [inlined]
+wait(::Future) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:486
+sync_end(::Array{Any,1}) at ./task.jl:213
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:268 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##13#14")){String,Performance,Int64,Route,DateTime,SharedArray{Float64,2}},UnitRange{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] run_ensemble_weather_scenarios() at ./none:55
+ [5] top-level scope at none:0
+Worker 4 terminated.
+ERROR: ProcessExitedException()
+try_yieldto(::typeof(Base.ensure_rescheduled), ::Base.RefValue{Task}) at ./event.jl:196
+wait() at ./event.jl:255
+wait(::Condition) at ./event.jl:46
+take_buffered(::Channel{Any}) at ./channels.jl:353
+take!(::Channel{Any}) at ./channels.jl:306
+take!(::Distributed.RemoteValue) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:562
+#remotecall_fetch#149(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:375
+remotecall_fetch(::Function, ::Distributed.Worker, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:371
+#remotecall_fetch#152(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, ::Function, ::Function, ::Int64, ::Distributed.RRID, ::Vararg{Any,N} where N) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392
+call_on_owner at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:392 [inlined]
+wait(::Future) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/remotecall.jl:486
+sync_end(::Array{Any,1}) at ./task.jl:213
+macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:268 [inlined]
+(::getfield(Distributed, Symbol("##169#171")){getfield(Main, Symbol("##16#18")){Float64,Float64,Float64,Float64,Int64,String,Array{Performance,1},SharedArray{Float64,2}},Base.OneTo{Int64}})() at ./task.jl:244
+Stacktrace:
+ [1] sync_end(::Array{Any,1}) at ./task.jl:226
+ [2] macro expansion at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.0/Distributed/src/macros.jl:337 [inlined]
+ [3] macro expansion at ./task.jl:244 [inlined]
+ [4] run_varied_performance() at ./none:89
+ [5] top-level scope at none:0
+==============================================================================
+Running epilogue script on red210.
+
+Submit time  : 2018-09-26T11:32:49
+Start time   : 2018-09-26T11:32:50
+End time     : 2018-09-26T11:36:43
+Elapsed time : 00:03:53 (Timelimit=20:00:00)
+
+Job ID: 148839
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:25:05
+CPU Efficiency: 64.59% of 00:38:50 core-walltime
+Memory Utilized: 103.68 GB
+

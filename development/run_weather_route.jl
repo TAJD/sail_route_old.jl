@@ -68,9 +68,7 @@ function run_ensemble_weather_scenarios()
     CSV.write(name1, df_res)
 end
 
-t = @benchmarkable run_ensemble_weather_scenarios()
-tune!(t)
-dump(t)
+run_ensemble_weather_scenarios()
 
 function run_varied_performance()
     lon1 = -11.5
@@ -101,6 +99,4 @@ function run_varied_performance()
     CSV.write(save_path, df)
 end
 
-vp = @benchmarkable run_varied_performance()
-tune!(vp)
-run(vp)
+run_varied_performance()

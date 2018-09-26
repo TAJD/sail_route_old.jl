@@ -1,34 +1,37 @@
-Running SLURM prolog script on red022.cluster.local
+Running SLURM prolog script on red207.cluster.local
 ===============================================================================
-Job started on Wed Sep 26 10:23:14 BST 2018
-Job ID          : 148701
+Job started on Wed Sep 26 11:32:14 BST 2018
+Job ID          : 148838
 Job name        : submit_single_weather_route
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
 Num hosts       : 1
 Num cores       : 10
 Num of tasks    : 10
-Hosts allocated : red022
+Hosts allocated : red207
 Job Output Follows ...
 ===============================================================================
+┌ Warning: passing columns argument with non-AbstractVector entries is deprecated
+│   caller = run_discretized_routes() at none:65
+└ @ Main ./none:65
 ==============================================================================
-Running epilogue script on red022.
+Running epilogue script on red207.
 
-Submit time  : 2018-09-26T10:23:13
-Start time   : 2018-09-26T10:23:14
-End time     : 2018-09-26T10:34:35
-Elapsed time : 00:11:21 (Timelimit=20:00:00)
+Submit time  : 2018-09-26T11:32:12
+Start time   : 2018-09-26T11:32:14
+End time     : 2018-09-26T11:52:42
+Elapsed time : 00:20:28 (Timelimit=20:00:00)
 
-Job ID: 148701
+Job ID: 148838
 Cluster: i5
 User/Group: td7g11/mm
 State: COMPLETED (exit code 0)
 Nodes: 1
 Cores per node: 10
-CPU Utilized: 00:13:42
+CPU Utilized: 00:23:00
 **** Please note that the CPU efficency of your job is less than 50% ****
 **** Ask the HPC team for advice -- if you need it
-**** CPU Efficiency: 12.07% of 01:53:30 core-walltime
+**** CPU Efficiency: 11.24% of 03:24:40 core-walltime
 
-Memory Utilized: 9.50 GB
+Memory Utilized: 14.15 GB
 

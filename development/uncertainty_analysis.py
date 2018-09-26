@@ -74,7 +74,7 @@ def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill
     map.scatter(r_f_x, r_f_y, color='blue', s=50, label='Finish')
 
     x_r1, y_r1 = map(r1["x1"].values, r1["x2"].values)
-    map.plot(x_r1, y_r1, label="10 nodes, {0:.2f}".format(t1))
+    map.plot(x_r1, y_r1, label="320 nodes, {0:.2f}".format(t1))
     x_r2, y_r2 = map(r2["x1"].values, r2["x2"].values)
     map.plot(x_r1, y_r1, label="160 nodes, {0:.2f}".format(t2))
     x_r3, y_r3 = map(r3["x1"].values, r3["x2"].values)
@@ -92,13 +92,13 @@ def plot_varied_grid_results():
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    t1 = 308.87
+    t1 = 255.00
     t2 = 300
     t3 = 300
-    r1 = pd.read_csv(dir_path+"_10_nodes")
+    r1 = pd.read_csv(dir_path+"_320_nodes")
     r2 = pd.read_csv(dir_path+"_160_nodes")
     r3 = pd.read_csv(dir_path+"_80_nodes")
-    plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, fname)
+    plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname)
 
 
 def plot_ensemble_results(lon1, lat1, lon2, lat2, df_paths, df_results, fname, fill=1.0):
