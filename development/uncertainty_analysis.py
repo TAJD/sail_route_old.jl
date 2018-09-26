@@ -49,7 +49,7 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 
-def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, fname, fill=1.0):
+def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill=1.0):
     """Plot routes generated as a function of different grid sizes."""
     add_param = fill
     res = 'i'
@@ -74,27 +74,30 @@ def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, fname, fill=1.0):
     map.scatter(r_f_x, r_f_y, color='blue', s=50, label='Finish')
 
     x_r1, y_r1 = map(r1["x1"].values, r1["x2"].values)
-    map.plot(x_r1, y_r1, label="320 nodes")
+    map.plot(x_r1, y_r1, label="10 nodes, {0:.2f}".format(t1))
     x_r2, y_r2 = map(r2["x1"].values, r2["x2"].values)
-    map.plot(x_r1, y_r1, label="160 nodes")
+    map.plot(x_r1, y_r1, label="160 nodes, {0:.2f}".format(t2))
     x_r3, y_r3 = map(r3["x1"].values, r3["x2"].values)
-    map.plot(x_r1, y_r1, label="80 nodes")
-    plt.legend(loc='lower right', fancybox=True, framealpha=0.5)
+    map.plot(x_r1, y_r1, label="80 nodes, {0:.2f}".format(t3))
+    plt.legend(bbox_to_anchor=(1.1, 1.05), fancybox=True, framealpha=0.5)
     plt.savefig(fname)
     plt.show()
     plt.clf()
 
 
 def plot_varied_grid_results():
-    dir_path = os.path.dirname(os.path.realpath(__file__))+"/"
-    fname = dir_path+"discretized_routing.png"
-    lon1 = -11.5
-    lat1 = 47.67
-    lon2 = -77.67
-    lat2 = 25.7
-    r1 = pd.read_csv(dir_path+"disc_routesp1")
-    r2 = pd.read_csv(dir_path+"disc_routesp2")
-    r3 = pd.read_csv(dir_path+"disc_routesp3")
+    dir_path = os.path.dirname(os.path.realpath(__file__))+"/polynesian/"
+    fname = dir_path+"poly_discretized_routing.png"
+    lon1 = -171.75
+    lat1 = -13.917
+    lon2 = -158.07
+    lat2 = -19.59
+    t1 = 308.87
+    t2 = 300
+    t3 = 300
+    r1 = pd.read_csv(dir_path+"_10_nodes")
+    r2 = pd.read_csv(dir_path+"_160_nodes")
+    r3 = pd.read_csv(dir_path+"_80_nodes")
     plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, fname)
 
 
@@ -153,4 +156,5 @@ def plot_ensemble_weather_simulations_results():
     # plot each route with the associated ensemble weather scenario and the label
 
 if __name__ == "__main__":
-    plot_ensemble_weather_simulations_results()
+    plot_varied_grid_results()
+    # plot_ensemble_weather_simulations_results()

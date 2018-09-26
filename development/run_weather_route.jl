@@ -47,7 +47,7 @@ function run_ensemble_weather_scenarios()
     lat1 = 47.67
     lon2 = -77.67
     lat2 = 25.7
-    n = 80 # won't interpolate well below 20 nodes
+    n = 360 # won't interpolate well below 20 nodes
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
     
@@ -68,9 +68,9 @@ function run_ensemble_weather_scenarios()
     CSV.write(name1, df_res)
 end
 
-# t = @benchmarkable run_ensemble_weather_scenarios()
-# tune!(t)
-# dump(t)
+t = @benchmarkable run_ensemble_weather_scenarios()
+tune!(t)
+dump(t)
 
 function run_varied_performance()
     lon1 = -11.5

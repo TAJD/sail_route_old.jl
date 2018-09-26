@@ -23,7 +23,7 @@ def line_points(x, y, n_nodes, dist):
 
 def gen_grid(start_long, finish_long, start_lat, finish_lat,
              n_ranks, n_nodes, dist):
-    """Return grid between start and finish."""
+    """Return grid between start and finish. Dist needs to be in metres."""
     g = pyproj.Geod(ellps='clrk66')
     azimuths = g.inv(start_long, start_lat, finish_long, finish_lat)
     rot = azimuths[0]-90.0

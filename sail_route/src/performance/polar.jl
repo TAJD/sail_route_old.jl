@@ -43,7 +43,7 @@ Return interpolation object.
 """
 function setup_interpolation(tws, twa, perf)
     knots = (twa, tws)
-    itp = LinearInterpolation(knots, perf, extrapolation_bc=0.1)
+    itp = LinearInterpolation(knots, perf, extrapolation_bc = Line())
     return itp
 end
 

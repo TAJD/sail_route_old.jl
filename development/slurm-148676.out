@@ -1,0 +1,34 @@
+Running SLURM prolog script on red068.cluster.local
+===============================================================================
+Job started on Wed Sep 26 10:09:07 BST 2018
+Job ID          : 148676
+Job name        : submit_single_weather_route
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 40
+Num of tasks    : 40
+Hosts allocated : red068
+Job Output Follows ...
+===============================================================================
+==============================================================================
+Running epilogue script on red068.
+
+Submit time  : 2018-09-26T10:09:07
+Start time   : 2018-09-26T10:09:07
+End time     : 2018-09-26T10:14:32
+Elapsed time : 00:05:25 (Timelimit=20:00:00)
+
+Job ID: 148676
+Cluster: i5
+User/Group: td7g11/mm
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 40
+CPU Utilized: 00:08:01
+**** Please note that the CPU efficency of your job is less than 50% ****
+**** Ask the HPC team for advice -- if you need it
+**** CPU Efficiency: 3.70% of 03:36:40 core-walltime
+
+Memory Utilized: 6.17 GB
+

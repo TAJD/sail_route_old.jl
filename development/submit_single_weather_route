@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --time=20:00:00
-#SBATCH --ntasks=40
+#SBATCH --ntasks=10
 
 export PATH="/scratch/td7g11/julia/julia-1.0.0/bin/:${PATH}"
 
