@@ -43,8 +43,9 @@ Return interpolation object.
 """
 function setup_interpolation(tws, twa, perf)
     knots = (twa, tws)
-    itp = LinearInterpolation(knots, perf, extrapolation_bc = Line())
-    return itp
+    itp = interpolate(knots, perf, Gridded(Linear()))
+    etp0 = extrapolate(itp, Line())
+    return etp0
 end
 
 
@@ -54,7 +55,7 @@ end
 Return interpolated performance. Convert from ms to knots here.
 """
 function perf_interp(performance, twa, tws)
-    return performance.polar(twa, tws*1.9438444924574)*performance.uncertainty + 0.000001
+    return performance.polar(twa, tws*1.94384)*performance.uncertainty
 end
 
 
@@ -128,5 +129,11 @@ function cost_function(performance::Performance,
     #         return vs
     #     end
     # end
-    return perf_interp(performance, min_angle(widi, bearing), wisp)
+    if widi > 360.0
+        return 0.0
+    elseif wisp > 40.0
+        return 0.0
+    else
+        return perf_interp(performance, min_angle(widi, bearing), wisp)
+    end
 end

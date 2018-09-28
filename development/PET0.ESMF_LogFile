@@ -1,4 +1,3 @@
-20180926 101342.236 ERROR            PET0 ESMF_Array.F90:3907 ESMF_ArrayWrite Unable to write to file  - Internal subroutine call returned Error
-20180926 101342.236 ERROR            PET0 ESMF_IOScrip.F90:364 ESMF_OutputWeightFile Unable to write to file  - Internal subroutine call returned Error
-20180926 101342.236 ERROR            PET0 ESMF_IOScrip.F90:136 ESMF_SparseMatrixWrite Unable to write to file  - Internal subroutine call returned Error
-20180926 101342.236 ERROR            PET0 ESMF_Field_C.F90:1176 f_esmf_regridstorefile Unable to write to file  - Internal subroutine call returned Error
+20180927 161452.543 ERROR            PET0 ESMF_IOScrip.F90:211 ESMF_OutputWeightFile Operation not yet supported  - "factorList" has size 0 and PET count is 1. There is nothing to write.
+20180927 161452.543 ERROR            PET0 ESMF_IOScrip.F90:136 ESMF_SparseMatrixWrite Operation not yet supported  - Internal subroutine call returned Error
+20180927 161452.543 ERROR            PET0 ESMF_Field_C.F90:1176 f_esmf_regridstorefile Operation not yet supported  - Internal subroutine call returned Error

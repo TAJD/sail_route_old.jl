@@ -47,26 +47,27 @@ function run_ensemble_weather_scenarios()
     lat1 = 47.67
     lon2 = -77.67
     lat2 = 25.7
-    n = 360 # won't interpolate well below 20 nodes
+    n = 10 # won't interpolate well below 20 nodes
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
     
     times = SharedArray{Float64}(10, 2)
-    @sync @distributed for i = 1:10
-    # for i = 1
+    # @sync @distributed for i = 1:10
+    for i = 1
         wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
         results = route_solve(sample_route, sample_perf, start_time,
                               wisp, widi, wadi, wahi, Int(i-1))
         @show arrival_time = results[1]
         route = results[2]
-        name = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_transat_ens_number_"*repr(Int(i))*"_nodes_"*repr(n)
+        name = ENV["HOME"]*"/sail_route.jl/development/sensitivity/_route_transat_ens_number_"*repr(Int(i))*"_nodes_"*repr(n)*"_date_"*repr(start_time)
         CSV.write(name, DataFrame(results[2]))
         times[i, :] = Array([Float64(i), results[1]])
     end
     @show df_res = DataFrame(times)
-    name1 = ENV["HOME"]*"/sail_route.jl/development/sensitivity/route_transat_ens_number_results"
+    name1 = ENV["HOME"]*"/sail_route.jl/development/sensitivity/route_ens_results_nodes_"*repr(n)*"_date_"*repr(start_time)
     CSV.write(name1, df_res)
 end
+
 
 run_ensemble_weather_scenarios()
 
@@ -86,7 +87,8 @@ function run_varied_performance()
     perfs = generate_performance_uncertainty_samples(polar, params)
      # create seperate instance bas
     results = SharedArray{Float64}(length(perfs), 2)
-    @sync @distributed for i in eachindex(perfs)
+    # @sync @distributed for i in eachindex(perfs)
+    for i = 1
         wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
         @show results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time,
                                                     wisp, widi, wadi, wahi, ens_number)
@@ -99,4 +101,4 @@ function run_varied_performance()
     CSV.write(save_path, df)
 end
 
-run_varied_performance()
+# run_varied_performance()

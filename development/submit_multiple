@@ -10,5 +10,4 @@ cd $HOME/sail_route.jl/development
 current_time=$(date "+%Y.%m.%d-%H.%M.%S")
 fname=multiple_simulations.$current_time.txt
 
-# julia -p 20 < "sensitivity/uncertain_routing_analysis.jl" > $fname
 julia -p 10 < "run_weather_route.jl" > $fname
