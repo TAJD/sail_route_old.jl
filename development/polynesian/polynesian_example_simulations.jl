@@ -42,10 +42,62 @@ using Distributed
         twa = Array{Float64}([0, 60, 70, 80, 90, 100, 110, 120])
         return twa, tws, perf
     end
+
+    function myrange(q::SharedArray) # create a custom iterator which breaks up a range based on the processor number
+        @show idx = indexpids(q)
+        if idx == 0 # This worker is not assigned a piece
+            return 1:0, 1:0
+        end
+        nchunks = length(procs(q))
+        splits = [round(Int, s) for s in range(0, stop=size(q,2), length=nchunks+1)]
+        1:size(q,1), splits[idx]+1:splits[idx+1]
+    end
+
+
+    function route_solve_chunk!(results, t_range, p_range, times, perfs)
+        for t in t_range, p in p_range
+            # this is where the action happens - have to reload everything here
+            lon1 = -171.75
+            lat1 = -13.917
+            lon2 = -158.07
+            lat2 = -19.59
+            n = 180
+            sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+            weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+            twa, tws, perf = load_tong()
+            polar = setup_interpolation(tws, twa, perf)
+            print(times[t], " ", perfs[p])
+        end
+        results
+    end
+
+
+    route_solve_shared_chunk!(results, times, perfs) = route_solve_chunk!(results, myrange(results)..., times, perfs)
+
 end
 
 
-function run_discretized_routes()
+function parallize_uncertain_routing()
+
+    start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
+    times = Dates.Date(1982, 7, 1, 0, 0, 0):Dates.Day(1):Dates.Date(1982, 7, 10, 0, 0)
+    n_perfs = 10
+    params = [i for i in LinRange(0.9, 1.1, n_perfs)]
+    perfs = generate_performance_uncertainty_samples(polar, params)
+    results = SharedArray{Float64, 2}(10, 10)
+    @sync begin
+        for p in procs(results)
+            @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs)
+        end
+    end
+    @show results
+    return results
+end
+
+parallize_uncertain_routing()
+
+
+function run_single_route()
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/1982/1982_polynesia.nc"
     twa, tws, perf = load_tong()
     polar = setup_interpolation(tws, twa, perf)
@@ -54,7 +106,7 @@ function run_discretized_routes()
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    n = 180 # won't interpolate well below 20 nodes
+    n = 180
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
     wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
@@ -69,34 +121,38 @@ function run_discretized_routes()
     CSV.write(name*"y_locs", DataFrame(results[5]))
 end
 
-run_discretized_routes()
+# run_single_route()
 
 
 function run_varied_performance()
-    lon1 = -11.5
-    lat1 = 47.67
-    lon2 = -77.67
-    lat2 = 25.7
-    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/1982/1982_polynesia.nc"
+    lon1 = -171.75
+    lat1 = -13.917
+    lon2 = -158.07
+    lat2 = -19.59
+    n = 180
+    sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     twa, tws, perf = load_tong()
     polar = setup_interpolation(tws, twa, perf)
-    time = Dates.DateTime(2016, 6, 1, 2, 0, 0)
+    start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
     n_perfs = 10
     params = [i for i in LinRange(0.9, 1.1, n_perfs)]
     perfs = generate_performance_uncertainty_samples(polar, params)
-     # create seperate instance bas
     results = SharedArray{Float64}(length(perfs), 2)
-    # @sync @distributed for i in eachindex(perfs)
-    for i = 1
-        wisp, widi, wahi, wadi, wapr = load_era5_weather(weather_data)
-        @show results[i, :] = disc_routing_analysis(lon2, lon1, lat2, lat1, perfs[i], time,
-                                                    wisp, widi, wadi, wahi)
+    @sync @distributed for i in eachindex(perfs)
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+        results = route_solve(sample_route, perfs[i], start_time,
+                              wisp, widi, wadi, wahi)
+        @show arrival_time = results[1]
+        route = results[2]
+        name = ENV["HOME"]*"/sail_route.jl/development/polynesian/_route_nodes_"*repr(n)*"_date_"*repr(start_time)
+        CSV.write(name, DataFrame(results[2]))
     end
     times = results[:, 1]
     unc = results[:, 2]
     @show df = DataFrame(perf=params, t=times, u=unc)
     time = Dates.format(Dates.now(), "HH:MM:SS")
-    save_path = ENV["HOME"]*"/sail_route.jl/development/sensitivity/results_"*time
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian/results_"*repr(start_time)
     CSV.write(save_path, df)
 end
 

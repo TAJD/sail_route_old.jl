@@ -1,0 +1,37 @@
+parallize_uncertain_routing (generic function with 1 method)
+run_single_route (generic function with 1 method)
+run_varied_performance (generic function with 1 method)
+      From worker 5:	arrival_time = results[1] = 263.822163131804
+      From worker 8:	arrival_time = results[1] = 243.7540548104981
+      From worker 11:	arrival_time = results[1] = 225.8083819900765
+      From worker 10:	arrival_time = results[1] = 232.217742681911
+      From worker 3:	arrival_time = results[1] = 274.9504587270771
+      From worker 9:	arrival_time = results[1] = 237.6093799198709
+      From worker 2:	arrival_time = results[1] = 282.4378092003972
+      From worker 7:	arrival_time = results[1] = 251.5113109779258
+      From worker 4:	arrival_time = results[1] = 268.9188298729527
+      From worker 6:	arrival_time = results[1] = 258.4541740751694
+df = DataFrame(perf=params, t=times, u=unc) = 10×3 DataFrame
+│ Row │ perf     │ t   │ u   │
+├─────┼──────────┼─────┼─────┤
+│ 1   │ 0.9      │ 0.0 │ 0.0 │
+│ 2   │ 0.922222 │ 0.0 │ 0.0 │
+│ 3   │ 0.944444 │ 0.0 │ 0.0 │
+│ 4   │ 0.966667 │ 0.0 │ 0.0 │
+│ 5   │ 0.988889 │ 0.0 │ 0.0 │
+│ 6   │ 1.01111  │ 0.0 │ 0.0 │
+│ 7   │ 1.03333  │ 0.0 │ 0.0 │
+│ 8   │ 1.05556  │ 0.0 │ 0.0 │
+│ 9   │ 1.07778  │ 0.0 │ 0.0 │
+│ 10  │ 1.1      │ 0.0 │ 0.0 │
+CSV.Sink{Nothing,DataType}(    CSV.Options:
+        delim: ','
+        quotechar: '"'
+        escapechar: '\\'
+        missingstring: ""
+        dateformat: 
+        decimal: '.'
+        truestring: 'true'
+        falsestring: 'false'
+        internstrings: true, IOBuffer(data=UInt8[...], readable=true, writable=true, seekable=true, append=false, size=0, maxsize=Inf, ptr=1, mark=-1), "/home/td7g11/sail_route.jl/development/polynesian/results_1982-07-01T00:00:00", 9, true, ["perf", "t", "u"], 3, false, Val{false})
+run_varied_performance_plots (generic function with 1 method)
