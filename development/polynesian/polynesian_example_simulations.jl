@@ -55,43 +55,42 @@ using Distributed
 
 
     function route_solve_chunk!(results, t_range, p_range, times, perfs)
+        lon1 = -171.75
+        lat1 = -13.917
+        lon2 = -158.07
+        lat2 = -19.59
+        n = 10
+        sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+        weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
         for t in t_range, p in p_range
-            # this is where the action happens - have to reload everything here
-            lon1 = -171.75
-            lat1 = -13.917
-            lon2 = -158.07
-            lat2 = -19.59
-            n = 180
-            sample_route = Route(lon1, lon2, lat1, lat2, n, n)
-            weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-            twa, tws, perf = load_tong()
-            polar = setup_interpolation(tws, twa, perf)
-            print(times[t], " ", perfs[p])
+            output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
+            results[t, p] = output[1]
         end
-        results
+        @show results
     end
 
-
     route_solve_shared_chunk!(results, times, perfs) = route_solve_chunk!(results, myrange(results)..., times, perfs)
-
 end
 
 
 function parallize_uncertain_routing()
-
-    start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
-    times = Dates.Date(1982, 7, 1, 0, 0, 0):Dates.Day(1):Dates.Date(1982, 7, 10, 0, 0)
+    times = Dates.Date(1982, 7, 1):Dates.Day(1):Dates.Date(1982, 7, 10)
+    times = [DateTime(t) for t in times]
     n_perfs = 10
     params = [i for i in LinRange(0.9, 1.1, n_perfs)]
+    twa, tws, perf = load_tong()
+    polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
-    results = SharedArray{Float64, 2}(10, 10)
+    results = SharedArray{Float64, 2}(length(times), n_perfs)
     @sync begin
         for p in procs(results)
             @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs)
         end
     end
     @show results
-    return results
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian/daily_uncertainty_routing"
+    CSV.write(save_path, DataFrame(results))
 end
 
 parallize_uncertain_routing()

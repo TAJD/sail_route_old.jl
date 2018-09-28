@@ -1,0 +1,24 @@
+parallize_uncertain_routing (generic function with 1 method)
+      From worker 10:	idx = indexpids(q) = 9
+      From worker 3:	idx = indexpids(q) = 2
+      From worker 2:	idx = indexpids(q) = 1
+      From worker 9:	idx = indexpids(q) = 8
+      From worker 4:	idx = indexpids(q) = 3
+      From worker 8:	idx = indexpids(q) = 7
+      From worker 11:	idx = indexpids(q) = 10
+      From worker 7:	idx = indexpids(q) = 6
+      From worker 5:	idx = indexpids(q) = 4
+      From worker 6:	idx = indexpids(q) = 5
+      From worker 11:	results[t, p] = output[1] = 227.04638281732895
+      From worker 11:	results[t, p] = output[1] = 251.54230553066276
+      From worker 11:	results[t, p] = output[1] = 259.2123749523687
+      From worker 11:	results[t, p] = output[1] = 244.5944249373172
+      From worker 11:	results[t, p] = output[1] = 223.43387754602057
+      From worker 11:	results[t, p] = output[1] = 219.14943951429763
+      From worker 11:	results[t, p] = output[1] = 216.23221708699475
+      From worker 11:	results[t, p] = output[1] = 215.4540519133105
+      From worker 11:	results[t, p] = output[1] = 223.05816028976668
+      From worker 11:	results[t, p] = output[1] = 239.65196218870756
+run_single_route (generic function with 1 method)
+run_varied_performance (generic function with 1 method)
+run_varied_performance_plots (generic function with 1 method)
