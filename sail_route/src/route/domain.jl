@@ -41,14 +41,15 @@ function co_ordinates(start_long, finish_long, start_lat, finish_lat,
 end
 
 
-function output()
-    x, y, land = co_ordinates(-6.0, -14.0, 0.0, 0.0, 10, 10, 5000.0)
-    print(x)
-    print(y)
-    print(land)
+"""Calculate the number of nodes for a specific distance in nm."""
+function calc_nodes(lon1, lon2, lat1, lat2, req_d)
+    d = haversine(lon1, lon2, lat1, lat2)[1]
+    req_n = round(Int, d/req_d)
+    req_n
 end
 
 
+"""Calculate the minimum distance between two angles."""
 function min_angle(a, b)
     abs(mod(a - b + 180.0, 360.0) - 180.0)
 end

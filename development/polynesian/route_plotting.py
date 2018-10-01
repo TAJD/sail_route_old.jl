@@ -55,8 +55,10 @@ def plot_isochrones(x, y, et, jt, r, fname):
 
 def inspect_route():
     """Script to inspect route."""
-    nodes = "_320_nodes_"
-    path = os.path.dirname(os.path.realpath(__file__)) + "/" +nodes
+    # name = "/boeckv2/"
+    name = "/tongiaki/"
+    nodes = name + "_125_nodes_"
+    path = os.path.dirname(os.path.realpath(__file__)) + nodes
     x = pd.read_csv(path+"x_locs").values
     y = pd.read_csv(path+"y_locs").values
     et = pd.read_csv(path+"earliest_times").values
@@ -118,5 +120,5 @@ def plot_varied_grid_results():
     plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname)
 
 if __name__ == "__main__":
-    # inspect_route()
-    plot_varied_grid_results()
+    inspect_route()
+    # plot_varied_grid_results()

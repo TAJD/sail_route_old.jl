@@ -26,7 +26,6 @@ def gen_grid(start_long, finish_long, start_lat, finish_lat,
     """Return grid between start and finish. Dist needs to be in metres."""
     g = pyproj.Geod(ellps='clrk66')
     dist *= 1.852001*1000.0
-    print(dist)
     azimuths = g.inv(start_long, start_lat, finish_long, finish_lat)
     rot = azimuths[0]-90.0
     height = dist * np.sin(rot) + dist * np.cos(rot)
