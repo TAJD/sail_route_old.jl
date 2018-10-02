@@ -84,16 +84,91 @@ using Distributed
         results
     end
 
-    route_solve_shared_chunk!(results, times, perfs) = route_solve_chunk!(results, myrange(results)..., times, perfs)
+
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+
+    function route_solve_upolu_to_atiu!(results, t_range, p_range, times, perfs)
+        lon1 = -171.75
+        lat1 = -13.917
+        lon2 = -158.07
+        lat2 = -19.59
+        min_dist = 5.0  # nm
+        n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+        sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+        weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+        for t in t_range, p in p_range
+            output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
+            @show results[t, p] = output[1]
+        end
+        results
+    end
+
+
+    function route_solve_upolu_to_moorea!(results, t_range, p_range, times, perfs)
+        lon1 = -171.75
+        lat1 = -13.917
+        lon2 = -149.83
+        lat2 = -17.53
+        min_dist = 5.0  # nm
+        n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+        sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+        weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+        for t in t_range, p in p_range
+            output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
+            @show results[t, p] = output[1]
+        end
+        results
+    end
+
+
+    function route_solve_tongatapu_to_moorea!(results, t_range, p_range, times, perfs)
+        lon1 = -171.15
+        lat1 = -17.53
+        lon2 = -149.83
+        lat2 = -17.53
+        min_dist = 5.0  # nm
+        n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+        sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+        weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+        for t in t_range, p in p_range
+            output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
+            @show results[t, p] = output[1]
+        end
+        results
+    end
+
+
+    function route_solve_tongatapu_to_atiu!(results, t_range, p_range, times, perfs)
+        lon1 = -171.15
+        lat1 = -17.53
+        lon2 = -158.07
+        lat2 = -19.59
+        min_dist = 5.0  # nm
+        n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+        sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+        weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc" 
+        wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+        for t in t_range, p in p_range
+            output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
+            @show results[t, p] = output[1]
+        end
+        results
+    end
+
+    route_solve_shared_chunk!(results, times, perfs) = route_solve_upolu_to_atiu!(results, myrange(results)..., times, perfs)
 end
 
 
 function parallize_uncertain_routing()
-    times = Dates.Date(1982, 1, 1):Dates.Day(2):Dates.Date(1982, 11, 15)
+    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 31)
     times = [DateTime(t) for t in times]
-    n_perfs = 5
+    n_perfs = 10
     params = [i for i in LinRange(0.9, 1.1, n_perfs)]
-    twa, tws, perf = load_boeckv2()
+    twa, tws, perf = load_tong()
+    # twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64, 2}(length(times), n_perfs)
@@ -102,8 +177,10 @@ function parallize_uncertain_routing()
             @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs)
         end
     end
-    results
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2_routing"*repr(times[1])*"finish_"*repr(times[end])
+    # @show results
+    route_name = ""
+    boat = "/boeckv2/"
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing"*route_name*"_"*repr(times[1])*"finish_"*repr(times[end])
     CSV.write(save_path, DataFrame(results))
 end
 
@@ -111,16 +188,17 @@ end
 
 
 function run_single_route()
-    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    twa, tws, perf = load_tong()
-    # twa, tws, perf = load_boeckv2()
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
+    # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    # twa, tws, perf = load_tong()
+    twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
     sample_perf = Performance(polar, 1.0, 1.0)
     lon1 = -171.75
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    min_dist = 10.0 # nm
+    min_dist = 2.0 # nm
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     # n = 10
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
@@ -129,7 +207,7 @@ function run_single_route()
     results = route_solve(sample_route, sample_perf, start_time,
                           wisp, widi, wadi, wahi)
     @show results[1]
-    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/tongiaki/_"*repr(n)*"_nodes_"
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"
     CSV.write(name*"route", DataFrame(results[2]))
     CSV.write(name*"time", DataFrame(Array{Float64}([results[1]])))
     CSV.write(name*"earliest_times", DataFrame(results[3]))
@@ -145,7 +223,7 @@ function run_varied_performance()
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    n = 180
+    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     twa, tws, perf = load_tong()

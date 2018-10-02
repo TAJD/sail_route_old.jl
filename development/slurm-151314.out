@@ -1,0 +1,13 @@
+Running SLURM prolog script on red350.cluster.local
+===============================================================================
+Job started on Tue Oct  2 15:25:19 BST 2018
+Job ID          : 151314
+Job name        : submit_single_weather_route
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 10
+Num of tasks    : 10
+Hosts allocated : red350
+Job Output Follows ...
+===============================================================================

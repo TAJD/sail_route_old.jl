@@ -48,6 +48,7 @@ def plot_isochrones(x, y, et, jt, r, fname):
     map.plot(x_r1, y_r1, label="Shortest path", color='black')
     plt.legend(loc='lower right', fancybox=True, framealpha=0.5)
     plt.title("Journey time {0:.2f} hrs".format(jt))
+    plt.tight_layout()
     plt.savefig(fname)
     # plt.show()
     plt.clf()
@@ -55,9 +56,9 @@ def plot_isochrones(x, y, et, jt, r, fname):
 
 def inspect_route():
     """Script to inspect route."""
-    # name = "/boeckv2/"
-    name = "/tongiaki/"
-    nodes = name + "_125_nodes_"
+    name = "/boeckv2/"
+    # name = "/tongiaki/"
+    nodes = name + "_5.0_nm_"
     path = os.path.dirname(os.path.realpath(__file__)) + nodes
     x = pd.read_csv(path+"x_locs").values
     y = pd.read_csv(path+"y_locs").values
