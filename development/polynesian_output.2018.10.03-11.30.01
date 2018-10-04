@@ -1,0 +1,4 @@
+parallize_uncertain_routing (generic function with 1 method)
+run_single_route (generic function with 1 method)
+results[1] = 193.7093956162378
+run_varied_performance (generic function with 1 method)

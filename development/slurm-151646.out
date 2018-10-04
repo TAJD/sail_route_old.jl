@@ -1,23 +1,22 @@
-Running SLURM prolog script on red350.cluster.local
+Running SLURM prolog script on red086.cluster.local
 ===============================================================================
-Job started on Tue Oct  2 15:25:19 BST 2018
-Job ID          : 151314
+Job started on Wed Oct  3 11:31:00 BST 2018
+Job ID          : 151646
 Job name        : submit_single_weather_route
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
 Num hosts       : 1
 Num cores       : 10
 Num of tasks    : 10
-Hosts allocated : red350
+Hosts allocated : red086
 Job Output Follows ...
 ===============================================================================
-slurmstepd: error: *** JOB 151314 ON red350 CANCELLED AT 2018-10-02T16:02:05 ***
 ==============================================================================
-Running epilogue script on red350.
+Running epilogue script on red086.
 
-Submit time  : 2018-10-02T15:25:19
-Start time   : 2018-10-02T15:25:19
-End time     : 2018-10-02T16:02:05
-Elapsed time : 00:36:46 (Timelimit=20:00:00)
+Submit time  : 2018-10-03T11:30:57
+Start time   : 2018-10-03T11:30:59
+End time     : 2018-10-03T11:40:10
+Elapsed time : 00:09:11 (Timelimit=20:00:00)
 
 

@@ -92,7 +92,7 @@ using Distributed
         lat1 = -13.917
         lon2 = -158.07
         lat2 = -19.59
-        min_dist = 5.0  # nm
+        min_dist = 20.0  # nm
         n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
         sample_route = Route(lon1, lon2, lat1, lat2, n, n)
         weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
@@ -163,23 +163,24 @@ end
 
 
 function parallize_uncertain_routing()
-    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 31)
+    times = Dates.Date(1982, 8, 1):Dates.Day(1):Dates.Date(1982, 8, 31)
     times = [DateTime(t) for t in times]
-    n_perfs = 10
-    params = [i for i in LinRange(0.9, 1.1, n_perfs)]
-    twa, tws, perf = load_tong()
-    # twa, tws, perf = load_boeckv2()
+    params = [i for i in LinRange(0.9, 1.1, 10)]
+    # twa, tws, perf = load_tong()
+    twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
-    results = SharedArray{Float64, 2}(length(times), n_perfs)
+    results = SharedArray{Float64, 2}(length(times), length(perfs))
+    @show size(results)
     @sync begin
         for p in procs(results)
             @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs)
         end
     end
-    # @show results
-    route_name = ""
-    boat = "/boeckv2/"
+    @show results
+    route_name = "upolu_to_atiu"
+    # boat = "/boeckv2/"
+    boat = "/tongiaki/"
     save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing"*route_name*"_"*repr(times[1])*"finish_"*repr(times[end])
     CSV.write(save_path, DataFrame(results))
 end
@@ -189,7 +190,9 @@ end
 
 function run_single_route()
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
+    start_time = Dates.DateTime(1976, 7, 1, 0, 0, 0)
     # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    # start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
     # twa, tws, perf = load_tong()
     twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
@@ -198,18 +201,15 @@ function run_single_route()
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    min_dist = 2.0 # nm
+    min_dist = 5.0 # nm
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    # n = 10
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
-    start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
     wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
     results = route_solve(sample_route, sample_perf, start_time,
                           wisp, widi, wadi, wahi)
-    @show results[1]
-    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_"
     CSV.write(name*"route", DataFrame(results[2]))
-    CSV.write(name*"time", DataFrame(Array{Float64}([results[1]])))
+    CSV.write(name*"time", DataFrame([[results[1]]]))
     CSV.write(name*"earliest_times", DataFrame(results[3]))
     CSV.write(name*"x_locs", DataFrame(results[4]))
     CSV.write(name*"y_locs", DataFrame(results[5]))

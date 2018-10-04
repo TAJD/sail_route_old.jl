@@ -1,7 +1,7 @@
 Running SLURM prolog script on red350.cluster.local
 ===============================================================================
-Job started on Tue Oct  2 15:25:19 BST 2018
-Job ID          : 151314
+Job started on Tue Oct  2 16:03:20 BST 2018
+Job ID          : 151348
 Job name        : submit_single_weather_route
 WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
 Partition       : batch
@@ -11,13 +11,17 @@ Num of tasks    : 10
 Hosts allocated : red350
 Job Output Follows ...
 ===============================================================================
-slurmstepd: error: *** JOB 151314 ON red350 CANCELLED AT 2018-10-02T16:02:05 ***
+ERROR: ArgumentError: unable to construct DataFrame from Array{Float64,1}
+Stacktrace:
+ [1] DataFrame(::Array{Float64,1}) at /home/td7g11/.julia/packages/DataFrames/VC5qi/src/other/tables.jl:32
+ [2] run_single_route() at ./none:211
+ [3] top-level scope at none:0
 ==============================================================================
 Running epilogue script on red350.
 
-Submit time  : 2018-10-02T15:25:19
-Start time   : 2018-10-02T15:25:19
-End time     : 2018-10-02T16:02:05
-Elapsed time : 00:36:46 (Timelimit=20:00:00)
+Submit time  : 2018-10-02T16:03:19
+Start time   : 2018-10-02T16:03:20
+End time     : 2018-10-02T16:07:29
+Elapsed time : 00:04:09 (Timelimit=20:00:00)
 
 
