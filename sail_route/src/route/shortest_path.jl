@@ -154,9 +154,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
                      ens_number::Int)
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
     x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
-                              route.x_nodes, route.y_nodes, y_dist)
-    println(y_dist)
-
+                              route.x_nodes, route.y_nodes, y_dist)å
     wisp = regrid_data(wisp, x[:, 1], y[:, 1])
     widi = regrid_data(widi, x[:, 1], y[:, 1])
     wadi = regrid_data(wadi, x[:, 1], y[:, 1])
@@ -171,7 +169,7 @@ function route_solve(route::Route, performance, start_time::DateTime,
             earliest_times[1, idx] = Inf
         else
             d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
-            ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
+            @show ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
                                 number=ens_number, method="nearest")[:data][1]
             wd_int = widi[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx],
                                 number=ens_number, method="nearest")[:data][1]

@@ -94,12 +94,13 @@ def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill
     map.scatter(r_f_x, r_f_y, color='blue', s=50, label='Finish')
 
     x_r1, y_r1 = map(r1["x1"].values, r1["x2"].values)
-    map.plot(x_r1, y_r1, label="5.0 nm, {0:.2f}".format(t1))
+    map.plot(x_r1, y_r1, label="5.0 nm, {0:.2f} hrs".format(t1))
     x_r2, y_r2 = map(r2["x1"].values, r2["x2"].values)
-    map.plot(x_r2, y_r2, label="10.0 nm, {0:.2f}".format(t2))
+    map.plot(x_r2, y_r2, label="10.0 nm, {0:.2f} hrs".format(t2))
     x_r3, y_r3 = map(r3["x1"].values, r3["x2"].values)
-    map.plot(x_r3, y_r3, label="15.0 nm, {0:.2f}".format(t3))
+    map.plot(x_r3, y_r3, label="15.0 nm, {0:.2f} hrs".format(t3))
     plt.legend(bbox_to_anchor=(1.1, 1.05), fancybox=True, framealpha=0.5)
+    plt.tight_layout()
     plt.savefig(fname)
     plt.show()
     plt.clf()
@@ -107,17 +108,18 @@ def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill
 
 def plot_varied_grid_results():
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/boeckv2/" 
-    fname = dir_path+"boeck_july_1976_discretized_routing.png"
+    fname = dir_path+"boeck_july_1982_discretized_routing.png"
     lon1 = -171.75
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    t1 = pd.read_csv(dir_path+"_5.0_nm_time").values[0][0]
-    t2 = pd.read_csv(dir_path+"_10.0_nm_time").values[0][0]
-    t3 = pd.read_csv(dir_path+"_15.0_nm_time").values[0][0]
-    r1 = pd.read_csv(dir_path+"_5.0_nm_route")
-    r2 = pd.read_csv(dir_path+"_10.0_nm_route")
-    r3 = pd.read_csv(dir_path+"_15.0_nm_route")
+    time = "_1982-07-01T00:00:00"
+    t1 = pd.read_csv(dir_path+"_5.0_nm"+time+"_time").values[0][0]
+    t2 = pd.read_csv(dir_path+"_10.0_nm"+time+"_time").values[0][0]
+    t3 = pd.read_csv(dir_path+"_15.0_nm"+time+"_time").values[0][0]
+    r1 = pd.read_csv(dir_path+"_5.0_nm"+time+"_route")
+    r2 = pd.read_csv(dir_path+"_10.0_nm"+time+"_route")
+    r3 = pd.read_csv(dir_path+"_15.0_nm"+time+"_route")
     plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill=2.5)
 
 if __name__ == "__main__":
