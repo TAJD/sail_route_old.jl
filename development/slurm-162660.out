@@ -1,0 +1,22 @@
+Running SLURM prolog script on red231.cluster.local
+===============================================================================
+Job started on Mon Oct  8 08:10:14 BST 2018
+Job ID          : 162660
+Job name        : submit_single_weather_route
+WorkDir         : /mainfs/home/td7g11/sail_route.jl/development
+Partition       : batch
+Num hosts       : 1
+Num cores       : 20
+Num of tasks    : 20
+Hosts allocated : red231
+Job Output Follows ...
+===============================================================================
+==============================================================================
+Running epilogue script on red231.
+
+Submit time  : 2018-10-08T08:10:11
+Start time   : 2018-10-08T08:10:14
+End time     : 2018-10-08T08:24:10
+Elapsed time : 00:13:56 (Timelimit=20:00:00)
+
+

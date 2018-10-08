@@ -15,20 +15,23 @@ using Distributed
     using SharedArrays
 
     global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    # global times = Dates.Date(1982, 6, 1):Dates.Day(1):Dates.Date(1982, 7, 30)
-    global times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 2, 28)
-    global min_dist = 10.0
-    route_solve_shared_chunk!(results, times, perfs) = route_solve_upolu_to_atiu!(results, myrange(results)..., times, perfs)
+    # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc"
+    global times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 10)
+    # global times = Dates.Date(1982, 7, 11):Dates.Day(1):Dates.Date(1982, 7, 20)
+    # global times = Dates.Date(1976, 6, 11):Dates.Day(1):Dates.Date(1976, 6, 21)
+    global min_dist = 20.0 # 50 solves for 20 days? 20 for 10 days
+    route_solve_shared_chunk!(results, times, perfs) = route_solve_tongatapu_to_atiu!(results, myrange(results)..., times, perfs)
 end
 
-# pause work on this whilst identifying what is wrong
-function parallize_uncertain_routing()
+
+function parallized_v2_uncertain_routing!()
     sim_times = [DateTime(t) for t in times]
-    params = [i for i in LinRange(0.9, 1.1, 10)]
+    params = [i for i in LinRange(0.9, 1.1, 11)]
     # route_name = "upolu_to_atiu"
     # route_name = "upolu_to_moorea"
     # route_name = "tongatapu_to_moorea"
-    # route_name = "tongatapu_to_atiu"
+    route_name = "tongatapu_to_atiu"
+    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
     # boat = "/boeckv2/"
     # twa, tws, perf = load_boeckv2()
     boat = "/tongiaki/"
@@ -36,42 +39,11 @@ function parallize_uncertain_routing()
     polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"finish_"*repr(times[end])
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm"
+    println(save_path)
     @sync begin
         for p in procs(results)
             @async remotecall_wait(route_solve_shared_chunk!, p, results, sim_times, perfs)
-            CSV.write(save_path, DataFrame(results)) # save results at each stage in case of crash
-        end
-    end
-    @show results
-    CSV.write(save_path, DataFrame(results))
-end
-
-parallize_uncertain_routing()
-
-function parallized_v2_uncertain_routing!()
-    sim_times = [DateTime(t) for t in times]
-    params = [i for i in LinRange(0.9, 1.1, 11)]
-    route_name = "upolu_to_atiu"
-    lon1 = -171.75
-    lat1 = -13.917
-    lon2 = -158.07
-    lat2 = -19.59
-    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    sample_route = Route(lon1, lon2, lat1, lat2, n, n)
-    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
-    boat = "/boeckv2/"
-    twa, tws, perf = load_boeckv2()
-    # boat = "/tongiaki/"
-    # twa, tws, perf = load_tong()
-    polar = setup_interpolation(tws, twa, perf)
-    perfs = generate_performance_uncertainty_samples(polar, params)
-    results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])
-    for t in eachindex(sim_times) 
-        @sync @distributed for p in eachindex(perfs)
-            output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
-            @show results[t, p] = output[1]
         end
     end
     @show results
@@ -80,21 +52,22 @@ end
 
 # parallized_v2_uncertain_routing!()
 
+
 """Running a routing simulation for a single set of initial conditions."""
 function run_single_route()
     # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
     # start_time = Dates.DateTime(1976, 7, 1, 0, 0, 0)
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
+    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
     # twa, tws, perf = load_tong()
     twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
     sample_perf = Performance(polar, 1.0, 1.0)
-    lon1 = -171.75
-    lat1 = -13.917
+    lon1 = -171.15
+    lat1 = -21.21
     lon2 = -158.07
     lat2 = -19.59
-    min_dist = 50.0 # nm
+    min_dist = 20.0 # nm
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
@@ -109,7 +82,6 @@ function run_single_route()
 end
 
 # run_single_route()
-
 
 """Simulation demonstrating the calculation of uncertainty for a single set of initial conditions. Being tested."""
 function run_algorithm_uncertainty_route()
@@ -128,8 +100,6 @@ function run_algorithm_uncertainty_route()
     @show results
 end
 
-# @btime run_algorithm_uncertainty_route()
-
 
 """Simulation varying performance for a single starting time. Not tested yet."""
 function run_varied_performance()
@@ -137,13 +107,13 @@ function run_varied_performance()
     lat1 = -13.917
     lon2 = -158.07
     lat2 = -19.59
-    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    n = calc_nodes(lon1, lon2, lat1, lat2, 50.0)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     twa, tws, perf = load_tong()
     polar = setup_interpolation(tws, twa, perf)
     start_time = Dates.DateTime(1982, 7, 1, 0, 0, 0)
-    params = [i for i in LinRange(0.9, 1.1, 11)]
+    params = [i for i in LinRange(0.9, 1.1, 3)]
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64}(length(perfs), 2)
     @sync @distributed for i in eachindex(perfs)
@@ -162,5 +132,3 @@ function run_varied_performance()
     save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian/results_"*repr(start_time)
     CSV.write(save_path, df)
 end
-
-# run_varied_performance()

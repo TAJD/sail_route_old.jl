@@ -23,6 +23,7 @@ function route_solve_upolu_to_atiu!(results, t_range, p_range, sim_times, perfs)
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
+        Base.GC.gc()
     end
     results
 end
@@ -39,6 +40,7 @@ function route_solve_upolu_to_moorea!(results, t_range, p_range, sim_times, perf
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
+        Base.GC.gc()
     end
     results
 end
@@ -55,6 +57,7 @@ function route_solve_tongatapu_to_moorea!(results, t_range, p_range, sim_times, 
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
+        Base.GC.gc()
     end
     results
 end
@@ -72,24 +75,7 @@ function route_solve_tongatapu_to_atiu!(results, t_range, p_range, sim_times, pe
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
-    end
-    results
-end
-
-
-function route_solve_chunk!(results, t_range, p_range, times, perfs)
-    lon1 = -171.75
-    lat1 = -13.917
-    lon2 = -158.07
-    lat2 = -19.59
-    min_dist = 10.0  # nm
-    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    sample_route = Route(lon1, lon2, lat1, lat2, n, n)
-    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
-    for t in t_range, p in p_range
-        output = route_solve(sample_route, perfs[p], times[t], wisp, widi, wadi, wahi)
-        @show results[t, p] = output[1]
+        Base.GC.gc()
     end
     results
 end

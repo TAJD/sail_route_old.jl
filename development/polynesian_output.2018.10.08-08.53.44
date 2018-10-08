@@ -1,0 +1,147 @@
+parallized_v2_uncertain_routing! (generic function with 1 method)
+      From worker 4:	idx = indexpids(q) = 3
+      From worker 11:	idx = indexpids(q) = 10
+      From worker 13:	idx = indexpids(q) = 12
+      From worker 7:	idx = indexpids(q) = 6
+      From worker 16:	idx = indexpids(q) = 15
+      From worker 12:	idx = indexpids(q) = 11
+      From worker 5:	idx = indexpids(q) = 4
+      From worker 8:	idx = indexpids(q) = 7
+      From worker 17:	idx = indexpids(q) = 16
+      From worker 10:	idx = indexpids(q) = 9
+      From worker 18:	idx = indexpids(q) = 17
+      From worker 9:	idx = indexpids(q) = 8
+      From worker 14:	idx = indexpids(q) = 13
+      From worker 20:	idx = indexpids(q) = 19
+      From worker 6:	idx = indexpids(q) = 5
+      From worker 2:	idx = indexpids(q) = 1
+      From worker 21:	idx = indexpids(q) = 20
+      From worker 19:	idx = indexpids(q) = 18
+      From worker 3:	idx = indexpids(q) = 2
+      From worker 15:	idx = indexpids(q) = 14
+      From worker 13:	results[t, p] = output[1] = 308.89300567397277
+      From worker 4:	results[t, p] = output[1] = 341.9030180805387
+      From worker 2:	results[t, p] = output[1] = 349.4425389075469
+      From worker 10:	results[t, p] = output[1] = 320.65924055169427
+      From worker 6:	results[t, p] = output[1] = 333.78458687564876
+      From worker 11:	results[t, p] = output[1] = 315.0055502463277
+      From worker 21:	results[t, p] = output[1] = 285.27095550108453
+      From worker 19:	results[t, p] = output[1] = 290.186695070732
+      From worker 15:	results[t, p] = output[1] = 302.5232401811901
+      From worker 17:	results[t, p] = output[1] = 295.88415721992754
+      From worker 8:	results[t, p] = output[1] = 327.5563647046525
+      From worker 13:	results[t, p] = output[1] = 322.3179169820685
+      From worker 4:	results[t, p] = output[1] = 359.6309797135231
+      From worker 2:	results[t, p] = output[1] = 368.09548733831775
+      From worker 10:	results[t, p] = output[1] = 338.1578741032786
+      From worker 11:	results[t, p] = output[1] = 330.7799831427101
+      From worker 6:	results[t, p] = output[1] = 352.8577994727449
+      From worker 21:	results[t, p] = output[1] = 297.55089122817327
+      From worker 19:	results[t, p] = output[1] = 303.74907173728474
+      From worker 15:	results[t, p] = output[1] = 315.55537948410665
+      From worker 17:	results[t, p] = output[1] = 308.9488942234331
+      From worker 8:	results[t, p] = output[1] = 344.85889396148815
+      From worker 13:	results[t, p] = output[1] = 335.49413931462226
+      From worker 4:	results[t, p] = output[1] = 373.19364606070815
+      From worker 2:	results[t, p] = output[1] = 382.89029909326905
+      From worker 10:	results[t, p] = output[1] = 348.2424185046568
+      From worker 11:	results[t, p] = output[1] = 341.77307224478153
+      From worker 6:	results[t, p] = output[1] = 364.3976518113136
+      From worker 21:	results[t, p] = output[1] = 312.94312117602055
+      From worker 19:	results[t, p] = output[1] = 318.66417865998585
+      From worker 15:	results[t, p] = output[1] = 329.56057831457696
+      From worker 17:	results[t, p] = output[1] = 323.46266903241786
+      From worker 8:	results[t, p] = output[1] = 355.8382341021416
+      From worker 13:	results[t, p] = output[1] = 351.74635608984926
+      From worker 4:	results[t, p] = output[1] = 388.0898523784827
+      From worker 2:	results[t, p] = output[1] = 395.035706728389
+      From worker 10:	results[t, p] = output[1] = 365.1117710911084
+      From worker 11:	results[t, p] = output[1] = 357.9991675753245
+      From worker 21:	results[t, p] = output[1] = 322.635810847025
+      From worker 6:	results[t, p] = output[1] = 380.0711768659931
+      From worker 19:	results[t, p] = output[1] = 329.95984158420634
+      From worker 15:	results[t, p] = output[1] = 343.10270618698667
+      From worker 17:	results[t, p] = output[1] = 336.98955651331073
+      From worker 8:	results[t, p] = output[1] = 372.52289670044524
+      From worker 13:	results[t, p] = output[1] = 349.57274954206395
+      From worker 4:	results[t, p] = output[1] = 381.7718701419345
+      From worker 2:	results[t, p] = output[1] = 387.7284815918035
+      From worker 10:	results[t, p] = output[1] = 361.5068420826974
+      From worker 11:	results[t, p] = output[1] = 355.59283917093256
+      From worker 21:	results[t, p] = output[1] = 325.21418314494167
+      From worker 6:	results[t, p] = output[1] = 374.5381748289958
+      From worker 19:	results[t, p] = output[1] = 332.60171979434324
+      From worker 15:	results[t, p] = output[1] = 344.14020295879874
+      From worker 17:	results[t, p] = output[1] = 337.4919015706774
+      From worker 8:	results[t, p] = output[1] = 368.34734880822754
+      From worker 13:	results[t, p] = output[1] = 342.15924568399606
+      From worker 4:	results[t, p] = output[1] = 367.03948456213186
+      From worker 2:	results[t, p] = output[1] = 372.87801603098853
+      From worker 10:	results[t, p] = output[1] = 352.3969691019781
+      From worker 21:	results[t, p] = output[1] = 320.87215174335154
+      From worker 11:	results[t, p] = output[1] = 347.30625087022696
+      From worker 6:	results[t, p] = output[1] = 361.765465905583
+      From worker 19:	results[t, p] = output[1] = 326.2850103802216
+      From worker 15:	results[t, p] = output[1] = 336.9855599933936
+      From worker 17:	results[t, p] = output[1] = 331.8540465053042
+      From worker 13:	results[t, p] = output[1] = 325.8168402518271
+      From worker 8:	results[t, p] = output[1] = 357.28906607461226
+      From worker 2:	results[t, p] = output[1] = 357.5615977731437
+      From worker 4:	results[t, p] = output[1] = 352.5847207749387
+      From worker 10:	results[t, p] = output[1] = 335.3680534820601
+      From worker 11:	results[t, p] = output[1] = 330.9558406280472
+      From worker 21:	results[t, p] = output[1] = 310.4603092036253
+      From worker 6:	results[t, p] = output[1] = 345.70404783089987
+      From worker 19:	results[t, p] = output[1] = 314.3404006169429
+      From worker 15:	results[t, p] = output[1] = 322.027092707042
+      From worker 13:	results[t, p] = output[1] = 313.45608228175047
+      From worker 2:	results[t, p] = output[1] = 343.8893168854677
+      From worker 4:	results[t, p] = output[1] = 337.8782655962039
+      From worker 17:	results[t, p] = output[1] = 318.09086773479623
+      From worker 8:	results[t, p] = output[1] = 339.7993772562496
+      From worker 10:	results[t, p] = output[1] = 322.57125167908987
+      From worker 11:	results[t, p] = output[1] = 317.92050440737745
+      From worker 21:	results[t, p] = output[1] = 294.0344339338772
+      From worker 6:	results[t, p] = output[1] = 332.87459814924097
+      From worker 19:	results[t, p] = output[1] = 298.8408860693705
+      From worker 15:	results[t, p] = output[1] = 308.26665627186077
+      From worker 13:	results[t, p] = output[1] = 301.06359740318476
+      From worker 2:	results[t, p] = output[1] = 332.9788743217406
+      From worker 4:	results[t, p] = output[1] = 327.73046167681724
+      From worker 10:	results[t, p] = output[1] = 310.27407281294865
+      From worker 11:	results[t, p] = output[1] = 305.5669254803175
+      From worker 17:	results[t, p] = output[1] = 303.80444119523156
+      From worker 6:	results[t, p] = output[1] = 321.0748457458475
+      From worker 21:	results[t, p] = output[1] = 283.8396412048299
+      From worker 8:	results[t, p] = output[1] = 327.2848094570608
+      From worker 19:	results[t, p] = output[1] = 287.9130844144295
+      From worker 15:	results[t, p] = output[1] = 295.97113878470145
+      From worker 13:	results[t, p] = output[1] = 288.9216354564176
+      From worker 2:	results[t, p] = output[1] = 317.77237872350656
+      From worker 4:	results[t, p] = output[1] = 312.37642840257126
+      From worker 10:	results[t, p] = output[1] = 297.18368470319905
+      From worker 11:	results[t, p] = output[1] = 292.98950132968434
+      From worker 6:	results[t, p] = output[1] = 307.20597458717987
+      From worker 21:	results[t, p] = output[1] = 270.89199813372716
+      From worker 17:	results[t, p] = output[1] = 292.0156698646394
+      From worker 8:	results[t, p] = output[1] = 315.29192684005375
+      From worker 19:	results[t, p] = output[1] = 275.4728647333739
+      From worker 15:	results[t, p] = output[1] = 284.3998153259626
+      From worker 13:	results[t, p] = output[1] = 275.84959209160047
+      From worker 2:	results[t, p] = output[1] = 309.69967570731984
+      From worker 4:	results[t, p] = output[1] = 303.28680378988753
+      From worker 10:	results[t, p] = output[1] = 285.9564669338269
+      From worker 11:	results[t, p] = output[1] = 280.49934170531765
+      From worker 6:	results[t, p] = output[1] = 296.66976424451815
+      From worker 21:	results[t, p] = output[1] = 258.8854726124077
+      From worker 19:	results[t, p] = output[1] = 262.50316478382837
+      From worker 17:	results[t, p] = output[1] = 279.63708791151356
+      From worker 8:	results[t, p] = output[1] = 302.0763425381807
+      From worker 15:	results[t, p] = output[1] = 271.35090098841255
+      From worker 17:	results[t, p] = output[1] = 266.1430261665501
+      From worker 8:	results[t, p] = output[1] = 290.8248650922717
+results = [349.443 341.903 333.785 327.556 320.659 315.006 308.893 302.523 295.884 290.187 285.271; 368.095 359.631 352.858 344.859 338.158 330.78 322.318 315.555 308.949 303.749 297.551; 382.89 373.194 364.398 355.838 348.242 341.773 335.494 329.561 323.463 318.664 312.943; 395.036 388.09 380.071 372.523 365.112 357.999 351.746 343.103 336.99 329.96 322.636; 387.728 381.772 374.538 368.347 361.507 355.593 349.573 344.14 337.492 332.602 325.214; 372.878 367.039 361.765 357.289 352.397 347.306 342.159 336.986 331.854 326.285 320.872; 357.562 352.585 345.704 339.799 335.368 330.956 325.817 322.027 318.091 314.34 310.46; 343.889 337.878 332.875 327.285 322.571 317.921 313.456 308.267 303.804 298.841 294.034; 332.979 327.73 321.075 315.292 310.274 305.567 301.064 295.971 292.016 287.913 283.84; 317.772 312.376 307.206 302.076 297.184 292.99 288.922 284.4 279.637 275.473 270.892; 309.7 303.287 296.67 290.825 285.956 280.499 275.85 271.351 266.143 262.503 258.885]
+"/home/td7g11/sail_route.jl/development/polynesian/tongiaki/_routing_tongatapu_to_atiu_1976-01-21_to_1976-01-31_20.0_nm"
+run_single_route
+run_algorithm_uncertainty_route
+run_varied_performance

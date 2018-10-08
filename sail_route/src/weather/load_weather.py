@@ -37,6 +37,7 @@ def regrid_data(ds, longs, lats):
     ds0 = regridder(ds)
     ds0.coords['lat_b'] = ('lat_b', ds0['lat'].values)
     ds0.coords['lon_b'] = ('lon_b', ds0['lon'].values)
+    ds = None  #free memory
     return ds0
 
 
@@ -85,16 +86,16 @@ def process_era5_weather(path_nc, longs, lats):
     wh = load_dataset(path_nc, 'swh')
     wd = load_dataset(path_nc, 'mdts')
     wp = load_dataset(path_nc, 'mpts')
-    # wisp_rg = wisp.copy(deep=True)
-    # widi_rg = wisp.copy(deep=True)
-    # wh_rg = wisp.copy(deep=True)
-    # wd_rg = wisp.copy(deep=True)
-    # wp_rg = wisp.copy(deep=True)
     rg_wisp = regrid_data(wisp, longs[:, 0], lats[0, :])
     rg_widi = regrid_data(widi, longs[:, 0], lats[0, :])
     rg_wh = regrid_data(wh, longs[:, 0], lats[0, :])
     rg_wd = regrid_data(wd, longs[:, 0], lats[0, :])
     rg_wp = regrid_data(wp, longs[:, 0], lats[0, :])
+    wisp = None
+    widi = None
+    wh = None
+    wd = None
+    wp = None
     return rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp
 
 
@@ -190,16 +191,18 @@ def concatenate_weather_files(dir_path):
 
 
 def aggregate_weather_files():
-    weather_path = os.path.dirname(os.path.realpath(__file__))
-    path = weather_path + "/polynesia_weather/1982/"
+    # weather_path = os.path.dirname(os.path.realpath(__file__))
+    path = "/mainfs/home/td7g11/weather_data/polynesia_weather/low/1976"
+    # path = weather_path + "/weather_data/polynesia_weather/low/1976/"
     # get a list of all the files in a directory
     ds_whole = concatenate_weather_files(path)
     print(ds_whole.last())
-    ds_whole.last().to_netcdf(path+"1982_polynesia.nc")
+    ds_whole.last().to_netcdf(path+"1976_polynesia.nc")
 
 if __name__ == '__main__':
-    path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_polynesia.nc"
-    look_in_netcdf(path)
+    aggregate_weather_files()
+    # path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_polynesia.nc"
+    # look_in_netcdf(path)
     # rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
     # print(rg_wisp['number'])
     # print(rg_wisp['longitude'])
