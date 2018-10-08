@@ -34,10 +34,10 @@ Return the co-ordinates of each point across the discretized domain.
 """
 function co_ordinates(start_long, finish_long, start_lat, finish_lat,
                       n_ranks::Int, n_nodes::Int, dist)
-    x, y, land = pd[:return_co_ords](start_long, finish_long, start_lat,
+    x, y = pd[:return_co_ords](start_long, finish_long, start_lat,
                                      finish_lat, n_ranks, n_nodes,
                                      dist)
-    return x, y, land
+    return x, y
 end
 
 

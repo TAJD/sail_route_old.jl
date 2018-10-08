@@ -14,13 +14,14 @@ using Distributed
     using DataFrames
     using SharedArrays
 
-    global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc"
-    global times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 10)
+    # global times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 10)
     # global times = Dates.Date(1982, 7, 11):Dates.Day(1):Dates.Date(1982, 7, 20)
     # global times = Dates.Date(1976, 6, 11):Dates.Day(1):Dates.Date(1976, 6, 21)
-    global min_dist = 20.0 # 50 solves for 20 days? 20 for 10 days
-    route_solve_shared_chunk!(results, times, perfs) = route_solve_tongatapu_to_atiu!(results, myrange(results)..., times, perfs)
+    # global min_dist = 20.0 # 50 solves for 20 days? 20 for 10 days
+    # route_solve_shared_chunk!(results, times, perfs) = route_solve_tongatapu_to_atiu!(results, myrange(results)..., times, perfs)
+    route_solve_shared_chunk!(results, times, perfs, route, x, y, wisp, widi, wadi, wahi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, x, y, wisp, widi, wadi, wahi)
 end
 
 
@@ -53,6 +54,46 @@ end
 # parallized_v2_uncertain_routing!()
 
 
+# function route_solve_shared_chunk_v1, p, results, sim_times, perfs
+
+
+function parallized_v3_uncertain_routing!()
+    # variables
+    route_name = "tongatapu_to_atiu"
+    lon1 = -171.15
+    lat1 = -21.21
+    lon2 = -158.07
+    lat2 = -19.59
+    min_dist = 20.0
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 5)
+    boat = "/tongiaki/"
+    twa, tws, perf = load_tong()
+    # don't touch
+    sim_times = [DateTime(t) for t in times]
+    params = [i for i in LinRange(0.9, 1.1, 5)]
+    polar = setup_interpolation(tws, twa, perf)
+    perfs = generate_performance_uncertainty_samples(polar, params)
+    results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm"
+    println(save_path)
+    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    route = Route(lon1, lon2, lat1, lat2, n, n)
+    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+    x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+    println(save_path)
+    @sync begin
+        for p in procs(results)
+            @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route, x, y,
+                                   wisp, widi, wadi, wahi)
+        end
+    end
+    @show results
+    CSV.write(save_path, DataFrame(results))
+
+end
+
+
 """Running a routing simulation for a single set of initial conditions."""
 function run_single_route()
     # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
@@ -71,14 +112,16 @@ function run_single_route()
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
-    results = route_solve(sample_route, sample_perf, start_time,
-                          wisp, widi, wadi, wahi)
-    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_"
-    CSV.write(name*"route", DataFrame(results[2]))
-    CSV.write(name*"time", DataFrame([[results[1]]]))
-    CSV.write(name*"earliest_times", DataFrame(results[3]))
-    CSV.write(name*"x_locs", DataFrame(results[4]))
-    CSV.write(name*"y_locs", DataFrame(results[5]))
+    x, y, wisp, widi, wadi, wahi = generate_inputs(sample_route, wisp, widi, wadi, wahi)
+    # results = route_solve(sample_route, sample_perf, start_time, x, y,
+    #                       wisp, widi, wadi, wahi)
+    # name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_"
+    # CSV.write(name*"route", DataFrame(results[2]))
+    # CSV.write(name*"time", DataFrame([[results[1]]]))
+    # CSV.write(name*"earliest_times", DataFrame(results[3]))
+    # CSV.write(name*"x_locs", DataFrame(results[4]))
+    # CSV.write(name*"y_locs", DataFrame(results[5]))
+    return wisp
 end
 
 # run_single_route()

@@ -23,7 +23,6 @@ function route_solve_upolu_to_atiu!(results, t_range, p_range, sim_times, perfs)
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
-        Base.GC.gc()
     end
     results
 end
@@ -79,6 +78,16 @@ function route_solve_tongatapu_to_atiu!(results, t_range, p_range, sim_times, pe
     end
     results
 end
+
+
+function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
+                            route, x, y, wisp, widi, wadi, wahi)
+    for t in t_range, p in p_range
+        output = route_solve(route, perfs[p], sim_times[t], x, y, wisp, widi, wadi, wahi)
+        @show results[t, p] = output[1]
+    end
+end
+
 
 
 function load_tong()
