@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xesmf as xe
-import glob, os
+import glob, os,  time
+from datetime import datetime
 
 
 def look_in_netcdf(path):
@@ -29,6 +30,14 @@ def load_dataset(path_nc, var):
         return ds[var]
 
 
+def return_time_index(ds):
+    """Return the time index from a Dataset in unix timestamp."""
+    time_vals = ds['time']
+    time_vals = time_vals.values
+    times = [(t - np.datetime64('1970-01-01T00:00:00Z'))/np.timedelta64(1, 's') for t in time_vals]
+    return np.array(times)
+
+
 def regrid_data(ds, longs, lats):
     """Regrid dataset to new longs and lats."""
     ds_out = xr.Dataset({'lat': (['lat_b'], lats),
@@ -37,7 +46,6 @@ def regrid_data(ds, longs, lats):
     ds0 = regridder(ds)
     ds0.coords['lat_b'] = ('lat_b', ds0['lat'].values)
     ds0.coords['lon_b'] = ('lon_b', ds0['lon'].values)
-    ds = None  #free memory
     return ds0
 
 
@@ -114,7 +122,8 @@ def retrieve_era20_weather(path_nc):
     wh = load_dataset(path_nc, 'swh')
     wd = load_dataset(path_nc, 'mwd')
     wp = load_dataset(path_nc, 'mwp')
-    return wisp, widi, wh, wd, wp
+    time = return_time_index(wisp)
+    return wisp, widi, wh, wd, wp, time
 
 
 def change_area_values(array, value, lon1, lat1, lon2, lat2):
@@ -200,10 +209,11 @@ def aggregate_weather_files():
     ds_whole.last().to_netcdf(path+"1976_polynesia.nc")
 
 if __name__ == '__main__':
-    aggregate_weather_files()
-    # path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/1982/1982_polynesia.nc"
+    # aggregate_weather_files()
+    path = r"/mainfs/home/td7g11/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     # look_in_netcdf(path)
-    # rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era5_weather(path)
+    rg_wisp, rg_widi, rg_wh, rg_wd, rg_wp = retrieve_era20_weather(path)
+    print(return_time_index(rg_wisp))
     # print(rg_wisp['number'])
     # print(rg_wisp['longitude'])
     # print(rg_wisp['latitude'])

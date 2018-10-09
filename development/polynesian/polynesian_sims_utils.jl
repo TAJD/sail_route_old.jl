@@ -81,9 +81,9 @@ end
 
 
 function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
-                            route, x, y, wisp, widi, wadi, wahi)
+                            route, time_indexes, x, y, wisp, widi, wadi, wahi)
     for t in t_range, p in p_range
-        output = route_solve(route, perfs[p], sim_times[t], x, y, wisp, widi, wadi, wahi)
+        output = route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
     end
 end

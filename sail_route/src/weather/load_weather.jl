@@ -30,7 +30,9 @@ end
 
 
 function regrid_data(ds, longs, lats)
-    return w[:regrid_data](ds, longs, lats)
+    dataset = w[:regrid_data](ds, longs, lats)
+    return Array{Float64}(dataset[:values])
+    # return dataset
 end
 
 
@@ -41,7 +43,8 @@ end
 
 
 function load_era20_weather(path_nc)
-    wisp, widi, wh, wd, wp = w[:retrieve_era20_weather](path_nc)
-    return wisp, widi, wh, wd, wp
+    wisp, widi, wh, wd, wp, time_values = w[:retrieve_era20_weather](path_nc)
+    time = [Dates.unix2datetime(Int64(i)) for i in time_values]
+    return wisp, widi, wh, wd, wp, time
 end
 

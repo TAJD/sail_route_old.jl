@@ -21,7 +21,7 @@ using Distributed
     # global times = Dates.Date(1976, 6, 11):Dates.Day(1):Dates.Date(1976, 6, 21)
     # global min_dist = 20.0 # 50 solves for 20 days? 20 for 10 days
     # route_solve_shared_chunk!(results, times, perfs) = route_solve_tongatapu_to_atiu!(results, myrange(results)..., times, perfs)
-    route_solve_shared_chunk!(results, times, perfs, route, x, y, wisp, widi, wadi, wahi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, x, y, wisp, widi, wadi, wahi)
+    route_solve_shared_chunk!(results, times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi)
 end
 
 
@@ -54,8 +54,6 @@ end
 # parallized_v2_uncertain_routing!()
 
 
-# function route_solve_shared_chunk_v1, p, results, sim_times, perfs
-
 
 function parallized_v3_uncertain_routing!()
     # variables
@@ -66,12 +64,13 @@ function parallized_v3_uncertain_routing!()
     lat2 = -19.59
     min_dist = 20.0
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 5)
+    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 10)
     boat = "/tongiaki/"
     twa, tws, perf = load_tong()
     # don't touch
-    sim_times = [DateTime(t) for t in times]
-    params = [i for i in LinRange(0.9, 1.1, 5)]
+    # sim_times = [DateTime(t) for t in times]
+    sim_times = [t for t in times]
+    params = [i for i in LinRange(0.9, 1.1, 10)]
     polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
@@ -79,18 +78,18 @@ function parallized_v3_uncertain_routing!()
     println(save_path)
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     route = Route(lon1, lon2, lat1, lat2, n, n)
-    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+    wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
     x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
     println(save_path)
     @sync begin
         for p in procs(results)
-            @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route, x, y,
+            @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route,
+                                   time_indexes, x, y,
                                    wisp, widi, wadi, wahi)
         end
     end
     @show results
     CSV.write(save_path, DataFrame(results))
-
 end
 
 
@@ -108,21 +107,62 @@ function run_single_route()
     lat1 = -21.21
     lon2 = -158.07
     lat2 = -19.59
+    min_dist = 5.0 # nm
+    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    sample_route = Route(lon1, lon2, lat1, lat2, n, n)
+    wisp, widi, wahi, wadi, wapr, times = load_era20_weather(weather_data)
+    x, y, wisp, widi, wadi, wahi = generate_inputs(sample_route, wisp, widi, wadi, wahi)
+    results = route_solve(sample_route, sample_perf, start_time, times, x, y,
+                           wisp, widi, wadi, wahi)
+    # rsolve()
+    # @time rsolve()
+
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_new_method"
+    CSV.write(name*"route", DataFrame(results[2]))
+    CSV.write(name*"time", DataFrame([[results[1]]]))
+    CSV.write(name*"earliest_times", DataFrame(results[3]))
+    CSV.write(name*"x_locs", DataFrame(results[4]))
+    CSV.write(name*"y_locs", DataFrame(results[5]))
+end
+
+# run_single_route()
+
+
+function check_indexing() # won't work now as the method of loading datasets has changed, change line 33 in load_weather.jl to check
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
+    # twa, tws, perf = load_tong()
+    twa, tws, perf = load_boeckv2()
+    polar = setup_interpolation(tws, twa, perf)
+    sample_perf = Performance(polar, 1.0, 1.0)
+    lon1 = -171.15
+    lat1 = -21.21
+    lon2 = -158.07
+    lat2 = -19.59
     min_dist = 20.0 # nm
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
-    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
+    wisp, widi, wahi, wadi, wapr, time = load_era20_weather(weather_data)
+    time_idx = convert_start_time(start_time, time)
     x, y, wisp, widi, wadi, wahi = generate_inputs(sample_route, wisp, widi, wadi, wahi)
-    # results = route_solve(sample_route, sample_perf, start_time, x, y,
-    #                       wisp, widi, wadi, wahi)
-    # name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_"
-    # CSV.write(name*"route", DataFrame(results[2]))
-    # CSV.write(name*"time", DataFrame([[results[1]]]))
-    # CSV.write(name*"earliest_times", DataFrame(results[3]))
-    # CSV.write(name*"x_locs", DataFrame(results[4]))
-    # CSV.write(name*"y_locs", DataFrame(results[5]))
-    return wisp
+    idx_y_1 = 1
+    idx_x_1 = 1
+    wisp_vals = Array{Float64}(wisp[:values])
+    m_index_1 = wisp_vals[time_idx, idx_x_1, idx_y_1]
+    lat_test_1 = -3.13
+    lon_test_1 = -171.0
+    m_interp_1 = wisp[:sel](time=start_time, lon_b=lon_test_1, lat_b=lat_test_1,
+                        method="nearest")[:data][1]
+    println("Method test 1 ", isapprox(m_index_1, m_interp_1, atol = 0.0001))
+    idx_y_2 = 2
+    idx_x_2 = 1
+    m_index_2 = wisp_vals[time_idx, idx_y_2, idx_x_2]
+    lat_test_2 = -3.115
+    m_interp_2 = wisp[:sel](time=start_time, lon_b=lon_test_1, lat_b=lat_test_2,
+                            method="nearest")[:data][1]
+    println("Method test 2 ", isapprox(m_index_2, m_interp_2, atol = 0.0001))
 end
+
 
 # run_single_route()
 
