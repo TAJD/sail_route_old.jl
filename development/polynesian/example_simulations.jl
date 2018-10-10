@@ -25,61 +25,30 @@ using Distributed
 end
 
 
-function parallized_v2_uncertain_routing!()
-    sim_times = [DateTime(t) for t in times]
-    params = [i for i in LinRange(0.9, 1.1, 11)]
-    # route_name = "upolu_to_atiu"
-    # route_name = "upolu_to_moorea"
-    # route_name = "tongatapu_to_moorea"
-    route_name = "tongatapu_to_atiu"
-    wisp, widi, wahi, wadi, wapr = load_era20_weather(weather_data)
-    # boat = "/boeckv2/"
-    # twa, tws, perf = load_boeckv2()
-    boat = "/tongiaki/"
-    twa, tws, perf = load_tong()
-    polar = setup_interpolation(tws, twa, perf)
-    perfs = generate_performance_uncertainty_samples(polar, params)
-    results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm"
-    println(save_path)
-    @sync begin
-        for p in procs(results)
-            @async remotecall_wait(route_solve_shared_chunk!, p, results, sim_times, perfs)
-        end
-    end
-    @show results
-    CSV.write(save_path, DataFrame(results))
-end
-
-# parallized_v2_uncertain_routing!()
-
-
-
-function parallized_v3_uncertain_routing!()
+function parallized_uncertain_routing!()
     # variables
     route_name = "tongatapu_to_atiu"
-    lon1 = -171.15
-    lat1 = -21.21
-    lon2 = -158.07
-    lat2 = -19.59
-    min_dist = 20.0
-    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    times = Dates.Date(1982, 1, 1):Dates.Day(1):Dates.Date(1982, 1, 10)
+    @everywhere lon1 = -171.15
+    @everywhere lat1 = -21.21
+    @everywhere lon2 = -158.07
+    @everywhere lat2 = -19.59
+    @everywhere min_dist = 20.0
+    @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 1, 31, 0, 0)
     boat = "/tongiaki/"
-    twa, tws, perf = load_tong()
-    # don't touch
-    # sim_times = [DateTime(t) for t in times]
-    sim_times = [t for t in times]
+    @everywhere twa, tws, perf = load_tong()
+    sim_times = [DateTime(t) for t in times]
+    @show typeof(sim_times[1])
     params = [i for i in LinRange(0.9, 1.1, 10)]
-    polar = setup_interpolation(tws, twa, perf)
+    @everywhere polar = setup_interpolation(tws, twa, perf)
     perfs = generate_performance_uncertainty_samples(polar, params)
     results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
     save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm"
     println(save_path)
-    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    route = Route(lon1, lon2, lat1, lat2, n, n)
-    wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
-    x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+    @everywhere n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    @everywhere route = Route(lon1, lon2, lat1, lat2, n, n)
+    @everywhere wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
+    @everywhere x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
     println(save_path)
     @sync begin
         for p in procs(results)
@@ -93,12 +62,15 @@ function parallized_v3_uncertain_routing!()
 end
 
 
+# parallized_uncertain_routing!()
+
+
 """Running a routing simulation for a single set of initial conditions."""
 function run_single_route()
     # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
     # start_time = Dates.DateTime(1976, 7, 1, 0, 0, 0)
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
+    start_time = Dates.DateTime(1982, 7, 2, 0, 0, 0)
     # twa, tws, perf = load_tong()
     twa, tws, perf = load_boeckv2()
     polar = setup_interpolation(tws, twa, perf)
@@ -107,17 +79,14 @@ function run_single_route()
     lat1 = -21.21
     lon2 = -158.07
     lat2 = -19.59
-    min_dist = 5.0 # nm
+    min_dist = 175.0 # nm
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     sample_route = Route(lon1, lon2, lat1, lat2, n, n)
     wisp, widi, wahi, wadi, wapr, times = load_era20_weather(weather_data)
     x, y, wisp, widi, wadi, wahi = generate_inputs(sample_route, wisp, widi, wadi, wahi)
     results = route_solve(sample_route, sample_perf, start_time, times, x, y,
                            wisp, widi, wadi, wahi)
-    # rsolve()
-    # @time rsolve()
-
-    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)*"_new_method"
+    name = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_"*repr(min_dist)*"_nm_"*repr(start_time)
     CSV.write(name*"route", DataFrame(results[2]))
     CSV.write(name*"time", DataFrame([[results[1]]]))
     CSV.write(name*"earliest_times", DataFrame(results[3]))
@@ -126,6 +95,7 @@ function run_single_route()
 end
 
 # run_single_route()
+# parallized_v3_uncertain_routing!()
 
 
 function check_indexing() # won't work now as the method of loading datasets has changed, change line 33 in load_weather.jl to check

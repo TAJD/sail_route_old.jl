@@ -58,7 +58,7 @@ def inspect_route():
     """Script to inspect route."""
     name = "/boeckv2/"
     # name = "/tongiaki/"
-    nodes = name + "_5.0_nm_"
+    nodes = name + "_30.0_nm_1982-07-01T00:00:00"
     path = os.path.dirname(os.path.realpath(__file__)) + nodes
     x = pd.read_csv(path+"x_locs").values
     y = pd.read_csv(path+"y_locs").values
@@ -123,5 +123,5 @@ def plot_varied_grid_results():
     plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, t1, t2, t3, fname, fill=2.5)
 
 if __name__ == "__main__":
-    # inspect_route()
-    plot_varied_grid_results()
+    inspect_route()
+    # plot_varied_grid_results()

@@ -273,10 +273,9 @@ end
 
 
 "Time dependent shortest path with no current and for single reanalysis."
-function route_solve(route::Route, performance, start_time, times, x, y,
+function route_solve(route::Route, performance, start_time::DateTime, times, x, y,
                      wisp, widi,
                      wadi, wahi)
-    start_time = convert(DateTime, start_time)
     start_time_idx = time_to_index(start_time, times)
     earliest_times = fill(Inf, size(x))
     prev_node = zero(x)
@@ -286,11 +285,11 @@ function route_solve(route::Route, performance, start_time, times, x, y,
     earliest_times = fill(Inf, size(x))
     for idx in 1:size(x)[2]
         d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
-        wd_int = widi[start_time_idx, 1, idx]
-        ws_int = wisp[start_time_idx, 1, idx]
-        wd_int = wadi[start_time_idx, 1, idx]
-        wh_int = wahi[start_time_idx, 1, idx]
-        speed = cost_function(performance, wd_int, ws_int, wd_int, wh_int, b)
+        wd_int = widi[start_time_idx, idx, 1]
+        ws_int = wisp[start_time_idx, idx, 1]
+        wadi_int = wadi[start_time_idx, idx, 1]
+        wh_int = wahi[start_time_idx, idx, 1]
+        speed = cost_function(performance, wd_int, ws_int, wadi_int, wh_int, b)
         earliest_times[1, idx] = d/speed
     end
     for idy in 1:size(x)[1]-1
@@ -298,14 +297,14 @@ function route_solve(route::Route, performance, start_time, times, x, y,
             if isinf(earliest_times[idy, idx1]) == false
                 t = start_time + convert_time(earliest_times[idy, idx1])
                 t_idx = time_to_index(t, times)
-                wd_int = widi[t_idx, idy, idx1]
-                ws_int = wisp[t_idx, idy, idx1]
-                wd_int = wadi[t_idx, idy, idx1]
-                wh_int = wahi[t_idx, idy, idx1]
+                wd_int = widi[t_idx, idx1, idy]
+                ws_int = wisp[t_idx, idx1, idy]
+                wadi_int = wadi[t_idx, idx1, idy]
+                wh_int = wahi[t_idx, idx1, idy]
                 for idx2 in 1:size(x)[2]
                     d, b = haversine(x[idy, idx1], y[idy, idx1],
                                         x[idy+1, idx2], y[idy+1, idx2])
-                    speed = cost_function(performance, wd_int, ws_int, wd_int,
+                    speed = cost_function(performance, wd_int, ws_int, wadi_int,
                                             wh_int, b)
                     tt = earliest_times[idy, idx1] + d/speed
                     if earliest_times[idy+1, idx2] > tt
@@ -321,11 +320,11 @@ function route_solve(route::Route, performance, start_time, times, x, y,
             d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
             t = start_time + convert_time(earliest_times[end, idx])
             t_idx = time_to_index(t, times)
-            wd_int = widi[t_idx, end, idx]
-            ws_int = wisp[t_idx, end, idx]
-            wd_int = wadi[t_idx, end, idx]
-            wh_int = wahi[t_idx, end, idx]
-            speed = cost_function(performance, wd_int, ws_int, wd_int, wh_int, b)
+            wd_int = widi[t_idx, idx, end]
+            ws_int = wisp[t_idx, idx, end]
+            wadi_int = wadi[t_idx, idx, end]
+            wh_int = wahi[t_idx, idx, end]
+            speed = cost_function(performance, wd_int, ws_int, wadi_int, wh_int, b)
             tt = earliest_times[end, idx] + d/speed
             if tt < arrival_time
                 arrival_time = tt
