@@ -23,6 +23,7 @@ function route_solve_upolu_to_atiu!(results, t_range, p_range, sim_times, perfs)
     for t in t_range, p in p_range
         output = route_solve(sample_route, perfs[p], sim_times[t], wisp, widi, wadi, wahi)
         @show results[t, p] = output[1]
+        output = nothing
     end
     results
 end
@@ -84,7 +85,7 @@ function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
                             route, time_indexes, x, y, wisp, widi, wadi, wahi)
     for t in t_range, p in p_range
         output = route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi)
-        @show results[t, p] = output[1]
+        results[t, p] = output[1]
         output = nothing
     end
 end
@@ -112,8 +113,8 @@ end
 
 
 """Generate range of modified polars for performance uncertainty simulation."""
-function generate_performance_uncertainty_samples(polar, params)
-    unc_perf = [Performance(polar, i, 1.0) for i in params]
+function generate_performance_uncertainty_samples(polar, params, wave_m)
+    unc_perf = [Performance(polar, i, 1.0, wave_m) for i in params]
 end
 
 
