@@ -70,10 +70,10 @@ function cost_function(performance::Performance,
     bearing)
     if widi > 360.0
         return 0.0
-    # elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
-    #     return 0.0
-    # elseif  wadi < 45.0
-    #     return 0.0
+    elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
+        return 0.0
+    elseif  wadi < 45.0
+        return 0.0
     else
         return perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
     end
@@ -81,43 +81,43 @@ end
 
 
 """
-# cost_function(performance, cudi::Float64, cusp::Float64,
-#                        widi::Float64, wisp::Float64,
-#                        wadi::Float64, wahi::Float64,
-#                        bearing::Float64)
+cost_function(performance, cudi::Float64, cusp::Float64,
+                       widi::Float64, wisp::Float64,
+                       wadi::Float64, wahi::Float64,
+                       bearing::Float64)
 
 
-# Calculate the correct speed of the sailing craft given the failure model and environmental conditions.
-# """
-# function cost_function(performance::Performance,
-#                        cudi::Float32, cusp::Float32,
-#                        widi::Float32, wisp::Float32,
-#                        wadi::Float32, wahi::Float32,
-#                        bearing::Float64)
-#     if performance.acceptable_failure == 1.0
-#         h1 = 0.0
-#         h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-#         while h2 - h1 > 0.1
-#             h1 = h2
-#             h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-#         end
-#         bearing = bearing + h2
-#         @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
-#         return vs + cusp
-#     else 
-#         pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
-#         if pf < performance.acceptable_failure
-#             return Inf
-#         else
-#             h1 = 0.0
-#             h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-#             while h2 - h1 > 0.1
-#                 h1 = h2
-#                 h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-#             end
-#             bearing = bearing + h2
-#             @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
-#             return vs + cusp
-#         end
-#     end
-# end
+Calculate the correct speed of the sailing craft given the failure model and environmental conditions.
+"""
+function cost_function(performance::Performance,
+                       cudi, cusp,
+                       widi, wisp,
+                       wadi, wahi,
+                       bearing)
+    if performance.acceptable_failure == 1.0
+        h1 = 0.0
+        h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+        while h2 - h1 > 0.1
+            h1 = h2
+            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+        end
+        bearing = bearing + h2
+        @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
+        return vs + cusp
+    else 
+        pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
+        if pf < performance.acceptable_failure
+            return Inf
+        else
+            h1 = 0.0
+            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+            while h2 - h1 > 0.1
+                h1 = h2
+                h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
+            end
+            bearing = bearing + h2
+            @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
+            return vs + cusp
+        end
+    end
+end

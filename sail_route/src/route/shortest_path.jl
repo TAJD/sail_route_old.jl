@@ -60,6 +60,9 @@ end
 """Identify the shortest path given arrays of locations and an array of the earliest time at each point."""
 function shortest_path(indx, pindx, sp)
     ix = findfirst(isequal(sp[end]), indx)
+    if ix == nothing
+        return sp
+    end
     pix = pindx[ix]
     append!(sp, pix)
     if pix == 0.0
@@ -182,6 +185,82 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
 end
 
 
+"Time dependent shortest path."
+function route_solve(route::Route, performance, start_time::DateTime, 
+                     wisp, widi,
+                     cusp, cudi,
+                     wadi, wahi)
+    y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
+    x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
+                              route.x_nodes, route.y_nodes, y_dist)
+    earliest_times = fill(Inf, size(x))
+    prev_node = zero(x)
+    node_indices = reshape(1:length(x), size(x)) 
+    arrival_time = Inf
+    for idx in 1:size(x)[2]
+        d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
+        wd_int = widi[start_time_idx, idx, 1]
+        ws_int = wisp[start_time_idx, idx, 1]
+        wadi_int = wadi[start_time_idx, idx, 1]
+        wahi_int = wahi[start_time_idx, idx, 1]
+        cs_int = cusp[start_time_idx, idx, 1]
+        cd_int = cudi[start_time_idx, idx, 1]
+        speed = cost_function(performance, cd_int, cs_int, wd_int, ws_int,
+                              wadi_int, wahi_int, b)
+        if speed != Inf
+            earliest_times[1, idx] = d/speed
+        else
+            earliest_times[1, idx] = Inf
+        end
+    end
+    
+    for idy in 1:size(x)[1]-1
+        @simd for idx in 1:size(x)[2]
+            t = start_time + convert_time(earliest_times[idy, idx])
+            t_idx = time_to_index(t, times)
+            d, b = haversine(x[idy, idx], y[idy, idx], x[idy+1, idx], y[idy+1, idx])
+            wd_int = widi[t_idx, idx1, idy]
+            ws_int = wisp[t_idx, idx1, idy]
+            wadi_int = wadi[t_idx, idx1, idy]
+            wahi_int = wahi[t_idx, idx1, idy]
+            cs_int = cusp[t_idx, idx1, idy]
+            cd_int = cudi[t_idx, idx1, idy]
+            @inbounds speed = cost_function(performance, cd_int, cs_int,
+                                            wd_int, ws_int, wadi_int, wahi_int, b)
+            if speed != Inf
+                tt = earliest_times[idy, idx] + d/speed
+                if earliest_times[idy+1, idx] > tt
+                    earliest_times[idy+1, idx] = tt
+                    prev_node[idy+1, idx] = node_indices[idy, idx]
+                end
+            end
+        end
+    end
+    
+    for idx in 1:size(x)[2]
+        @inbounds d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
+        t = start_time + convert_time(earliest_times[end, idx])
+        wd_int = widi[t_idx, idx, end]
+        ws_int = wisp[t_idx, idx, end]
+        wadi_int = wadi[t_idx, idx, end]
+        wh_int = wahi[t_idx, idx, end]
+        cs_int = cusp[t_idx, idx, end]
+        cd_int = cudi[t_idx, idx, end]
+        speed = cost_function(performance, cd_int, cs_int,
+                              wd_int, ws_int, wadi_int, wahi_int, b)
+        if speed != Inf 
+            tt = earliest_times[end, idx] + d/speed
+            if arrival_time > tt
+                arrival_time = tt
+                final_node = node_indices[end, idx]
+            end
+        end
+    end
+    sp = shortest_path(node_indices, prev_node, [final_node])
+    locs = get_locs(node_indices, sp, x, y)
+    return arrival_time, locs, earliest_times, x, y
+end
+
 # "Mean weather conditions shortest path with no current."
 # function route_solve(route::Route, performance, 
 #                      wisp::String, widi::String)
@@ -255,82 +334,7 @@ end
 # end
 
 
-# "Time dependent shortest path."
-# function route_solve(route::Route, performance, start_time::DateTime, 
-#                      wisp::PyObject, widi::PyObject,
-#                      cusp::PyObject, cudi::PyObject,
-#                      wadi::PyObject, wahi::PyObject)
-#     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
-#     x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
-#                               route.x_nodes, route.y_nodes, y_dist)
-#     earliest_times = fill(Inf, size(x))
-#     prev_node = zero(x)
-#     node_indices = reshape(1:length(x), size(x)) 
-#     arrival_time = Inf
-#     # @simd for idx in 1:size(x)[2]
-#     for idx in 1:size(x)[2]
-#         # @inbounds d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
-#         d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
-#         ws_int = wisp[:sel](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx], number=0)
-#         wd_int = widi[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
-#         cs_int = cusp[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
-#         cd_int = cudi[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
-#         wadi_int = wadi[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
-#         wahi_int = wahi[:interp](time=start_time, lon_b=x[1, idx], lat_b=y[1, idx])[:data][1]
-#         speed = cost_function(performance, cd_int, cs_int, wd_int, ws_int,
-#                               wadi_int, wahi_int, b)
-#         if speed != Inf
-#             earliest_times[1, idx] = d/speed
-#         else
-#             earliest_times[1, idx] = Inf
-#         end
-#     end
-    
-#     for idy in 1:size(x)[1]-1
-#         @simd for idx in 1:size(x)[2]
-#             t = start_time + convert_time(earliest_times[idy, idx])
-#             @inbounds d, b = haversine(x[idy, idx], y[idy, idx], x[idy+1, idx], y[idy+1, idx])
-#             ws_int = wisp[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             wd_int = widi[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             cs_int = cusp[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             cd_int = cudi[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             wadi_int = wadi[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             wahi_int = wahi[:interp](time=t, lon_b=x[idy, idx], lat_b=y[idy, idx])[:data][1]
-#             @inbounds speed = cost_function(performance, cd_int, cs_int,
-#                                             wd_int, ws_int, wadi_int, wahi_int, b)
-#             if speed != Inf
-#                 tt = earliest_times[idy, idx] + d/speed
-#                 if earliest_times[idy+1, idx] > tt
-#                     earliest_times[idy+1, idx] = tt
-#                     prev_node[idy+1, idx] = node_indices[idy, idx]
-#                 end
-#             end
-#         end
-#     end
-    
-#     for idx in 1:size(x)[2]
-#         @inbounds d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
-#         t = start_time + convert_time(earliest_times[end, idx])
-#          ws_int = wisp[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          wd_int = widi[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          cs_int = cusp[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          cd_int = cudi[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          wadi_int = wadi[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          wahi_int = wahi[:interp](time=t, lon_b=x[end, idx], lat_b=y[end, idx])[:data][1]
-#          @inbounds speed = cost_function(performance, cd_int, cs_int,
-#                                          wd_int, ws_int, wadi_int, wahi_int, b)
-#         if speed != Inf 
-#             tt = earliest_times[end, idx] + d/speed
-#             if arrival_time > tt
-#                 arrival_time = tt
-#                 final_node = node_indices[end, idx]
-#             end
-#         end
-#     end
-#     sp = shortest_path(node_indices, prev_node, [final_node])
-#     locs = get_locs(node_indices, sp, x, y)
-#     return arrival_time, locs, earliest_times, x, y
-# end
+
 
 
 # "Time dependent shortest path with no current and ensemble selected."

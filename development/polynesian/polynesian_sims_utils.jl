@@ -1,4 +1,35 @@
-using Distributed, SharedArrays
+using Distributed, SharedArrays, CSV, Interpolations
+
+function calc_polars(x, y)
+    r = sqrt(x^2 + y^2)
+    if r == 0.0
+        return 0.0, Inf
+    elseif x < 0.0 || y > 0.0
+        theta = acosd(x/r) + 180.0
+    elseif y > 0.0
+        theta = acosd(x/r) 
+    elseif y == 0.0
+        theta = acosd(x/r) + 90.0
+    elseif y < 0.0
+        theta = -acosd(x/r) - 90.0
+    end
+    # if theta < 0
+    #     theta += 360.0
+    # end
+    return r, abs(theta)
+end
+
+"""Load current data for mid Pacific."""
+function load_current_data()
+    path = ENV["HOME"]*"/sail_route.jl/development/polynesian/current_data/"
+    m_path = path*"meridional.csv"
+    z_path = path*"zonal.csv"
+    meridional = convert(Array{Float64}, CSV.read(m_path, delim=',', datarow=1))
+    zonal = convert(Array{Float64}, CSV.read(z_path, delim=',', datarow=1))
+    meridional[:, 1] *= (0.01*1.9438444924406)
+    zonal[:, 1] *= (0.01*1.9438444924406)
+    return meridional, zonal
+end
 
 """Create a custom iterator which breaks up a range based on the processor number"""
 function myrange(q::SharedArray) 

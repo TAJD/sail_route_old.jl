@@ -22,15 +22,16 @@ end
 
 function parallized_uncertain_routing()
     # variables
+    boat = "/tongiaki/"
     route_name = "tongatapu_to_atiu"
+    wave_model = "resistance_direction_"
     @everywhere lon1 = -171.15
     @everywhere lat1 = -21.21
     @everywhere lon2 = -158.07
     @everywhere lat2 = -19.59
-    @everywhere min_dist = 20.0
+    @everywhere min_dist = 10.0
     @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
-    boat = "/tongiaki/"
     @everywhere twa, tws, perf = load_tong()
     sim_times = [DateTime(t) for t in times]
     params = [i for i in LinRange(0.85, 1.15, 20)]
@@ -38,7 +39,8 @@ function parallized_uncertain_routing()
     wave_resistance_model = typical_aerrtsen()
     perfs = generate_performance_uncertainty_samples(polar, params, wave_resistance_model)
     results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*boat*"_routing_"*route_name*"_"*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm"
+    path_name = boat*"_routing_"*route_name*"_"*wave_model*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm.txt"
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*path_name
     println(save_path)
     @everywhere n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     @everywhere route = Route(lon1, lon2, lat1, lat2, n, n)
@@ -51,8 +53,11 @@ function parallized_uncertain_routing()
                                    wisp, widi, wadi, wahi)
         end
     end
-    @show results
-    CSV.write(save_path, DataFrame(results))
+    _results = DataFrame(results)
+    names!(_results, [Symbol(i) for i in params])
+    insert!(_results, 1, times, :start_time)
+    CSV.write(save_path, _results)
+    return _results
 end
 
 
@@ -61,10 +66,10 @@ function run_single_route()
     # weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_era20_jul_sep.nc"
     # start_time = Dates.DateTime(1976, 7, 1, 0, 0, 0)
     weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    start_time = Dates.DateTime(1982, 1, 2, 0, 0, 0)
+    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
     # twa, tws, perf = load_tong()
     twa, tws, perf = load_boeckv2()
-    polar = setup_interpolation(tws, twa, perf)
+    polar = setup_perf_interpolation(tws, twa, perf)
     wave_resistance_model = typical_aerrtsen()
     sample_perf = Performance(polar, 1.0, 1.0, wave_resistance_model)
     # sample_perf = Performance(polar, 1.0, 1.0, nothing)
