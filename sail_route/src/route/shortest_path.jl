@@ -100,8 +100,8 @@ end
 
 
 """Convert hours in float to an index value to be added to the start index."""
-function convert_time(old_time::Float64)
-    mm = round(old_time*60/320)
+function convert_time(time::Float64)
+    mm = round(time*60/320)
     return Dates.Hour(mm*3.0)
 end
 
@@ -110,10 +110,14 @@ function generate_inputs(route, wisp, widi, wadi, wahi)
     y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1) # in nm
     x, y = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
                         route.x_nodes, route.y_nodes, y_dist)
-    wisp = regrid_data(wisp, x[:, 1], y[:, 1])
-    widi = regrid_data(widi, x[:, 1], y[:, 1])
-    wadi = regrid_data(wadi, x[:, 1], y[:, 1])
-    wahi = regrid_data(wahi, x[:, 1], y[:, 1])
+    # wisp = regrid_data(wisp, x[:, 1], y[:, 1])
+    # widi = regrid_data(widi, x[:, 1], y[:, 1])
+    # wadi = regrid_data(wadi, x[:, 1], y[:, 1])
+    # wahi = regrid_data(wahi, x[:, 1], y[:, 1])
+    wisp = regrid_domain(wisp, x, y)
+    widi = regrid_domain(widi, x, y)
+    wadi = regrid_domain(wadi, x, y)
+    wahi = regrid_domain(wahi, x, y)
     return x, y, wisp, widi, wadi, wahi
 end
 
@@ -186,17 +190,17 @@ end
 
 
 "Time dependent shortest path."
-function route_solve(route::Route, performance, start_time::DateTime, 
+function route_solve(route::Route, performance::Performance, start_time::DateTime, times, x, y, 
                      wisp, widi,
                      cusp, cudi,
                      wadi, wahi)
-    y_dist = haversine(route.lon1, route.lon2, route.lat1, route.lat2)[1]/(route.y_nodes+1)
-    x, y, land = co_ordinates(route.lon1, route.lon2, route.lat1, route.lat2,
-                              route.x_nodes, route.y_nodes, y_dist)
+    start_time_idx = time_to_index(start_time, times)
     earliest_times = fill(Inf, size(x))
     prev_node = zero(x)
-    node_indices = reshape(1:length(x), size(x)) 
+    node_indices = reshape(1:length(x), size(x))
     arrival_time = Inf
+    final_node = 0
+    earliest_times = fill(Inf, size(x))
     for idx in 1:size(x)[2]
         d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
         wd_int = widi[start_time_idx, idx, 1]
@@ -213,46 +217,51 @@ function route_solve(route::Route, performance, start_time::DateTime,
             earliest_times[1, idx] = Inf
         end
     end
-    
     for idy in 1:size(x)[1]-1
-        @simd for idx in 1:size(x)[2]
-            t = start_time + convert_time(earliest_times[idy, idx])
-            t_idx = time_to_index(t, times)
-            d, b = haversine(x[idy, idx], y[idy, idx], x[idy+1, idx], y[idy+1, idx])
-            wd_int = widi[t_idx, idx1, idy]
-            ws_int = wisp[t_idx, idx1, idy]
-            wadi_int = wadi[t_idx, idx1, idy]
-            wahi_int = wahi[t_idx, idx1, idy]
-            cs_int = cusp[t_idx, idx1, idy]
-            cd_int = cudi[t_idx, idx1, idy]
-            @inbounds speed = cost_function(performance, cd_int, cs_int,
-                                            wd_int, ws_int, wadi_int, wahi_int, b)
-            if speed != Inf
-                tt = earliest_times[idy, idx] + d/speed
-                if earliest_times[idy+1, idx] > tt
-                    earliest_times[idy+1, idx] = tt
-                    prev_node[idy+1, idx] = node_indices[idy, idx]
+        for idx1 in 1:size(x)[2]
+            if isinf(earliest_times[idy, idx1]) == false
+                t = start_time + convert_time(earliest_times[idy, idx1])
+                t_idx = time_to_index(t, times)
+                wd_int = widi[t_idx, idx1, idy]
+                ws_int = wisp[t_idx, idx1, idy]
+                wadi_int = wadi[t_idx, idx1, idy]
+                wahi_int = wahi[t_idx, idx1, idy]
+                cs_int = cusp[t_idx, idx1, idy]
+                cd_int = cudi[t_idx, idx1, idy]
+                for idx2 in 1:size(x)[2]
+                    d, b = haversine(x[idy, idx1], y[idy, idx1],
+                                        x[idy+1, idx2], y[idy+1, idx2])
+                    @inbounds speed = cost_function(performance, cd_int, cs_int,
+                                                    wd_int, ws_int, wadi_int, wahi_int, b)
+                    tt = earliest_times[idy, idx1] + d/speed
+                    if earliest_times[idy+1, idx2] > tt
+                        earliest_times[idy+1, idx2] = tt
+                        prev_node[idy+1, idx2] = node_indices[idy, idx1]
+                    end
                 end
             end
         end
     end
     
     for idx in 1:size(x)[2]
-        @inbounds d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
-        t = start_time + convert_time(earliest_times[end, idx])
-        wd_int = widi[t_idx, idx, end]
-        ws_int = wisp[t_idx, idx, end]
-        wadi_int = wadi[t_idx, idx, end]
-        wh_int = wahi[t_idx, idx, end]
-        cs_int = cusp[t_idx, idx, end]
-        cd_int = cudi[t_idx, idx, end]
-        speed = cost_function(performance, cd_int, cs_int,
-                              wd_int, ws_int, wadi_int, wahi_int, b)
-        if speed != Inf 
-            tt = earliest_times[end, idx] + d/speed
-            if arrival_time > tt
-                arrival_time = tt
-                final_node = node_indices[end, idx]
+        if isinf(earliest_times[end, idx]) == false
+            d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
+            t = start_time + convert_time(earliest_times[end, idx])
+            t_idx = time_to_index(t, times)
+            wd_int = widi[t_idx, idx, end]
+            ws_int = wisp[t_idx, idx, end]
+            wadi_int = wadi[t_idx, idx, end]
+            wahi_int = wahi[t_idx, idx, end]
+            cs_int = cusp[t_idx, idx, end]
+            cd_int = cudi[t_idx, idx, end]
+            speed = cost_function(performance, cd_int, cs_int,
+                                wd_int, ws_int, wadi_int, wahi_int, b)
+            if speed != Inf 
+                tt = earliest_times[end, idx] + d/speed
+                if arrival_time > tt
+                    arrival_time = tt
+                    final_node = node_indices[end, idx]
+                end
             end
         end
     end

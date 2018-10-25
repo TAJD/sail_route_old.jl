@@ -31,7 +31,7 @@ function load_current_data()
     merid = extrapolate(merid_interp, Line())  
     zonal_interp = interpolate((zonal[:, 2],), zonal[:, 1], Gridded(Linear()))
     zonal = extrapolate(zonal_interp, Line())  
-    lats = collect(LinRange(-15, 15, 30))
+    lats = collect(LinRange(-25, 25, 80))
     merid_sp = merid.(lats)
     zonal_sp = zonal.(lats)
     r = zeros(size(lats))
@@ -42,8 +42,20 @@ function load_current_data()
     r_final = extrapolate(r_interp, Line()) 
     theta_interp = interpolate((lats,), theta, Gridded(Linear()))
     theta_final = extrapolate(theta_interp, Line())
-    return r_final, theta_final  
+    return r_final, theta_final
 end
+
+function return_current_vectors(y, t_length)
+    cusp = zeros((t_length, size(y)[1], size(y)[2]))
+    cudi = zeros((t_length, size(y)[1], size(y)[2]))
+    r, theta = load_current_data()
+    for i in 1:t_length
+        cusp[i, :, :] = r.(y)
+        cudi[i, :, :] = theta.(y)
+    end
+    return cusp, cudi
+end
+
 
 """Create a custom iterator which breaks up a range based on the processor number"""
 function myrange(q::SharedArray) 
@@ -127,9 +139,9 @@ end
 
 
 function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
-                            route, time_indexes, x, y, wisp, widi, wadi, wahi)
+                            route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
     for t in t_range, p in p_range
-        output = route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi)
+        output = route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
         results[t, p] = output[1]
         output = nothing
     end

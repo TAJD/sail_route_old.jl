@@ -32,8 +32,7 @@ def load_dataset(path_nc, var):
 
 def return_time_index(ds):
     """Return the time index from a Dataset in unix timestamp."""
-    time_vals = ds['time']
-    time_vals = time_vals.values
+    time_vals = ds['time'].values
     times = [(t - np.datetime64('1970-01-01T00:00:00Z'))/np.timedelta64(1, 's') for t in time_vals]
     return np.array(times)
 
@@ -47,6 +46,16 @@ def regrid_data(ds, longs, lats):
     ds0.coords['lat_b'] = ('lat_b', ds0['lat'].values)
     ds0.coords['lon_b'] = ('lon_b', ds0['lon'].values)
     return ds0
+
+
+def return_data(ds):
+    """Return the values, longs, lats and timestamps of dataset."""
+    ds = ds.bfill('longitude', limit=None)
+    values = ds.values
+    lons = ds['lon'].values
+    lats = ds['lat'].values
+    time_vals = ds['time'].values
+    return values, lons, lats
 
 
 def load_cluster(path_nc, longs, lats, var):

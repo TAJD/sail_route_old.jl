@@ -32,7 +32,8 @@ end
 """Generic Aerrtsen typical speed loss values. Needs to be made more specific."""
 function typical_aerrtsen()
     itp = interpolate(([0.2, 0.6, 1.5, 2.3, 4.2, 8.2],), [100.0, 99.0, 97.0, 94.0, 83.0, 60.0], Gridded(Linear()))
-    return itp
+    etp = extrapolate(itp, Line())
+    return etp
 end
 
 """
@@ -51,23 +52,27 @@ end
 
 
 function h(cudi, cusp, bearing)
-    cusp*sin(deg2rad(cudi-bearing))
+    cusp*sind(cudi-bearing)
 end
 
 
 """Calculate the current vector."""
-function current(polar, cudi, cusp, widi, wisp, bearing, heading)
-    vs = perf_interp(polar, min_angle(widi, heading), wisp)
-    return (acos(h(cudi, cusp, bearing)/vs)*180/π - bearing)
+function current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, heading)
+    vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
+    height = h(cudi, cusp, bearing)/vs
+    if abs(height/vs) < 1.0
+        return (acosd(height/vs) - bearing)
+    else
+        return (acosd(1.0) - bearing)
+    end
 end
 
 
-
-
+"""Cost function not considering current."""
 function cost_function(performance::Performance,
-    widi, wisp,
-    wadi, wahi,
-    bearing)
+                       widi, wisp,
+                       wadi, wahi,
+                       bearing)
     if widi > 360.0
         return 0.0
     elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
@@ -94,30 +99,49 @@ function cost_function(performance::Performance,
                        widi, wisp,
                        wadi, wahi,
                        bearing)
-    if performance.acceptable_failure == 1.0
-        h1 = 0.0
-        h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-        while h2 - h1 > 0.1
-            h1 = h2
-            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-        end
-        bearing = bearing + h2
-        @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
+    h1 = 0.0
+    h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+    while abs(h2 - h1) > 0.1
+        h1 = h2
+        h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+    end
+    bearing = bearing + h2
+    @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
+    if vs+cusp < 0.0
+        return 0.0
+    else
         return vs + cusp
-    else 
-        pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
-        if pf < performance.acceptable_failure
-            return Inf
-        else
-            h1 = 0.0
-            h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-            while h2 - h1 > 0.1
-                h1 = h2
-                h2 = current(performance.polar, cudi, cusp, widi, wisp, bearing, h1)
-            end
-            bearing = bearing + h2
-            @inbounds vs = perf_interp(performance.polar, min_angle(widi, bearing), wisp)
-            return vs + cusp
-        end
     end
 end
+# function cost_function(performance::Performance,
+#                        cudi, cusp,
+#                        widi, wisp,
+#                        wadi, wahi,
+#                        bearing)
+#     if performance.acceptable_failure == 1.0
+#         h1 = 0.0
+#         h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+#         while h2 - h1 > 0.1
+#             h1 = h2
+#             h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+#         end
+#         bearing = bearing + h2
+#         @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
+#         return vs + cusp
+#     else 
+#         pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
+#         if pf < performance.acceptable_failure
+#             return Inf
+#         else
+#             h1 = 0.0
+#             h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+#             while h2 - h1 > 0.1
+#                 h1 = h2
+#                 h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
+#             end
+#             bearing = bearing + h2
+#             @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
+#             return vs + cusp
+#         end
+#     end
+# end

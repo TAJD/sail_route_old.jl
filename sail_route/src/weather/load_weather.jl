@@ -1,4 +1,4 @@
-using PyCall
+using PyCall, Interpolations
 
 @pyimport importlib.machinery as machinery
 loader = machinery.SourceFileLoader("weather",ENV["HOME"]*"/sail_route.jl/sail_route/src/weather/load_weather.py")
@@ -29,12 +29,33 @@ function load_era5_weather(path_nc)
 end
 
 
+"""Regrids the weather data to a grid which is approximately the same as the sailing domain."""
 function regrid_data(ds, longs, lats)
     dataset = w[:regrid_data](ds, longs, lats)
     return Array{Float64}(dataset[:values])
     # return dataset
 end
 
+
+"""Regrids the weather data to a grid which is the same as the sailing domain."""
+function regrid_domain(ds, req_lons, req_lats)
+    # return the values and original lats and longs and times of the dataset - python function "return data"
+    # create empty array for the real weather conditions
+    # for each timestep;
+    #   load a 2D interpolator instance
+    #   interpolate the weather conditions for the locations passed (try dot notation)
+    #   add weather data  to the empty array
+    # return the now full array of weather data
+    values, lons, lats = w[:return_data](ds)
+    req_lons = mod(req_lons .+ 360.0, 360.0) # convert -ve lons to +vs 
+    interp_values = zeros((size(values)[1], size(req_lons)[1], size(req_lons)[2]))
+    knots = (lats[end:-1:1], lons)
+    for i in 1:size(values)[1]
+        itp = interpolate(knots, values[i, end:-1:1, :], Gridded(Linear()))
+        interp_values[i, end:-1:1, :] = itp.(req_lats, req_lons)
+    end
+    return interp_values
+end
 
 function load_cluster(path_nc, longs, lats, var)
     ds = w[:load_cluster](path_nc, longs, lats, var)

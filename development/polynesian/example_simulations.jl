@@ -16,7 +16,7 @@ using Distributed
 
     # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
     # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc"
-    route_solve_shared_chunk!(results, times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi)
+    route_solve_shared_chunk!(results, times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
 end
 
 
@@ -46,11 +46,14 @@ function parallized_uncertain_routing()
     @everywhere route = Route(lon1, lon2, lat1, lat2, n, n)
     @everywhere wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
     @everywhere x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+    @everywhere dims = size(wisp)
+    @everywhere cusp, cudi = return_current_vectors(y, dims[1])
     @sync begin
         for p in procs(results)
+            @show p
             @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route,
                                    time_indexes, x, y,
-                                   wisp, widi, wadi, wahi)
+                                   wisp, widi, wadi, wahi, cusp, cudi)
         end
     end
     _results = DataFrame(results)
@@ -58,6 +61,47 @@ function parallized_uncertain_routing()
     insert!(_results, 1, times, :start_time)
     CSV.write(save_path, _results)
     return _results
+end
+
+
+function check_current_works()
+    # variables
+    boat = "/tongiaki/"
+    route_name = "tongatapu_to_atiu"
+    wave_model = "resistance_direction_"
+    @everywhere lon1 = -171.15
+    @everywhere lat1 = -21.21
+    @everywhere lon2 = -158.07
+    @everywhere lat2 = -19.59
+    @everywhere min_dist = 10.0
+    @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
+    @everywhere twa, tws, perf = load_tong()
+    sim_times = [DateTime(t) for t in times]
+    params = [i for i in LinRange(0.85, 1.15, 20)]
+    @everywhere polar = setup_perf_interpolation(tws, twa, perf)
+    @everywhere wave_resistance_model = typical_aerrtsen()
+    perfs = generate_performance_uncertainty_samples(polar,
+                                                     params,
+                                                     wave_resistance_model)
+    results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
+    path_name = boat*"_routing_"*route_name*"_"*wave_model*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm.txt"
+    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*path_name
+    println(save_path)
+    @everywhere n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    @everywhere route = Route(lon1, lon2, lat1, lat2, n, n)
+    @everywhere wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
+    @everywhere x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+    @everywhere dims = size(wisp)
+    @everywhere cusp, cudi = return_current_vectors(y, dims[1])
+    results = route_solve(route, perfs[1], sim_times[10], times, x, y,
+                          wisp, widi,
+                          cusp, cudi,
+                          wadi, wahi)
+    println(results[1])
+    results = route_solve(route, perfs[1], sim_times[10], times, x, y,
+                          wisp, widi, wadi, wahi)
+    println(results[1])
 end
 
 
@@ -92,9 +136,6 @@ function run_single_route()
     CSV.write(name*"x_locs", DataFrame(results[4]))
     CSV.write(name*"y_locs", DataFrame(results[5]))
 end
-
-# run_single_route()
-# parallized_uncertain_routing()
 
 
 function check_indexing() # won't work now as the method of loading datasets has changed, change line 33 in load_weather.jl to check
@@ -132,8 +173,6 @@ function check_indexing() # won't work now as the method of loading datasets has
     println("Method test 2 ", isapprox(m_index_2, m_interp_2, atol = 0.0001))
 end
 
-
-# run_single_route()
 
 """Simulation demonstrating the calculation of uncertainty for a single set of initial conditions. Being tested."""
 function run_algorithm_uncertainty_route()
