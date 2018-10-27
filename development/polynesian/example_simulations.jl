@@ -31,7 +31,7 @@ function parallized_uncertain_routing()
     @everywhere lat2 = -19.59
     @everywhere min_dist = 10.0
     @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
+    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 1, 30, 0, 0, 0)
     @everywhere twa, tws, perf = load_tong()
     sim_times = [DateTime(t) for t in times]
     params = [i for i in LinRange(0.85, 1.15, 20)]
@@ -64,23 +64,23 @@ function parallized_uncertain_routing()
 end
 
 
-function check_current_works()
+function check_current_works(d)
     # variables
     boat = "/tongiaki/"
     route_name = "tongatapu_to_atiu"
     wave_model = "resistance_direction_"
-    @everywhere lon1 = -171.15
-    @everywhere lat1 = -21.21
-    @everywhere lon2 = -158.07
-    @everywhere lat2 = -19.59
-    @everywhere min_dist = 10.0
-    @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
-    @everywhere twa, tws, perf = load_tong()
+    lon1 = -171.15
+    lat1 = -21.21
+    lon2 = -158.07
+    lat2 = -19.59
+    min_dist = d
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
+    twa, tws, perf = load_tong()
     sim_times = [DateTime(t) for t in times]
     params = [i for i in LinRange(0.85, 1.15, 20)]
-    @everywhere polar = setup_perf_interpolation(tws, twa, perf)
-    @everywhere wave_resistance_model = typical_aerrtsen()
+    polar = setup_perf_interpolation(tws, twa, perf)
+    wave_resistance_model = typical_aerrtsen()
     perfs = generate_performance_uncertainty_samples(polar,
                                                      params,
                                                      wave_resistance_model)
@@ -88,21 +88,22 @@ function check_current_works()
     path_name = boat*"_routing_"*route_name*"_"*wave_model*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm.txt"
     save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*path_name
     println(save_path)
-    @everywhere n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    @everywhere route = Route(lon1, lon2, lat1, lat2, n, n)
-    @everywhere wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
-    @everywhere x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
-    @everywhere dims = size(wisp)
-    @everywhere cusp, cudi = return_current_vectors(y, dims[1])
+    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+    route = Route(lon1, lon2, lat1, lat2, n, n)
+    wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
+    x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+    dims = size(wisp)
+    cusp, cudi = return_current_vectors(y, dims[1])
     results = route_solve(route, perfs[1], sim_times[10], times, x, y,
                           wisp, widi,
                           cusp, cudi,
                           wadi, wahi)
     println(results[1])
-    results = route_solve(route, perfs[1], sim_times[10], times, x, y,
-                          wisp, widi, wadi, wahi)
-    println(results[1])
 end
+
+
+# check_current_works()
+# parallized_uncertain_routing()
 
 
 """Running a routing simulation for a single set of initial conditions."""

@@ -1,4 +1,4 @@
-using CSV, Interpolations, DataFrames
+using CSV, Interpolations, DataFrames, Roots
 
 
 """
@@ -24,6 +24,7 @@ function setup_perf_interpolation(tws, twa, perf)
     knots = (twa, tws)
     itp = interpolate(knots, perf, Gridded(Linear()))
     etp0 = extrapolate(itp, Line())
+    # etp0 = extrapolate(itp, 0.0)
     return etp0
 end
 
@@ -41,7 +42,7 @@ end
 
 Return interpolated performance. Convert from ms to knots here.
 """
-function perf_interp(performance, twa, tws, wahi, wadi)
+@inline function perf_interp(performance, twa, tws, wahi, wadi)
     if performance.wave_resistance == nothing
         wave_res = 1.0
     else
@@ -51,20 +52,20 @@ function perf_interp(performance, twa, tws, wahi, wadi)
 end
 
 
+"""Calculate the horizontal component of the current."""
 function h(cudi, cusp, bearing)
     cusp*sind(cudi-bearing)
 end
 
 
-"""Calculate the current vector."""
-function current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, heading)
-    vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-    height = h(cudi, cusp, bearing)/vs
-    if abs(height/vs) < 1.0
-        return (acosd(height/vs) - bearing)
-    else
-        return (acosd(1.0) - bearing)
-    end
+"""Calculate the resultant of the horizontal components of the boat and the current. The horizontal components of the speed of the vessel due to heading change and the current must be equal.
+
+Bearing is the angle between waypoints. Heading is the actual course followed.
+
+"""
+function hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, heading)
+    v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
+    return v*sind(bearing-heading) - h(cudi, cusp, bearing)
 end
 
 
@@ -85,6 +86,24 @@ function cost_function(performance::Performance,
 end
 
 
+"""Check if the awa suggested is within the possible values for awa from the polar data."""
+@inline function check_brackets(bearing, twa)
+    awa = min_angle(bearing, twa[1])
+    heading_awa = awa
+    max_awa = 160.0
+    min_awa = 40.0
+    max_awa_delta = max_awa - awa
+    min_awa_delta = awa - min_awa
+    delta = 0.0
+    if min_awa_delta < 0 && max_awa_delta > 0
+        bearing -= min_awa_delta 
+    elseif min_awa_delta < 0 && max_awa_delta < 0
+        bearing += max_awa_delta
+    end
+    return mod(bearing, 360.0)
+end
+
+
 """
 cost_function(performance, cudi::Float64, cusp::Float64,
                        widi::Float64, wisp::Float64,
@@ -92,56 +111,27 @@ cost_function(performance, cudi::Float64, cusp::Float64,
                        bearing::Float64)
 
 
-Calculate the correct speed of the sailing craft given the failure model and environmental conditions.
+Calculate the speed of the sailing craft given the failure model and environmental conditions. 
 """
 function cost_function(performance::Performance,
                        cudi, cusp,
                        widi, wisp,
                        wadi, wahi,
                        bearing)
-    h1 = 0.0
-    h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-    while abs(h2 - h1) > 0.1
-        h1 = h2
-        h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-    end
-    bearing = bearing + h2
-    @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-    if vs+cusp < 0.0
+    w_c_di = mod(widi + cudi, 360.0)
+    w_c_sp = wisp + cusp
+    v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
+    @inline resultant(x) = hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, x)
+    low_bearing = check_brackets(bearing-45.0, w_c_di)
+    high_bearing = check_brackets(bearing+45.0, w_c_di)
+    try 
+        phi = find_zero(resultant, (low_bearing, high_bearing), xatol=0.1)
+        v = perf_interp(performance, min_angle(w_c_di, phi), w_c_sp, wahi, wadi)
+        if abs(phi - bearing) > 30.0
+            return 0.0
+        end
+        return v + cusp
+    catch ArgumentError
         return 0.0
-    else
-        return vs + cusp
     end
 end
-# function cost_function(performance::Performance,
-#                        cudi, cusp,
-#                        widi, wisp,
-#                        wadi, wahi,
-#                        bearing)
-#     if performance.acceptable_failure == 1.0
-#         h1 = 0.0
-#         h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-#         while h2 - h1 > 0.1
-#             h1 = h2
-#             h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-#         end
-#         bearing = bearing + h2
-#         @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-#         return vs + cusp
-#     else 
-#         pf = interrogate_model(performance.failure_model, wisp, widi, wahi, wadi)
-#         if pf < performance.acceptable_failure
-#             return Inf
-#         else
-#             h1 = 0.0
-#             h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-#             while h2 - h1 > 0.1
-#                 h1 = h2
-#                 h2 = current(performance, cudi, cusp, widi, wisp, wahi, wadi, bearing, h1)
-#             end
-#             bearing = bearing + h2
-#             @inbounds vs = perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-#             return vs + cusp
-#         end
-#     end
-# end

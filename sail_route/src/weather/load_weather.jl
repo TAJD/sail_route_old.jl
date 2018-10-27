@@ -39,15 +39,8 @@ end
 
 """Regrids the weather data to a grid which is the same as the sailing domain."""
 function regrid_domain(ds, req_lons, req_lats)
-    # return the values and original lats and longs and times of the dataset - python function "return data"
-    # create empty array for the real weather conditions
-    # for each timestep;
-    #   load a 2D interpolator instance
-    #   interpolate the weather conditions for the locations passed (try dot notation)
-    #   add weather data  to the empty array
-    # return the now full array of weather data
     values, lons, lats = w[:return_data](ds)
-    req_lons = mod(req_lons .+ 360.0, 360.0) # convert -ve lons to +vs 
+    req_lons = mod.(req_lons .+ 360.0, 360.0) 
     interp_values = zeros((size(values)[1], size(req_lons)[1], size(req_lons)[2]))
     knots = (lats[end:-1:1], lons)
     for i in 1:size(values)[1]

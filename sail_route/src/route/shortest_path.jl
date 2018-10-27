@@ -23,7 +23,7 @@ Arguments:
 
 - twa: Array of true wind angles for each point in polar plot.
 - tws: Array of true wind speeds for each point in polar plot.
-- boat_perf: Dierckx 2D spline instance.
+- boat_perf: Interpolations instance.
 
 """
 struct Performance
