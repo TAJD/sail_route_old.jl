@@ -31,7 +31,7 @@ function parallized_uncertain_routing()
     @everywhere lat2 = -19.59
     @everywhere min_dist = 10.0
     @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 1, 30, 0, 0, 0)
+    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 10, 1, 0, 0, 0)
     @everywhere twa, tws, perf = load_tong()
     sim_times = [DateTime(t) for t in times]
     params = [i for i in LinRange(0.85, 1.15, 20)]
@@ -50,7 +50,6 @@ function parallized_uncertain_routing()
     @everywhere cusp, cudi = return_current_vectors(y, dims[1])
     @sync begin
         for p in procs(results)
-            @show p
             @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route,
                                    time_indexes, x, y,
                                    wisp, widi, wadi, wahi, cusp, cudi)
@@ -62,6 +61,8 @@ function parallized_uncertain_routing()
     CSV.write(save_path, _results)
     return _results
 end
+
+parallized_uncertain_routing()
 
 
 function check_current_works(d)
@@ -86,15 +87,13 @@ function check_current_works(d)
                                                      wave_resistance_model)
     results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
     path_name = boat*"_routing_"*route_name*"_"*wave_model*repr(times[1])*"_to_"*repr(times[end])*"_"*repr(min_dist)*"_nm.txt"
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*path_name
-    println(save_path)
     n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
     route = Route(lon1, lon2, lat1, lat2, n, n)
     wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather_data)
     x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
     dims = size(wisp)
     cusp, cudi = return_current_vectors(y, dims[1])
-    results = route_solve(route, perfs[1], sim_times[10], times, x, y,
+    results = route_solve(route, perfs[1], sim_times[1], times, x, y,
                           wisp, widi,
                           cusp, cudi,
                           wadi, wahi)
@@ -102,7 +101,7 @@ function check_current_works(d)
 end
 
 
-# check_current_works()
+# check_current_works(20)
 # parallized_uncertain_routing()
 
 

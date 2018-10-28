@@ -42,7 +42,7 @@ end
 
 Return interpolated performance. Convert from ms to knots here.
 """
-@inline function perf_interp(performance, twa, tws, wahi, wadi)
+function perf_interp(performance, twa, tws, wahi, wadi)
     if performance.wave_resistance == nothing
         wave_res = 1.0
     else
@@ -69,25 +69,25 @@ function hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing
 end
 
 
-"""Cost function not considering current."""
-function cost_function(performance::Performance,
-                       widi, wisp,
-                       wadi, wahi,
-                       bearing)
-    if widi > 360.0
-        return 0.0
-    elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
-        return 0.0
-    elseif  wadi < 45.0
-        return 0.0
-    else
-        return perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-    end
-end
+# """Cost function not considering current."""
+# function cost_function_no_current(performance::Performance,
+#                        widi, wisp,
+#                        wadi, wahi,
+#                        bearing)
+#     if widi > 360.0
+#         return 0.0
+#     elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
+#         return 0.0
+#     elseif  min_angle(wadi, bearing) < 45.0
+#         return 0.0
+#     else
+#         return perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
+#     end
+# end
 
 
 """Check if the awa suggested is within the possible values for awa from the polar data."""
-@inline function check_brackets(bearing, twa)
+function check_brackets(bearing, twa)
     awa = min_angle(bearing, twa[1])
     heading_awa = awa
     max_awa = 160.0
@@ -105,7 +105,7 @@ end
 
 
 """
-cost_function(performance, cudi::Float64, cusp::Float64,
+cost_function_canoe(performance, cudi::Float64, cusp::Float64,
                        widi::Float64, wisp::Float64,
                        wadi::Float64, wahi::Float64,
                        bearing::Float64)
@@ -113,7 +113,49 @@ cost_function(performance, cudi::Float64, cusp::Float64,
 
 Calculate the speed of the sailing craft given the failure model and environmental conditions. 
 """
-function cost_function(performance::Performance,
+function cost_function_canoe(performance::Performance,
+                       cudi, cusp,
+                       widi, wisp,
+                       wadi, wahi,
+                       bearing)
+    if min_angle(bearing, wadi) < 40.0
+        return 0.05
+    elseif wahi > 5.0
+        return 0.05
+    end
+    w_c_di = mod(widi + cudi, 360.0)
+    w_c_sp = wisp + cusp
+    v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
+    resultant(x) = hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, x)
+    low_bearing = check_brackets(bearing-45.0, w_c_di)
+    high_bearing = check_brackets(bearing+45.0, w_c_di)
+    try 
+        phi = find_zero(resultant, (low_bearing, high_bearing), xatol=0.1)
+        v = perf_interp(performance, min_angle(w_c_di, phi), w_c_sp, wahi, wadi)
+        if min_angle(phi, bearing) > 60.0
+            return 0.05
+        end
+        if v + cusp < 0.0
+            return 0.05
+        else
+            return v + cusp
+        end
+    catch ArgumentError
+        return 0.05
+    end
+end
+
+
+"""
+cost_function_conventional(performance, cudi::Float64, cusp::Float64,
+                       widi::Float64, wisp::Float64,
+                       wadi::Float64, wahi::Float64,
+                       bearing::Float64)
+
+
+Calculate the speed of the sailing craft given the failure model and environmental conditions. 
+"""
+function cost_function_conventional(performance::Performance,
                        cudi, cusp,
                        widi, wisp,
                        wadi, wahi,
@@ -121,17 +163,23 @@ function cost_function(performance::Performance,
     w_c_di = mod(widi + cudi, 360.0)
     w_c_sp = wisp + cusp
     v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
-    @inline resultant(x) = hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, x)
+    resultant(x) = hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, x)
     low_bearing = check_brackets(bearing-45.0, w_c_di)
     high_bearing = check_brackets(bearing+45.0, w_c_di)
     try 
         phi = find_zero(resultant, (low_bearing, high_bearing), xatol=0.1)
         v = perf_interp(performance, min_angle(w_c_di, phi), w_c_sp, wahi, wadi)
-        if abs(phi - bearing) > 30.0
+        if min_angle(phi, bearing) > 60.0
             return 0.0
         end
-        return v + cusp
+        if v + cusp < 0.0
+            return 0.0
+        else
+            return v + cusp
+        end
     catch ArgumentError
         return 0.0
     end
 end
+
+cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_canoe(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)

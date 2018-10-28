@@ -190,10 +190,10 @@ end
 
 
 "Time dependent shortest path."
-function route_solve(route::Route, performance::Performance, start_time::DateTime, times, x, y, 
+function route_solve(route::Route, performance::Performance, start_time::DateTime, times, x, y,
                      wisp, widi,
-                     cusp, cudi,
-                     wadi, wahi)
+                     wadi, wahi,
+                     cusp, cudi)
     start_time_idx = time_to_index(start_time, times)
     earliest_times = fill(Inf, size(x))
     prev_node = zero(x)
