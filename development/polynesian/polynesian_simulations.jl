@@ -80,6 +80,27 @@ function test_single_instance()
 end
 
 
+"""Generate the parameters to simulate for all cases of the Polynesian routing simulation."""
+function generate_for_loop()
+    start_locations_lat = [-13.917, -21.21]
+    start_locations_lon = [-171.75, -175.15]
+    finish_locations_lat = [-19.59, -17.53]
+    finish_locations_lon = [-158.07, -149.83]
+    start_location_names = ["upolu", "tongatapu"]
+    finish_location_names = ["atiu", "moorea"]
+    boat_performance = [load_tong(), load_boeckv2()]
+    boat_performance_names = ["tongiaki", "boeckv2"]
+    t_inc = 12
+    t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 2, 1, 0, 0, 0)
+    t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 2, 1, 0, 0, 0)
+    weather_times = [t_low, t_high]
+    weather_names = ["low", "high"]
+    node_spacing = [20.0, 15.0, 10.0]
+end
+
+
+generate_for_loop()
+
 # three for loops;
 # #1 for boat type 
 # #2 for start/finish locations
