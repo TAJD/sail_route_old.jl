@@ -22,17 +22,21 @@ end
 
 function parallized_uncertain_routing()
     # variables
-    boat = "/tongiaki/"
+    # boat = "/tongiaki/"
+    boat = "/boeckv2/"
     route_name = "tongatapu_to_atiu"
     wave_model = "resistance_direction_"
     @everywhere lon1 = -171.15
     @everywhere lat1 = -21.21
     @everywhere lon2 = -158.07
     @everywhere lat2 = -19.59
-    @everywhere min_dist = 10.0
-    @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 10, 1, 0, 0, 0)
-    @everywhere twa, tws, perf = load_tong()
+    @everywhere min_dist = 20.0
+    @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc"
+    @everywhere times = Dates.DateTime(1976, 7, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1976, 11, 1, 0, 0, 0)
+    # @everywhere weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    # @everywhere times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 1, 0, 0, 0)
+    # @everywhere twa, tws, perf = load_tong()
+    @everywhere twa, tws, perf = load_boeckv2()
     sim_times = [DateTime(t) for t in times]
     params = [i for i in LinRange(0.85, 1.15, 20)]
     polar = setup_perf_interpolation(tws, twa, perf)
