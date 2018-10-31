@@ -66,7 +66,7 @@ function parallized_uncertain_routing()
     return _results
 end
 
-parallized_uncertain_routing()
+# parallized_uncertain_routing()
 
 
 function check_current_works(d)
