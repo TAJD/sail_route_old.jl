@@ -189,3 +189,44 @@ function disc_routing_analysis(lon2, lon1, lat2, lat1, perf, time,
                         route_nodes[1], route_nodes[2], route_nodes[3])
     return Array([results[1], results[1]*gci_fine])
 end
+
+
+"""Generate the parameters to simulate for all cases of the Polynesian routing simulation."""
+function generate_settings()
+    start_locations_lat = [-13.917, -21.21]
+    start_locations_lon = [-171.75, -175.15]
+    finish_locations_lat = [-19.59, -17.53]
+    finish_locations_lon = [-158.07, -149.83]
+    start_location_names = ["upolu", "tongatapu"]
+    finish_location_names = ["atiu", "moorea"]
+    boat_performance = [load_tong(), load_boeckv2()]
+    boat_performance_names = ["/tongiaki/", "/boeckv2/"]
+    t_inc = 12
+    t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 2, 1, 0, 0, 0)
+    t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 2, 1, 0, 0, 0)
+    weather_times = [t_low, t_high]
+    weather_names = ["low", "high"]
+    weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
+    node_spacing = [20.0, 15.0, 10.0]
+    simulation_settings = []
+    save_paths = []
+    for i in node_spacing
+        for j in eachindex(start_location_names)
+            for k in eachindex(finish_location_names)
+                for l in eachindex(weather_names)
+                    for m in eachindex(boat_performance_names)
+                        push!(simulation_settings, [i, start_locations_lon[j], finish_locations_lon[k],
+                                                    start_locations_lat[j], finish_locations_lat[k],
+                                                    weather_paths[l], weather_times[l],
+                                                    boat_performance[m]])
+                        route_name = start_location_names[j]*"_to_"*finish_location_names[k]
+                        path = boat_performance_names[m]*"_routing_"*route_name*"_"*repr(weather_times[l][1])*"_to_"*repr(weather_times[l][end])*"_"*repr(i)*"_nm.txt"
+                        push!(save_paths, path)
+                    end
+                end
+            end
+        end
+    end
+    return simulation_settings, save_paths
+end
