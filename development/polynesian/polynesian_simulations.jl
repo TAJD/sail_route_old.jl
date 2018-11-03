@@ -15,56 +15,42 @@ using Distributed
     using SharedArrays
 
 
-    # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
-    # global weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc"
     route_solve_shared_chunk!(results, times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi) = route_solve_chunk!(results, myrange(results)..., times, perfs, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
-end
 
-
-"""parallized_uncertain_routing(min_dist)
-
-This file contains the scripts which provide the essential results quantifying the performance of Polynesian seafaring technology.
-
-Inputs need to be;
-
-1. Path name for saving files
-2. Start/finish locations
-3. Location of weather data 
-4. Start times requiring simulation
-5. Performance of sailing craft
-6. Minimum distance 
-"""
-
-
-@everywhere function parallized_uncertain_routing(save_path, lon1, lat1, lon2, lat2,
-                                      weather, times, perf_t, min_dist)
-    sim_times = [DateTime(t) for t in times]
-    twa, tws, perf = perf_t
-    params = [i for i in LinRange(0.85, 1.15, 20)]
-    polar = setup_perf_interpolation(tws, twa, perf)
-    wave_resistance_model = typical_aerrtsen()
-    perfs = generate_performance_uncertainty_samples(polar, params, wave_resistance_model)
-    results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
-    save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*save_path
-    println(save_path)
-    n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
-    route = Route(lon1, lon2, lat1, lat2, n, n)
-    wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather)
-    x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
-    dims = size(wisp)
-    cusp, cudi = return_current_vectors(y, dims[1])
-    @sync begin
-        for p in procs(results)
-            @async remotecall_wait(route_solve_shared_chunk!, p, results, times, perfs, route,
-                                   time_indexes, x, y,
-                                   wisp, widi, wadi, wahi, cusp, cudi)
+    """parallized_uncertain_routing(save_path, lon1, lat1, lon2, lat2,
+                                    weather, times, perf_t, min_dist)
+    Parallized routing simulations.
+    """
+    function parallized_uncertain_routing(save_path, lon1, lat1, lon2, lat2,
+                                          weather, times, perf_t, min_dist)
+        sim_times = [DateTime(t) for t in times]
+        twa, tws, perf = perf_t
+        params = [i for i in LinRange(0.85, 1.15, 20)]
+        polar = setup_perf_interpolation(tws, twa, perf)
+        wave_resistance_model = typical_aerrtsen()
+        perfs = generate_performance_uncertainty_samples(polar, params, wave_resistance_model)
+        results = SharedArray{Float64, 2}(length(sim_times), length(perfs))
+        save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian"*save_path
+        println(save_path)
+        n = calc_nodes(lon1, lon2, lat1, lat2, min_dist)
+        route = Route(lon1, lon2, lat1, lat2, n, n)
+        wisp, widi, wahi, wadi, wapr, time_indexes = load_era20_weather(weather)
+        x, y, wisp, widi, wadi, wahi = generate_inputs(route, wisp, widi, wadi, wahi)
+        dims = size(wisp)
+        cusp, cudi = return_current_vectors(y, dims[1])
+        @sync begin
+            for p in procs(results)
+                @async remotecall_wait(route_solve_shared_chunk!, p, results, times,
+                                       perfs, route, time_indexes, x, y,
+                                       wisp, widi, wadi, wahi, cusp, cudi)
+            end
         end
+        _results = DataFrame(results)
+        names!(_results, [Symbol(i) for i in params])
+        insert!(_results, 1, times, :start_time)
+        CSV.write(save_path, _results)
+        return _results
     end
-    _results = DataFrame(results)
-    names!(_results, [Symbol(i) for i in params])
-    insert!(_results, 1, times, :start_time)
-    CSV.write(save_path, _results)
-    return _results
 end
 
 
@@ -85,9 +71,8 @@ function test_single_instance()
     println(results[1, 1])
 end
 
-# test_single_instance()
 
-# """Run polynesian simulations based on arguments from command line. Two arguments used to set the lower and upper limits of a range to iterate over."""
+"""Run polynesian simulations based on arguments from command line. Two arguments used to set the lower and upper limits of a range to iterate over."""
 function run_simulations(i)
     @everywhere settings = generate_settings()
     @everywhere vals = settings[1]

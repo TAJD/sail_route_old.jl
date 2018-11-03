@@ -1,2 +1,0 @@
-
-"""Create sample weather scenario."""

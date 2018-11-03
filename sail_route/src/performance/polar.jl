@@ -65,7 +65,7 @@ Bearing is the angle between waypoints. Heading is the actual course followed.
 """
 function hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, heading)
     v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
-    return v*sind(bearing-heading) - h(cudi, cusp, bearing)
+    return v*sind(bearing-heading) - cusp*sind(cudi-bearing)
 end
 
 
@@ -118,10 +118,8 @@ function cost_function_canoe(performance::Performance,
                        widi, wisp,
                        wadi, wahi,
                        bearing)
-    if min_angle(bearing, wadi) < 40.0
-        return 0.05
-    elseif wahi > 5.0
-        return 0.05
+    if wahi > 5.0
+        return 0.0
     end
     w_c_di = mod(widi + cudi, 360.0)
     w_c_sp = wisp + cusp
@@ -137,6 +135,8 @@ function cost_function_canoe(performance::Performance,
         end
         if v + cusp < 0.0
             return 0.05
+        elseif min_angle(bearing, wadi) < 40.0
+            return 0.25*(v+cusp)
         else
             return v + cusp
         end

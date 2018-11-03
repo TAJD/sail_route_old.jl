@@ -202,8 +202,8 @@ function generate_settings()
     boat_performance = [load_tong(), load_boeckv2()]
     boat_performance_names = ["/tongiaki/", "/boeckv2/"]
     t_inc = 12
-    t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 2, 1, 0, 0, 0)
-    t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 2, 1, 0, 0, 0)
+    t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 11, 1, 0, 0, 0)
+    t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 11, 1, 0, 0, 0)
     weather_times = [t_low, t_high]
     weather_names = ["low", "high"]
     weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
