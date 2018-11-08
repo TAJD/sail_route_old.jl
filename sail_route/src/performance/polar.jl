@@ -118,9 +118,6 @@ function cost_function_canoe(performance::Performance,
                        widi, wisp,
                        wadi, wahi,
                        bearing)
-    if wahi > 5.0
-        return 0.0
-    end
     w_c_di = mod(widi + cudi, 360.0)
     w_c_sp = wisp + cusp
     v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
@@ -136,7 +133,7 @@ function cost_function_canoe(performance::Performance,
         if v + cusp < 0.0
             return 0.05
         elseif min_angle(bearing, wadi) < 40.0
-            return 0.25*(v+cusp)
+            return 0.5*(v+cusp)
         else
             return v + cusp
         end
