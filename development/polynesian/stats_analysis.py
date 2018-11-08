@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use('agg')
+import scipy.stats as scis
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from matplotlib.patches import Polygon
@@ -186,6 +187,36 @@ def plot_date_range_results():
     plt.savefig(path+"/daily_variability.png")
 
 
+
+def pc_difference(df):
+    """Calculate the pc difference between voyage results and mean voyaging time."""
+    means = df.mean(axis=1)
+    df = df.sub(means, axis=0)
+    df = df.div(means, axis=0)
+    return df
+
+
+def apply_performance_difference_analysis():
+    """Apply performance difference analysis."""
+    path = "/home/td7g11/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_10.0_nm.txt"
+    df = pd.read_csv(path, index_col=0)
+    df = pc_difference(df)
+    # print(df.head())
+    print(df.describe())
+    mean_x_vals = np.array([float(x) for x in df.columns.values])
+    means = df.mean(axis=0).values
+    plt.figure()
+    plt.scatter(mean_x_vals, means, label="Performance mean pc variation")
+    slope, intercept, r_value, p_value, std_err = scis.linregress(means, mean_x_vals)
+    f = lambda x: slope*x + intercept
+    x = np.array([np.min(mean_x_vals),np.max(mean_x_vals)])
+    plt.plot(x, f(x), label=r"Fitted line, r$^2$ = {:03.2f}".format(r_value))
+    plt.legend()
+    plt.savefig("nd_performance_scatter.png")
+    # df.boxplot()
+    # plt.savefig("nd_performance_boxplot.png")
+
 if __name__ == "__main__":
     # compare_scenarios()
-    plot_date_range_results()
+    # plot_date_range_results()
+    apply_performance_difference_analysis()
