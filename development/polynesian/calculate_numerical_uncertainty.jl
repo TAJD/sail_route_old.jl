@@ -35,13 +35,13 @@ end
 """Return array of floats of finish times."""
 function finish_dates(array)
     time_index, performance_index = size(array)
-    converted_array = Array{Float64}(undef, time_index, performance_index-1)
+    converted_array = Array{Float64}(undef, time_index, performance_index)
     for i in 1:time_index
         for j in 2:performance_index
             hrs, rem = divrem(array[i, j], 1.0)
             mins = Dates.Minute(convert(Int64, round(rem*60)))
             hrs = Dates.Hour(convert(Int64, hrs))
-            converted_array[i, j-1] = Dates.value(hrs) + Dates.value(mins)/60.0
+            converted_array[i, j] = Dates.value(hrs) + Dates.value(mins)/60.0
         end
     end
     return converted_array

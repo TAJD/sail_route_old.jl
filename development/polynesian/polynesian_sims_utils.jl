@@ -208,7 +208,7 @@ function generate_settings()
     weather_names = ["low", "high"]
     weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
                      ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
-    node_spacing = [20.0, 15.0, 10.0]
+    node_spacing = [40.0, 20.0, 10.0]
     simulation_settings = []
     save_paths = []
     for i in node_spacing

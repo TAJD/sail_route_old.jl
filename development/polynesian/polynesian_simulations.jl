@@ -25,7 +25,7 @@ using Distributed
                                           weather, times, perf_t, min_dist)
         sim_times = [DateTime(t) for t in times]
         twa, tws, perf = perf_t
-        params = [i for i in LinRange(0.85, 1.15, 20)]
+        params = [i for i in LinRange(0.50, 1.50, 20)]
         polar = setup_perf_interpolation(tws, twa, perf)
         wave_resistance_model = typical_aerrtsen()
         perfs = generate_performance_uncertainty_samples(polar, params, wave_resistance_model)
