@@ -15,16 +15,16 @@ install:
   # - hash -r
   # - conda config --set always_yes yes --set changeps1 no
   # - conda update -q conda
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes -e 'add Pkg; Pkg.clone(pwd())'
+# script:
+  # - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  # - julia --check-bounds=yes -e 'add Pkg; Pkg.clone(pwd())'
   # - conda info -a
   # - source activate $HOME/.julia/v1.0/Conda/deps/usr
   # - conda install xarray pyproj shapely
   # - conda install -c conda-forge esmpy basemap
   # - pip install xesmf
   # - julia -e 'using Pkg; Pkg.test("sail_route")'
-# after_success:
-  # - julia -e 'using Pkg; Pkg.add("Documenter")'
-  # - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
-  # - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+after_success:
+  - julia -e 'using Pkg; Pkg.add("Documenter")'
+  - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
