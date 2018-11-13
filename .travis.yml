@@ -17,7 +17,7 @@ install:
   - conda update -q conda
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes -e 'using Pkg; Pkg.clone(pwd())'
+  - julia --check-bounds=yes -e 'add Pkg; Pkg.clone(pwd())'
   - conda info -a
   - source activate $HOME/.julia/v0.6/Conda/deps/usr
   - conda install xarray pyproj shapely
