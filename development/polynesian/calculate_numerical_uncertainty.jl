@@ -4,8 +4,8 @@ using DataFrames, CSV, Revise, Dates, Statistics
 
 function load_sample_data()
     file_10_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_10.0_nm.txt"
-    file_15_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_15.0_nm.txt"
-    file_20_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_20.0_nm.txt"
+    file_15_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_20.0_nm.txt"
+    file_20_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_40.0_nm.txt"
 
     file_10 = CSV.read(ENV["HOME"]*file_10_path, header=1, normalizenames=true)
     file_15 = CSV.read(ENV["HOME"]*file_15_path, header=1, normalizenames=true)
@@ -93,7 +93,7 @@ end
 function save_GCI_initial_analysis(file_10_path, file_15_path,
                                    file_20_path, save_path)
     f10, f15, f20 = load_data(file_10_path, file_15_path, file_20_path)
-    gci, extrap = GCI_calc_routing(f10, f15, f20, 10.0, 15.0, 20.0)
+    gci, extrap = GCI_calc_routing(f10, f15, f20, 10.0, 20.0, 40.0)
     CSV.write(save_path*"_GCI.txt", gci)
     CSV.write(save_path*"_extrap.txt", extrap)
 end
@@ -101,8 +101,8 @@ end
 
 function run_GCI_analysis()
     file_10_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_10.0_nm.txt"
-    file_15_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_15.0_nm.txt"
-    file_20_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_20.0_nm.txt"
+    file_15_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_20.0_nm.txt"
+    file_20_path = "/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00_40.0_nm.txt"
     save_path = ENV["HOME"]*"/sail_route.jl/development/polynesian/boeckv2/_routing_upolu_to_moorea_1982-01-01T00:00:00_to_1982-11-01T00:00:00"
     save_GCI_initial_analysis(file_10_path, file_15_path,
                               file_20_path, save_path)
