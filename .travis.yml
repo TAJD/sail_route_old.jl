@@ -17,14 +17,14 @@ install:
   - conda update -q conda
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes -e 'Pkg.clone(pwd())'
+  - julia --check-bounds=yes -e 'using Pkg; Pkg.clone(pwd())'
   - conda info -a
   - source activate $HOME/.julia/v0.6/Conda/deps/usr
   - conda install xarray pyproj shapely
   - conda install -c conda-forge esmpy basemap
   - pip install xesmf
-  - julia -e 'Pkg.test("sail_route")'
+  - julia -e 'using Pkg; Pkg.test("sail_route")'
 after_success:
-  - julia -e 'Pkg.add("Documenter")'
-  - julia -e 'cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
-  - julia -e 'cd(Pkg.dir("sail_route")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Documenter")'
+  - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; cd(Pkg.dir("sail_route")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
