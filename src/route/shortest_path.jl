@@ -13,27 +13,6 @@ struct Route
 end
 
 
-
-"""
-    Performance(twa, tws, boat_perf)
-
-Type to hold sailing craft performance information.
-
-Arguments:
-
-- twa: Array of true wind angles for each point in polar plot.
-- tws: Array of true wind speeds for each point in polar plot.
-- boat_perf: Interpolations instance.
-
-"""
-struct Performance
-    polar
-    uncertainty::Float64
-    acceptable_failure::Float64
-    wave_resistance
-end
-
-
 """Check if an array is monotonic. Works for both directions."""
 function check_monotonic(array)                                                  
     u = all(array[i] <= array[i+1] for i in range(1, length=length(array)-1))

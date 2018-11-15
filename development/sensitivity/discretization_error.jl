@@ -33,7 +33,7 @@ of convergence as the refinement ratio is not necessarily constant.
 
 This has been modified to the method of Celik (2008).
 """
-function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32, omega=0.5, tol=1.E-4)
+function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32, omega=0.5, tol=1.E-6)
     # Set a maximum residual and number of iterations
     max_res = 1.E6
     # calculate the epsilons.
@@ -64,7 +64,11 @@ function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32, ome
         residual = p1 - p0 
         iterations += 1
     end
-    return abs(p1)
+    if abs(p1) > 1.0
+        return 1.0
+    else
+        return abs(p1)
+    end
 end
 
 

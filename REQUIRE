@@ -1,6 +1,10 @@
-julia 0.7
-JuMP 0.18.2
-Cbc
-PyCall 1.17.1
+julia 1.0
+PyCall
 CSV
 Interpolations
+Dates
+SharedArrays
+BenchmarkTools
+Printf
+DataFrames
+Roots

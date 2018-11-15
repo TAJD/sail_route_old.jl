@@ -2,6 +2,26 @@ using CSV, Interpolations, DataFrames, Roots
 
 
 """
+    Performance(twa, tws, boat_perf)
+
+Type to hold sailing craft performance information.
+
+Arguments:
+
+- twa: Array of true wind angles for each point in polar plot.
+- tws: Array of true wind speeds for each point in polar plot.
+- boat_perf: Interpolations instance.
+
+"""
+struct Performance
+    polar
+    uncertainty::Float64
+    acceptable_failure::Float64
+    wave_resistance
+end
+
+
+"""
     load_file(path)
 
 Load the file specified by path.
