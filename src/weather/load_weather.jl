@@ -1,7 +1,7 @@
 using PyCall, Interpolations
 
 @pyimport importlib.machinery as machinery
-loader = machinery.SourceFileLoader("weather",ENV["HOME"]*"/sail_route.jl/sail_route/src/weather/load_weather.py")
+loader = machinery.SourceFileLoader("weather",ENV["HOME"]*"/sail_route_old/src/weather/load_weather.py")
 w = loader[:load_module]("weather")
 
 "Generate known weather conditions"

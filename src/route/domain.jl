@@ -1,7 +1,7 @@
 using PyCall
 
 @pyimport importlib.machinery as machinery
-loader = machinery.SourceFileLoader("pydomain",ENV["HOME"]*"/sail_route.jl/sail_route/src/route/pydomain.py")
+loader = machinery.SourceFileLoader("pydomain",ENV["HOME"]*"/sail_route_old/src/route/pydomain.py")
 pd = loader[:load_module]("pydomain")
 
 """

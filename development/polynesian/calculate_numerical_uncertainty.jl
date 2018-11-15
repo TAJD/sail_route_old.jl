@@ -48,6 +48,8 @@ function finish_dates(array)
 end
 
 
+
+"""Update this function - it isn't calculating the results correctly"""
 function GCI_calc_routing(small_results, medium_results, large_results,
                           h1, h2, h3)
     dates = small_results[1]
@@ -108,4 +110,4 @@ function run_GCI_analysis()
                               file_20_path, save_path)
 end
 
-run_GCI_analysis()
+# run_GCI_analysis()
