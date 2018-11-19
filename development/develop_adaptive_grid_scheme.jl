@@ -1,5 +1,9 @@
 include(ENV["HOME"]*"/sail_route_old/src/sail_route.jl")
 include(ENV["HOME"]*"/sail_route_old/development/sensitivity/discretization_error.jl")
+include(ENV["HOME"]*"/sail_route_old/development/polynesian/polynesian_sims_utils.jl")
+
+using BenchmarkTools, Revise
+
 
 """Generate weather for shortest path test functions."""
 function generate_weather(tws_val, twa_val, cs_val, cd_val,
@@ -32,6 +36,13 @@ function return_performance()
     polar = sail_route.setup_perf_interpolation(aws_range, awa_range, speed)
     perf = sail_route.Performance(polar, 1.0, 1.0, nothing)
     return perf
+end
+
+"""Check if an array is monotonic. Works for both directions."""
+function check_monotonic(array)                                                  
+    # u = all(array[i] <= array[i+1] for i in range(1, length=length(array)-1))
+    d = all(array[i] => array[i+1] for i in range(1, length=length(array)-1))
+    return u
 end
 
 
@@ -74,16 +85,55 @@ function test_routine()
     @show analytical_time
 end
 
-perf = return_performance()
-lat1 = 0.5
-lon1 = 0.0
-lat2 = 0.27
-lon2 = 2.0
-dist, bearing = sail_route.haversine(lon1, lat1, lon2, lat2)
-sample_route = sail_route.Route(lon1, lon2, lat1, lat2, 2, 2)
-start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
-times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
 
+function speed_test()
+    n_domain = 75
+    tws, twa, cs, cd, wahi, wadi = generate_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n_domain)
+    perf = return_performance()
+    lats = LinRange(0.0, 1.0, n_domain)
+    lons = LinRange(0.0, 1.0, n_domain)
+    grid_lon = [i for i in lons, j in lats]
+    grid_lat = [j for i in lons, j in lats]
+    lat1 = 0.5
+    lon1 = 0.0
+    lat2 = 0.5
+    lon2 = 1.0
+    n = 4
+    dist, bearing = sail_route.haversine(lon1, lat1, lon2, lat2)
+    sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n, n)
+
+    start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
+    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
+
+    m1 = BenchmarkTools.median(@benchmark sail_route.route_solve(sample_route, perf, start_time, times,
+                                                grid_lon, 
+                                                grid_lat,
+                                                tws, twa,
+                                                wadi, wahi,
+                                                cs, cd))
+    println(m1)
+    m2 = BenchmarkTools.median(@benchmark sail_route.route_solve(sample_route, perf, start_time, times,
+                                                grid_lon, 
+                                                grid_lat,
+                                                tws, twa,
+                                                wadi, wahi,
+                                                cs, cd))
+    println(m2)
+    println(judge(m1, m2; time_tolerance = 0.0001))
+end
+
+
+function test_inputs_dev_functions()
+    perf = return_performance()
+    lat1 = 0.5
+    lon1 = 0.0
+    lat2 = 0.27
+    lon2 = 2.0
+    dist, bearing = sail_route.haversine(lon1, lat1, lon2, lat2)
+    sample_route = sail_route.Route(lon1, lon2, lat1, lat2, 2, 2)
+    start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
+    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
+end
 
 function discretization_routine_first_loop(route, perf,
                                 start_time, 
@@ -121,85 +171,45 @@ function discretization_routine_first_loop(route, perf,
     return extrap, gci
 end
 
-"""For example weather and performance conditions apply the numerical error reduction routine.
 
-1. Iterates over three node distances calculated as a function of percentage of the voyage routes.
-2. If it doesn't look like the voyage times are converging due to the order of convergence or the results not monotonically decreasing then the next node distance will be reduced and the simulations will be run again.
+"""Test discretization routine for sample weather."""
+function test_discretization_uniform_weather()
+    n_domain = 75
+    tws, twa, cs, cd, wahi, wadi = generate_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n_domain)
+    perf = return_performance()
+    lats = LinRange(0.0, 1.0, n_domain)
+    lons = LinRange(0.0, 1.0, n_domain)
+    grid_lon = [i for i in lons, j in lats]
+    grid_lat = [j for i in lons, j in lats]
+    lat1 = 0.5
+    lon1 = 0.0
+    lat2 = 0.5
+    lon2 = 1.0
+    n = 4
+    dist, bearing = sail_route.haversine(lon1, lat1, lon2, lat2)
+    sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n, n)
 
-To develop this properly need to load the weather files and to interpolate them within each for/while loop."""
-function discretization_routine_sample(route, perf,
-                        start_time, 
-                        times)
-    d, b = sail_route.haversine(route.lon1, route.lat1, route.lon2, route.lat2)
-    d_n_range = [10.0, 5.0, 3.0] # normalized height
-    results = []
-    gci = []
-    extrap = []
-    ooc = []
-    for i in d_n_range # Loop 1
-        min_dist = d*i/100.0
-        n = sail_route.calc_nodes(route.lon1, route.lon2, route.lat1, route.lat2, min_dist)
-        sim_route = sail_route.Route(route.lon1, route.lon2, route.lat1, route.lat2, n, n)
-        lats = LinRange(0.0, 1.0, n)
-        lons = LinRange(0.0, 1.0, n)
-        grid_lon = [i for i in lons, j in lats]
-        grid_lat = [j for i in lons, j in lats]
-        tws, twa, cs, cd, wahi, wadi = generate_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n)
-        res = sail_route.route_solve(sim_route, perf,
-                                    start_time, 
-                                    times, 
-                                    grid_lon, 
-                                    grid_lat,
-                                    tws, twa,
-                                    wadi, wahi,
-                                    cs, cd)
-        push!(results, res[1])
-    end
-    gci = GCI_calc(results[end], results[end-1], results[end-2],
-                   d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-    extrap = extrap_value(results[end], results[end-1], results[end-2],
-                          d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-    ooc = ooc_value(results[end], results[end-1], results[end-2],
-                    d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-    if ooc > 1.0 && results[end-1] < results[end-2]
-        return extrap, gci
-    else 
-        iterations = 0
-        while ooc < 1.0  || results[end-1] > results[end-2] # Loop 2
-            if float(iterations) > 4.0
-                return extrap, gci
-            end
-            iterations += 1
-            d_n_m = d_n_range[end]/2.0 # calculate next multiple of d_n
-            push!(d_n_range, d_n_m)
-            min_dist = d*d_n_m/100.0
-            n = sail_route.calc_nodes(route.lon1, route.lon2, route.lat1, route.lat2, min_dist)
-            sim_route = sail_route.Route(route.lon1, route.lon2, route.lat1, route.lat2, n, n)
-            lats = LinRange(0.0, 1.0, n)
-            lons = LinRange(0.0, 1.0, n)
-            grid_lon = [i for i in lons, j in lats]
-            grid_lat = [j for i in lons, j in lats]
-            tws, twa, cs, cd, wahi, wadi = generate_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n)
-            res = sail_route.route_solve(sim_route, perf,
-                                        start_time, 
-                                        times, 
-                                        grid_lon, 
-                                        grid_lat,
-                                        tws, twa,
-                                        wadi, wahi,
-                                        cs, cd)
-            push!(results, res[1])
-            gci = GCI_calc(results[end], results[end-1], results[end-2],
-                           d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-            extrap = extrap_value(results[end], results[end-1], results[end-2],
-                                  d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-            ooc = ooc_value(results[end], results[end-1], results[end-2],
-                            d_n_range[end], d_n_range[end-1], d_n_range[end-2])
-            return extrap, gci
-        end
-    end
+    start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
+    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
 end
 
-# @show discretization_routine_first_loop(sample_route, perf, start_time, times)
+"""Test discretization routine for real weather"""
+function test_real_weather_discretization_routine()
+    lon1 = -171.15
+    lat1 = -21.21
+    lon2 = -158.07
+    lat2 = -19.59
+    sim_route = sail_route.Route(lon1, lon2, lat1, lat2, 80, 80)
+    weather_data = ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"
+    wisp, widi, wahi, wadi, wapr, time_indexes = sail_route.load_era20_weather(weather_data)
+    x, y, wisp_i, widi_i, wadi_i, wahi_i = sail_route.generate_inputs(sim_route, wisp, widi, wadi, wahi)
+    start_time = Dates.DateTime(1982, 1, 1, 0, 0, 0)
+    times = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(12):Dates.DateTime(1982, 11, 30, 0, 0, 0)
+    twa, tws, speeds = load_tong()
+    polar = sail_route.setup_perf_interpolation(tws, twa, speeds)
+    perf = sail_route.Performance(polar, 1.0, 1.0, nothing)
+    @show results = sail_route.poly_discretization_routine(sim_route, perf, start_time, times,
+                                                      wisp, widi, wadi, wahi)
+end
 
-@time discretization_routine_sample(sample_route, perf, start_time, times)
+test_real_weather_discretization_routine()

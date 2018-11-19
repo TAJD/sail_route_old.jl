@@ -62,7 +62,7 @@ end
 
 Return interpolated performance. Convert from ms to knots here.
 """
-function perf_interp(performance, twa, tws, wahi, wadi)
+@inline @fastmath function perf_interp(performance::Performance, twa, tws, wahi, wadi)
     if performance.wave_resistance == nothing
         wave_res = 1.0
     else
@@ -83,7 +83,7 @@ end
 Bearing is the angle between waypoints. Heading is the actual course followed.
 
 """
-function hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, heading)
+@inline @fastmath function hor_result(performance, w_c_di, w_c_sp, wahi, wadi, cudi, cusp, bearing, heading)
     v = perf_interp(performance, min_angle(w_c_di, bearing), w_c_sp, wahi, wadi)
     return v*sind(bearing-heading) - cusp*sind(cudi-bearing)
 end
@@ -107,7 +107,7 @@ end
 
 
 """Check if the awa suggested is within the possible values for awa from the polar data."""
-function check_brackets(bearing, twa)
+@fastmath function check_brackets(bearing, twa)
     awa = min_angle(bearing, twa[1])
     heading_awa = awa
     max_awa = 160.0
@@ -199,4 +199,11 @@ function cost_function_conventional(performance::Performance,
     end
 end
 
-cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_canoe(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)
+@fastmath cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_canoe(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)
+
+
+
+"""Generate range of modified polars for performance uncertainty simulation."""
+function generate_performance_uncertainty_samples(polar, params, wave_m)
+    unc_perf = [Performance(polar, i, 1.0, wave_m) for i in params]
+end

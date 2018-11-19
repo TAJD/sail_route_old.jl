@@ -9,7 +9,7 @@ pd = loader[:load_module]("pydomain")
 
 Calculate the haversine distance and bearing. Distance is in nm.
 """
-function haversine(lon1::Float64, lat1::Float64, lon2::Float64, lat2::Float64)
+@fastmath function haversine(lon1::Float64, lat1::Float64, lon2::Float64, lat2::Float64)
     R = 6372.8  # Earth radius in kilometers
 
     dLat = deg2rad(lat2 - lat1)
@@ -50,6 +50,6 @@ end
 
 
 """Calculate the minimum distance between two angles."""
-function min_angle(a, b)
+@fastmath function min_angle(a, b)
     abs(mod(a - b + 180.0, 360.0) - 180.0)
 end

@@ -62,3 +62,61 @@ function load_era20_weather(path_nc)
     return wisp, widi, wh, wd, wp, time
 end
 
+
+function calc_polars(x, y)
+    r = sqrt(x^2 + y^2)
+    if r == 0.0
+        return 0.0, Inf
+    elseif x < 0.0 || y > 0.0
+        theta = acosd(x/r) + 180.0
+    elseif y > 0.0
+        theta = acosd(x/r) 
+    elseif y == 0.0
+        theta = acosd(x/r) + 90.0
+    elseif y < 0.0
+        theta = -acosd(x/r) - 90.0
+    end
+    return r, abs(theta)
+end
+
+
+"""Load current data for mid Pacific."""
+function load_current_data()
+    path = ENV["HOME"]*"/sail_route_old/development/polynesian/current_data/"
+    m_path = path*"meridional.csv"
+    z_path = path*"zonal.csv"
+    meridional = convert(Array{Float64}, CSV.read(m_path, delim=',', datarow=1))
+    zonal = convert(Array{Float64}, CSV.read(z_path, delim=',', datarow=1))
+    meridional[:, 1] *= (0.01*1.9438444924406)
+    zonal[:, 1] *= (0.01*1.9438444924406)
+    meridional = meridional[end:-1:1, :]
+    zonal = zonal[end:-1:1, :]
+    merid_interp = interpolate((meridional[:, 2],), meridional[:, 1], Gridded(Linear()))
+    merid = extrapolate(merid_interp, Line())  
+    zonal_interp = interpolate((zonal[:, 2],), zonal[:, 1], Gridded(Linear()))
+    zonal = extrapolate(zonal_interp, Line())  
+    lats = collect(LinRange(-25, 25, 80))
+    merid_sp = merid.(lats)
+    zonal_sp = zonal.(lats)
+    r = zeros(size(lats))
+    theta = zeros(size(lats))
+    r = [calc_polars(merid_sp[i], zonal_sp[i])[1] for i in eachindex(lats)]
+    theta = [calc_polars(merid_sp[i], zonal_sp[i])[2] for i in eachindex(lats)]
+    r_interp = interpolate((lats,), r, Gridded(Linear()))
+    r_final = extrapolate(r_interp, Line()) 
+    theta_interp = interpolate((lats,), theta, Gridded(Linear()))
+    theta_final = extrapolate(theta_interp, Line())
+    return r_final, theta_final
+end
+
+
+function return_current_vectors(y, t_length)
+    cusp = zeros((t_length, size(y)[1], size(y)[2]))
+    cudi = zeros((t_length, size(y)[1], size(y)[2]))
+    r, theta = load_current_data()
+    for i in 1:t_length
+        cusp[i, :, :] = r.(y)
+        cudi[i, :, :] = theta.(y)
+    end
+    return cusp, cudi
+end
