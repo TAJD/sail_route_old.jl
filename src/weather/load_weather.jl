@@ -120,3 +120,25 @@ function return_current_vectors(y, t_length)
     end
     return cusp, cudi
 end
+
+
+"""Generate weather for shortest path test functions."""
+function generate_constant_weather(tws_val, twa_val, cs_val, cd_val,
+                          wahi_val, wadi_val, n)
+    empty = zeros(2000, n, n)
+    tws = copy(empty)
+    twa = copy(empty)
+    cs = copy(empty)
+    cd = copy(empty)
+    wahi = copy(empty)
+    wadi = copy(empty)
+    for i in eachindex(tws)
+        tws[i] = tws_val
+        twa[i] = twa_val
+        cs[i] = cs_val
+        cd[i] = cd_val
+        wahi[i] = wahi_val
+        wadi[i] = wadi_val
+    end
+    return tws, twa, cs, cd, wahi, wadi
+end

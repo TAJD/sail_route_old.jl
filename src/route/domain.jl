@@ -4,6 +4,13 @@ using PyCall
 loader = machinery.SourceFileLoader("pydomain",ENV["HOME"]*"/sail_route_old/src/route/pydomain.py")
 pd = loader[:load_module]("pydomain")
 
+
+"""Calculate the minimum distance between two angles."""
+@fastmath function min_angle(a, b)
+    abs(mod(a - b + 180.0, 360.0) - 180.0)
+end
+
+
 """
     haversine(lon1, lat1, lon2, lat2)
 
@@ -25,6 +32,35 @@ Calculate the haversine distance and bearing. Distance is in nm.
     theta = (rad2deg(theta) + 360) % 360
     return R*c*0.5399565, theta
 end
+
+
+
+"""
+    euclidean(x1, y1, x2, y2)
+
+Calculate the distance and argument between the vector and north between points 1 and 2.
+euclidean(0.0, 0.0, 10.0, 10.0) = (14.142135623730951, 45.0)
+euclidean(0.0, 0.0, 10.0, 10.0) = (14.142135623730951, 45.0)
+euclidean(0.0, 0.0, 10.0, 10.0) = (14.142135623730951, 45.0)
+euclidean(0.0, 0.0, 10.0, 10.0) = (14.142135623730951, 45.0)
+"""
+@inline @fastmath function euclidean(x1::Float64, y1::Float64, x2::Float64, y2::Float64)
+    dx = x2 - x1
+    dy = y2 - y1
+    dist = (dx^2 + dy^2)^(0.5)
+    theta = 0.0
+    if dy > 0.0 && dx > 0.0
+        theta = 90.0 - rad2deg(atan(dy, dx))
+    elseif dy < 0.0 && dx > 0.0
+        theta = 90.0 + rad2deg(atan(abs(dy), dx))
+    elseif dy < 0.0 && dx < 0.0
+        theta = 180 + rad2deg(atan(abs(dy), abs(dx)))
+    elseif dy > 0.0 && dx < 0.0
+        theta = 360 - rad2deg(atan(dy, abs(dx)))
+    end
+    return dist, theta
+end
+
 
 """
     co_ordinates(start_long, finish_long, start_lat, finish_lat,
@@ -48,8 +84,3 @@ function calc_nodes(lon1, lon2, lat1, lat2, req_d)
     req_n
 end
 
-
-"""Calculate the minimum distance between two angles."""
-@fastmath function min_angle(a, b)
-    abs(mod(a - b + 180.0, 360.0) - 180.0)
-end
