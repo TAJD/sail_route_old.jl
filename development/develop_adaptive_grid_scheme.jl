@@ -2,7 +2,7 @@ include(ENV["HOME"]*"/sail_route_old/src/sail_route.jl")
 include(ENV["HOME"]*"/sail_route_old/development/sensitivity/discretization_error.jl")
 include(ENV["HOME"]*"/sail_route_old/development/polynesian/polynesian_sims_utils.jl")
 
-using BenchmarkTools, Revise, DataFrames, Test
+using BenchmarkTools, Revise, DataFrames, Test, Printf
 using Plots
 unicodeplots()
 
@@ -192,7 +192,7 @@ function test_cartesian_routine()
                                                 wadi[1, 1, 1], wahi[1, 1, 1], bearing)
     analytical_time = dist/vs_con
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
-    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
+    times = Dates.DateTime(2016, 1, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 12, 2, 3, 0, 0)
     at, locs, ets, x_r, y_r = sail_route.cartesian_route_solve(sample_route,
                                                             perf,
                                                             start_time, 
@@ -210,17 +210,16 @@ function test_cartesian_routine()
 end
 
 
-test_cartesian_routine()
-
-# print(x_r)
-
 """No discretization error here"""
-function test_cartesian_routine_vary_n(n_locs)
-    tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n_locs)
-    # n_locs = 10
-    perf = return_performance()
+function inspect_cartesian_routine(n_locs, tws_v, twa_v)
+
+    boat_performance = ENV["HOME"]*"/sail_route_old/src/data/first40_orgi.csv"
+    twa, tws, perf = sail_route.load_file(boat_performance)
+    polar = sail_route.setup_perf_interpolation(tws, twa, perf)
+    perf = sail_route.Performance(polar, 1.0, 1.0, nothing)
     lats = LinRange(0.0, 1.0, n_locs)
     lons = LinRange(0.0, 1.0, n_locs)
+    tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(tws_v, twa_v, 0.0, 0.0, 0.0, 0.0, n_locs)
     grid_lon = [i for i in lons, j in lats]
     grid_lat = [j for i in lons, j in lats]
     lat1 = 0.5
@@ -229,13 +228,6 @@ function test_cartesian_routine_vary_n(n_locs)
     lon2 = 1.1
     dist, bearing = sail_route.euclidean(lon1, lat1, lon2, lat2)
     sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n_locs, n_locs)
-    vs_can = sail_route.cost_function_canoe(perf, cd[1, 1, 1], cs[1, 1, 1],
-                                        twa[1, 1, 1], tws[1, 1, 1],
-                                        wadi[1, 1, 1], wahi[1, 1, 1], bearing)
-    vs_con = sail_route.cost_function_conventional(perf, cd[1, 1, 1], cs[1, 1, 1],
-                                                twa[1, 1, 1], tws[1, 1, 1],
-                                                wadi[1, 1, 1], wahi[1, 1, 1], bearing)
-    analytical_time = dist/vs_con
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
     times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
     at, locs, ets, x_r, y_r = sail_route.cartesian_route_solve(sample_route,
@@ -247,15 +239,26 @@ function test_cartesian_routine_vary_n(n_locs)
                                                             tws, twa,
                                                             wadi, wahi,
                                                             cs, cd)
-    @test isapprox(at, analytical_time; atol=0.01)
-    return at, locs, grid_lon, grid_lat
+    # @test isapprox(at, analytical_time; atol=0.01)
+    n_width = dist/(n_locs+1)
+    return at, locs, grid_lon, grid_lat, n_width
 end
 
 
-plot()
-for i = range(40, step=5, 60)
-    at, locs, lons, lats = test_cartesian_routine_vary_n(i)
-    scatter!((locs[:, 1], locs[:, 2]), label=string(at))
-    plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
+# for loop for wind speed 
+# for loop for wind direction - plot for each wind speed and wind combination (with real boat)
+for tws in LinRange(10.0, 15.0, 2)
+    # for twa in LinRange(90.0, 270.0, 2)
+    for twa in [45.0, 90.0, 135]
+        plot()
+        println("$(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1]))")
+        # for i = range(61, step=20, 151)
+        for i = [71, 91]
+            at, locs, lons, lats, n_width = inspect_cartesian_routine(i, tws, twa)
+            scatter!((locs[:, 1], locs[:, 2]), label="n_width = $(@sprintf("%.6f", n_width)) nm, vt = $(@sprintf("%.6f", at)) hrs")
+            println("n_width = $(@sprintf("%.6f", n_width)) nm, vt = $(@sprintf("%.6f", at)) hrs")
+            plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
+        end
+        display(plot!(title="TWS = $(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1])) degrees", xlabel = "X (nm)", ylabel = "Y (nm)"))
+    end 
 end
-display(plot!(title="Shortest path =f(n)", xlabel = "X (nm)", ylabel = "Y (nm)"))

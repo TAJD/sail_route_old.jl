@@ -273,7 +273,6 @@ function cartesian_route_solve(route::Route, performance::Performance, start_tim
         else
             earliest_times[1, idx] = Inf
         end
-        earliest_times[1, idx]
     end
     @inbounds for idy in 1:size(x)[1]-1
         @inbounds for idx1 in 1:size(x)[2]

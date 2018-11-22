@@ -199,7 +199,8 @@ function cost_function_conventional(performance::Performance,
     end
 end
 
-@fastmath cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_canoe(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)
+
+@fastmath cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_conventional(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)
 
 
 
