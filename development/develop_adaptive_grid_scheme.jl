@@ -2,11 +2,9 @@ include(ENV["HOME"]*"/sail_route_old/src/sail_route.jl")
 include(ENV["HOME"]*"/sail_route_old/development/sensitivity/discretization_error.jl")
 include(ENV["HOME"]*"/sail_route_old/development/polynesian/polynesian_sims_utils.jl")
 
-using BenchmarkTools, Revise
+using BenchmarkTools, Revise, DataFrames, Test
 using Plots
 unicodeplots()
-
-
 
 
 """Generate constant performance for shortest path test functions."""
@@ -20,17 +18,10 @@ function return_performance()
     return perf
 end
 
-# """Check if an array is monotonic. Works for both directions."""
-# function check_monotonic(array)                                                  
-#     # u = all(array[i] <= array[i+1] for i in range(1, length=length(array)-1))
-#     d = all(array[i] => array[i+1] for i in range(1, length=length(array)-1))
-#     return u
-# end
-
 
 """No discretization error here"""
 function test_routine()
-    tws, twa, cs, cd, wahi, wadi = generate_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11)
+    tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11)
     perf = return_performance()
     lats = LinRange(0.0, 1.0, 11)
     lons = LinRange(0.0, 1.0, 11)
@@ -49,8 +40,6 @@ function test_routine()
     vs_con = sail_route.cost_function_conventional(perf, cd[1, 1, 1], cs[1, 1, 1],
                                                 twa[1, 1, 1], tws[1, 1, 1],
                                                 wadi[1, 1, 1], wahi[1, 1, 1], bearing)
-    # @test vs_can ≈ 10.0 atol = 0.01 # canoe cost function 
-    # @test vs_con ≈ 10.0 atol = 0.01 # conventional cost function 
     analytical_time = dist/vs_con
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
     times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
@@ -63,9 +52,10 @@ function test_routine()
                                                             tws, twa,
                                                             wadi, wahi,
                                                             cs, cd)
-    @show at
-    @show analytical_time
+    @test isapprox(at, analytical_time; atol=0.01)
+    return x_r, y_r    
 end
+
 
 
 function speed_test()
@@ -141,6 +131,7 @@ end
 function generate_heights(a, b, n=11)
     heights = LinRange(0.1, 1.0, n)
     log_heights = [a*exp(h*log(b/a)) for h in heights]
+    # log_heights = [a*]
     # plot(heights, log_heights,w=2)
     return heights, log_heights
 end
@@ -152,24 +143,119 @@ function test_discretization_uniform_weather()
     lat2 = 25.0
     lon2 = 51.0
     n = 1
-    heights, d_n_range = generate_heights(5.0, 25.0, 10)
+    heights, d_n_range = generate_heights(0.1, 5.0, 2)
+    @show heights
     dist, bearing = sail_route.haversine(lon1, lat1, lon2, lat2)
     sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n, n)
-    perf = return_performance()
+    boat_performance = ENV["HOME"]*"/sail_route_old/src/data/first40_orgi.csv"
+    twa, tws, perf = sail_route.load_file(boat_performance)
+    polar = sail_route.setup_perf_interpolation(tws, twa, perf)
+    perf = sail_route.Performance(polar, 1.0, 1.0, nothing)
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
     times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 10, 3, 0, 0)
     results = sail_route.constant_weather_discretization_routine(sample_route, perf,
                                                                  start_time, times, d_n_range)
-    # plot(d_n_range, results)
+    df = DataFrame(heights=d_n_range, times=results)
+    name1 = ENV["HOME"]*"/sail_route_old/development/constant_upwind_discretization_01 to 10.txt"
+    CSV.write(name1, df)
     plot()
-    nd_results = results./results[1]  # non dimensionalised by smallest height
-    scatter!(d_n_range, results)
+    # nd_results = results./results[1]  # non dimensionalised by smallest height
+    scatter!(log.(d_n_range), log.(results), color = :white)
     title!("Routing time as a function of grid size")
-    yaxis!("Voyaging time (hrs)",:log10)
-    xaxis!("Grid height (%)",:log10)
+    yaxis!("Voyaging time (hrs)")
+    xaxis!("Grid height (%)")
 end
 
-@time test_discretization_uniform_weather()
+# @time test_discretization_uniform_weather()
 
 
+"""No discretization error here"""
+function test_cartesian_routine()
+    tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 11)
+    n_locs = 10
+    perf = return_performance()
+    lats = LinRange(0.0, 1.0, n_locs)
+    lons = LinRange(0.0, 1.0, n_locs)
+    grid_lon = [i for i in lons, j in lats]
+    grid_lat = [j for i in lons, j in lats]
+    lat1 = 0.5
+    lon1 = -0.1
+    lat2 = 0.5
+    lon2 = 1.1
+    dist, bearing = sail_route.euclidean(lon1, lat1, lon2, lat2)
+    sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n_locs, n_locs)
+    vs_can = sail_route.cost_function_canoe(perf, cd[1, 1, 1], cs[1, 1, 1],
+                                        twa[1, 1, 1], tws[1, 1, 1],
+                                        wadi[1, 1, 1], wahi[1, 1, 1], bearing)
+    vs_con = sail_route.cost_function_conventional(perf, cd[1, 1, 1], cs[1, 1, 1],
+                                                twa[1, 1, 1], tws[1, 1, 1],
+                                                wadi[1, 1, 1], wahi[1, 1, 1], bearing)
+    analytical_time = dist/vs_con
+    start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
+    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
+    at, locs, ets, x_r, y_r = sail_route.cartesian_route_solve(sample_route,
+                                                            perf,
+                                                            start_time, 
+                                                            times, 
+                                                            grid_lon, 
+                                                            grid_lat,
+                                                            tws, twa,
+                                                            wadi, wahi,
+                                                            cs, cd)
+    @test isapprox(at, analytical_time; atol=0.01)
+    plot()
+    scatter((locs[:, 1], locs[:, 2]))
+    plot!(title = "Time = "*string(at), xlabel = "X (nm)", ylabel = "Y (nm)")
+    plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
+end
 
+
+test_cartesian_routine()
+
+# print(x_r)
+
+"""No discretization error here"""
+function test_cartesian_routine_vary_n(n_locs)
+    tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, n_locs)
+    # n_locs = 10
+    perf = return_performance()
+    lats = LinRange(0.0, 1.0, n_locs)
+    lons = LinRange(0.0, 1.0, n_locs)
+    grid_lon = [i for i in lons, j in lats]
+    grid_lat = [j for i in lons, j in lats]
+    lat1 = 0.5
+    lon1 = -0.1
+    lat2 = 0.5
+    lon2 = 1.1
+    dist, bearing = sail_route.euclidean(lon1, lat1, lon2, lat2)
+    sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n_locs, n_locs)
+    vs_can = sail_route.cost_function_canoe(perf, cd[1, 1, 1], cs[1, 1, 1],
+                                        twa[1, 1, 1], tws[1, 1, 1],
+                                        wadi[1, 1, 1], wahi[1, 1, 1], bearing)
+    vs_con = sail_route.cost_function_conventional(perf, cd[1, 1, 1], cs[1, 1, 1],
+                                                twa[1, 1, 1], tws[1, 1, 1],
+                                                wadi[1, 1, 1], wahi[1, 1, 1], bearing)
+    analytical_time = dist/vs_con
+    start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
+    times = Dates.DateTime(2016, 7, 1, 0, 0, 0):Dates.Hour(3):Dates.DateTime(2016, 7, 2, 3, 0, 0)
+    at, locs, ets, x_r, y_r = sail_route.cartesian_route_solve(sample_route,
+                                                            perf,
+                                                            start_time, 
+                                                            times, 
+                                                            grid_lon, 
+                                                            grid_lat,
+                                                            tws, twa,
+                                                            wadi, wahi,
+                                                            cs, cd)
+    @test isapprox(at, analytical_time; atol=0.01)
+    return at, locs, grid_lon, grid_lat
+end
+
+
+plot()
+for i = range(40, step=5, 60)
+    at, locs, lons, lats = test_cartesian_routine_vary_n(i)
+    scatter!((locs[:, 1], locs[:, 2]), label=string(at))
+    plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
+end
+display(plot!(title="Shortest path =f(n)", xlabel = "X (nm)", ylabel = "Y (nm)"))

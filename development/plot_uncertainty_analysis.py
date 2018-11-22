@@ -23,6 +23,7 @@ plt.rcParams['lines.linewidth'] = 2.0
 plt.rcParams['lines.markersize'] = 8
 plt.rcParams['legend.fontsize'] = 12
 # plt.rcParams['text.usetex'] = True
+# plt.rcParams["font.family"] = "Times New Roman"  
 plt.rcParams['font.serif'] = "cm"
 plt.rcParams['text.latex.preamble'] = """\\usepackage{subdepth},
                                          \\usepackage{type1cm}"""
@@ -155,6 +156,30 @@ def plot_ensemble_weather_simulations_results():
     # load the routing results
     # plot each route with the associated ensemble weather scenario and the label
 
+
+def plot_discretization_scatter():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    df = pd.read_csv(dir_path+"/constant_upwind_discretization.txt")
+    times = np.array(df['times'].values)
+    heights = np.array(df['heights'].values)
+    nd_times = np.array([(times[i] - times[0])/times[0] for i in range(len(times))])
+    # print(nd_times[1:5])
+    # f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    # ax1.scatter(nd_times, heights)
+    # ax1.set_title('$V_t = f(d_n)$')
+    # ax2.scatter(nd_times, heights)
+    # ax2.set_xscale('log')
+    plt.figure()
+    # plt.yscale('log')
+    # plt.xscale('log')
+    h = 5.0
+    plt.plot(heights[heights<h], nd_times[heights<h])
+    plt.xlabel("Height of grid as $\%$ voyage length")
+    plt.ylabel(r"$\frac{V_{t, i} - V_{t, min}}{V_{t, min}}$")
+    plt.savefig("discretization.png")
+
+
 if __name__ == "__main__":
-    plot_varied_grid_results()
+    # plot_varied_grid_results()
     # plot_ensemble_weather_simulations_results()
+    plot_discretization_scatter()

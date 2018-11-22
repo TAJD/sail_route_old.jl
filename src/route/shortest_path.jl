@@ -273,6 +273,7 @@ function cartesian_route_solve(route::Route, performance::Performance, start_tim
         else
             earliest_times[1, idx] = Inf
         end
+        earliest_times[1, idx]
     end
     @inbounds for idy in 1:size(x)[1]-1
         @inbounds for idx1 in 1:size(x)[2]
@@ -295,6 +296,7 @@ function cartesian_route_solve(route::Route, performance::Performance, start_tim
                         earliest_times[idy+1, idx2] = tt
                         prev_node[idy+1, idx2] = node_indices[idy, idx1]
                     end
+                    earliest_times[idy+1, idx2]
                 end
             end
         end
@@ -312,11 +314,11 @@ function cartesian_route_solve(route::Route, performance::Performance, start_tim
             cs_int = cusp[t_idx, idx, end]
             cd_int = cudi[t_idx, idx, end]
             speed = cost_function(performance, cd_int, cs_int,
-                        wd_int, ws_int, wadi_int, wahi_int, b)
+                                  wd_int, ws_int, wadi_int, wahi_int, b)
             if speed != Inf 
                 tt = earliest_times[end, idx] + d/speed
                 if arrival_time > tt
-                arrival_time = tt
+                    arrival_time = tt
                 final_node = node_indices[end, idx]
                 end
             end
@@ -329,7 +331,7 @@ end
 
 
 
-
+"""Run cartesian shortest path algorithm over the range of non dimensional grid heights given in d_n_range"""
 function constant_weather_discretization_routine(route, perf, start_time, times, d_n_range)
     results = []
     d, b = haversine(route.lon1, route.lat1, route.lon2, route.lat2)

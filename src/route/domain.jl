@@ -51,6 +51,10 @@ euclidean(0.0, 0.0, 10.0, 10.0) = (14.142135623730951, 45.0)
     theta = 0.0
     if dy > 0.0 && dx > 0.0
         theta = 90.0 - rad2deg(atan(dy, dx))
+    elseif dy == 0 && dx > 0.0
+        theta = 90.0
+    elseif dx == 0 && dy < 0.0
+        theta = 180.0
     elseif dy < 0.0 && dx > 0.0
         theta = 90.0 + rad2deg(atan(abs(dy), dx))
     elseif dy < 0.0 && dx < 0.0
