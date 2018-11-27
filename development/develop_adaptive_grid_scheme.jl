@@ -127,6 +127,9 @@ function test_real_weather_discretization_routine()
                                                       wisp, widi, wadi, wahi)
 end
 
+test_real_weather_discretization_routine()
+
+
 # test_real_weather_discretization_routine()
 function generate_heights(a, b, n=11)
     heights = LinRange(0.1, 1.0, n)
@@ -217,15 +220,15 @@ function inspect_cartesian_routine(n_locs, tws_v, twa_v)
     twa, tws, perf = sail_route.load_file(boat_performance)
     polar = sail_route.setup_perf_interpolation(tws, twa, perf)
     perf = sail_route.Performance(polar, 1.0, 1.0, nothing)
-    lats = LinRange(0.0, 1.0, n_locs)
-    lons = LinRange(0.0, 1.0, n_locs)
+    lats = LinRange(0.0, 600.0, n_locs)
+    lons = LinRange(0.0, 600.0, n_locs)
     tws, twa, cs, cd, wahi, wadi = sail_route.generate_constant_weather(tws_v, twa_v, 0.0, 0.0, 0.0, 0.0, n_locs)
     grid_lon = [i for i in lons, j in lats]
     grid_lat = [j for i in lons, j in lats]
-    lat1 = 0.5
-    lon1 = -0.1
-    lat2 = 0.5
-    lon2 = 1.1
+    lat1 = 300.0
+    lon1 = -1.0
+    lat2 = 300.0
+    lon2 = 601.0
     dist, bearing = sail_route.euclidean(lon1, lat1, lon2, lat2)
     sample_route = sail_route.Route(lon1, lon2, lat1, lat2, n_locs, n_locs)
     start_time = Dates.DateTime(2016, 6, 1, 0, 0, 0)
@@ -245,20 +248,24 @@ function inspect_cartesian_routine(n_locs, tws_v, twa_v)
 end
 
 
-# for loop for wind speed 
-# for loop for wind direction - plot for each wind speed and wind combination (with real boat)
-for tws in LinRange(10.0, 15.0, 2)
-    # for twa in LinRange(90.0, 270.0, 2)
-    for twa in [45.0, 90.0, 135]
-        plot()
-        println("$(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1]))")
-        # for i = range(61, step=20, 151)
-        for i = [71, 91]
-            at, locs, lons, lats, n_width = inspect_cartesian_routine(i, tws, twa)
-            scatter!((locs[:, 1], locs[:, 2]), label="n_width = $(@sprintf("%.6f", n_width)) nm, vt = $(@sprintf("%.6f", at)) hrs")
-            println("n_width = $(@sprintf("%.6f", n_width)) nm, vt = $(@sprintf("%.6f", at)) hrs")
-            plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
-        end
-        display(plot!(title="TWS = $(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1])) degrees", xlabel = "X (nm)", ylabel = "Y (nm)"))
-    end 
+function simulate_example_conditions()
+    # for loop for wind speed 
+    # for loop for wind direction - plot for each wind speed and wind combination (with real boat)
+    for tws in [10.0]
+        # for twa in LinRange(90.0, 270.0, 2)
+        for twa in [45.0, 90.0, 135]
+            plot()
+            println("$(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1]))")
+            # for i = range(61, step=20, 151)
+            for i = [31, 51, 71, 91, 111]
+                at, locs, lons, lats, n_width = inspect_cartesian_routine(i, tws, twa)
+                scatter!((locs[:, 1], locs[:, 2]), label="n_width = $(@sprintf("%.6f", n_width)) nm, vt = $(@sprintf("%.6f", at)) hrs")
+                println("n_width = $(@sprintf("%.6f", n_width)) %, vt = $(@sprintf("%.6f", at)) hrs")
+                plot!(xlims = (minimum(lons), maximum(lons)), ylims = (minimum(lons), maximum(lons)))
+            end
+            display(plot!(title="TWS = $(@sprintf("%.2f", tws[1])) kts, TWA=$(@sprintf("%.2f", twa[1])) degrees", xlabel = "X (nm)", ylabel = "Y (nm)"))
+        end 
+    end
 end
+
+# simulate_example_conditions()

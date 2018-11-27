@@ -16,7 +16,7 @@ end
 function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
                             route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
     for t in t_range, p in p_range
-        output = route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
+        output = sail_route.route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
         @show results[t, p] = output[1]
         output = nothing
     end
@@ -102,10 +102,10 @@ function generate_settings()
     weather_names = ["low", "high"]
     weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
                      ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
-    node_spacing = [40.0, 20.0, 10.0]
+    node_spacings = [20.0, 10.0, 5.0]
     simulation_settings = []
     save_paths = []
-    for i in node_spacing
+    for i in node_spacings
         for j in eachindex(start_location_names)
             for k in eachindex(finish_location_names)
                 for l in eachindex(weather_names)

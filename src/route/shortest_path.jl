@@ -180,7 +180,7 @@ end
 """Numerical error reduction routine applied to real polynesian weather scenarios."""
 function poly_discretization_routine(route, perf, start_time, times, wisp, widi, wahi, wadi)
     d, b = haversine(route.lon1, route.lat1, route.lon2, route.lat2)
-    d_n_range = [10.0, 5.0, 2.5] # normalized height
+    d_n_range = [5.0, 2.5, 1.0] # normalized height
     results = []
     gci = []
     extrap = []
