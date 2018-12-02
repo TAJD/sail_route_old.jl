@@ -50,8 +50,8 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 
-def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, r4, r5, 
-                     t1, t2, t3, t4, t5, fname, fill=1.0):
+def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, r4, r5, r6,
+                     t1, t2, t3, t4, t5, t6, fname, fill=1.0):
     """Plot routes generated as a function of different grid sizes."""
     add_param = fill
     res = 'l'
@@ -86,9 +86,11 @@ def plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, r4, r5,
     x_r3, y_r3 = map(r3["x1"].values, r3["x2"].values)
     map.plot(np.concatenate(([r_s_x], x_r3, [r_f_x])), np.concatenate(([r_s_y], y_r3, [r_f_y])), '_', label="10.0 nm, {0:.2f} hrs".format(t3.values[0][0]))
     x_r4, y_r4 = map(r4["x1"].values, r4["x2"].values)
-    map.plot(np.concatenate(([r_s_x], x_r4, [r_f_x])), np.concatenate(([r_s_y], y_r4, [r_f_y])), ':', label="20.0 nm, {0:.2f} hrs".format(t4.values[0][0]))
+    map.plot(np.concatenate(([r_s_x], x_r4, [r_f_x])), np.concatenate(([r_s_y], y_r4, [r_f_y])), ':', label="15.0 nm, {0:.2f} hrs".format(t4.values[0][0]))
     x_r5, y_r5 = map(r5["x1"].values, r5["x2"].values)
-    map.plot(np.concatenate(([r_s_x], x_r5, [r_f_x])), np.concatenate(([r_s_y], y_r5, [r_f_y])), '.', label="40.0 nm, {0:.2f} hrs".format(t5.values[0][0]))
+    map.plot(np.concatenate(([r_s_x], x_r5, [r_f_x])), np.concatenate(([r_s_y], y_r5, [r_f_y])), '.', label="20.0 nm, {0:.2f} hrs".format(t5.values[0][0]))
+    x_r6, y_r6 = map(r6["x1"].values, r6["x2"].values)
+    map.plot(np.concatenate(([r_s_x], x_r6, [r_f_x])), np.concatenate(([r_s_y], y_r6, [r_f_y])), '.', label="40.0 nm, {0:.2f} hrs".format(t6.values[0][0]))
     plt.legend(bbox_to_anchor=(0.6, -0.2), fancybox=True, framealpha=0.5)
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
@@ -116,7 +118,7 @@ def plot_varied_grid_results():
     save_path = "/Users/thomasdickson/Documents/PhD/papers/SA_weather_routing/figures/"
     fname = save_path+"poly_discretized_routing.png"
     fname_convergence = save_path+"convergence_plot.png"
-    # tongatapu to moorea
+    # tongatapu to atiu
     lon1 = -171.75
     lat1 = -21.21
     lon2 = -158.07
@@ -125,23 +127,26 @@ def plot_varied_grid_results():
     width_1 = "_2.5_nm_"
     width_2 = "_5.0_nm_"
     width_3 = "_10.0_nm_"
-    width_4 = "_20.0_nm_"
-    width_5 = "_40.0_nm_"
+    width_4 = "_15.0_nm_"
+    width_5 = "_20.0_nm_"
+    width_6 = "_40.0_nm_"
     t1 = pd.read_csv(dir_path+width_1+time+"time")
     t2 = pd.read_csv(dir_path+width_2+time+"time")
     t3 = pd.read_csv(dir_path+width_3+time+"time")
     t4 = pd.read_csv(dir_path+width_4+time+"time")
     t5 = pd.read_csv(dir_path+width_5+time+"time")
+    t6 = pd.read_csv(dir_path+width_6+time+"time")
     r1 = pd.read_csv(dir_path+width_1+time+"route")
     r2 = pd.read_csv(dir_path+width_2+time+"route")
     r3 = pd.read_csv(dir_path+width_3+time+"route")
     r4 = pd.read_csv(dir_path+width_4+time+"route")
     r5 = pd.read_csv(dir_path+width_5+time+"route")
-    x = np.array([2.5, 5.0, 10.0, 20.0, 40.0])
-    y = np.array([t1.values[0][0],t2.values[0][0],t3.values[0][0],t4.values[0][0],t5.values[0][0]])
+    r6 = pd.read_csv(dir_path+width_6+time+"route")
+    x = np.array([2.5, 5.0, 10.0, 15.0, 20.0, 40.0])
+    y = np.array([t1.values[0][0],t2.values[0][0],t3.values[0][0],t4.values[0][0],t5.values[0][0],t6.values[0][0]])
     plot_convergence_results(x, y, fname_convergence)
-    plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, r4, r5,
-                     t1, t2, t3, t4, t5, fname)
+    plot_varied_grid(lon1, lat1, lon2, lat2, r1, r2, r3, r4, r5, r6,
+                     t1, t2, t3, t4, t5, t6, fname)
 
 
 def plot_ensemble_results(lon1, lat1, lon2, lat2, df_paths, df_results,

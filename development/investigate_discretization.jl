@@ -44,6 +44,7 @@ function solve_example_route(min_dist)
     CSV.write(name*"y_locs", DataFrame(results[5]))
 end
 
-for i in [40.0, 20.0, 10.0, 5.0, 2.5]
+# for i in [40.0, 20.0, 15.0, 10.0, 5.0, 2.5]
+for i in [40.0]
     solve_example_route(i)
 end

@@ -103,10 +103,12 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
     earliest_times = fill(Inf, size(x))
     prev_node = zero(x)
     node_indices = reshape(1:length(x), size(x))
-    arrival_time = Inf
+    arrival_time = 20000
     final_node = 0
     earliest_times = fill(Inf, size(x))
-    @inbounds @simd for idx in 1:size(x)[2]
+    idx_range = size(x)[2]
+    idy_range = size(x)[1]
+    @simd for idx in 1:idx_range
         @inbounds d, b = haversine(route.lon1, route.lat1, x[1, idx], y[1, idx])
         wd_int = widi[start_time_idx, idx, 1]
         ws_int = wisp[start_time_idx, idx, 1]
@@ -122,8 +124,8 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
             earliest_times[1, idx] = Inf
         end
     end
-    @inbounds for idy in 1:size(x)[1]-1
-        @inbounds for idx1 in 1:size(x)[2]
+    @inbounds for idy in 1:idy_range-1
+        @inbounds for idx1 in 1:idx_range
             if isinf(earliest_times[idy, idx1]) == false
                 @inbounds t = start_time + convert_time(earliest_times[idy, idx1])
                 t_idx = time_to_index(t, times)
@@ -133,7 +135,7 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
                 wahi_int = wahi[t_idx, idx1, idy]
                 cs_int = cusp[t_idx, idx1, idy]
                 cd_int = cudi[t_idx, idx1, idy]
-                for idx2 in 1:size(x)[2]
+                @simd for idx2 in 1:idx_range
                     @inbounds d, b = haversine(x[idy, idx1], y[idy, idx1],
                                         x[idy+1, idx2], y[idy+1, idx2])
                     @inbounds speed = cost_function(performance, cd_int, cs_int,
@@ -148,7 +150,7 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
         end
     end
     
-    @inbounds for idx in 1:size(x)[2]
+    @inbounds @simd for idx in 1:idx_range
         if isinf(earliest_times[end, idx]) == false
             d, b = haversine(x[end, idx], y[end, idx], route.lon2, route.lat2)
             t = start_time + convert_time(earliest_times[end, idx])

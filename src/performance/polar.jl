@@ -73,7 +73,7 @@ end
 
 
 """Calculate the horizontal component of the current."""
-function h(cudi, cusp, bearing)
+@inline @fastmath function h(cudi, cusp, bearing)
     cusp*sind(cudi-bearing)
 end
 
@@ -107,7 +107,7 @@ end
 
 
 """Check if the awa suggested is within the possible values for awa from the polar data."""
-@fastmath function check_brackets(bearing, twa)
+@inline @fastmath function check_brackets(bearing, twa)
     awa = min_angle(bearing, twa[1])
     heading_awa = awa
     max_awa = 160.0

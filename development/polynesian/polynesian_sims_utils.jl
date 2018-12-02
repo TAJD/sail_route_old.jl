@@ -102,7 +102,52 @@ function generate_settings()
     weather_names = ["low", "high"]
     weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
                      ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
-    node_spacings = [20.0, 10.0, 5.0]
+    node_spacings = [30.0, 17.5, 12.5]
+    simulation_settings = []
+    save_paths = []
+    for i in node_spacings
+        for j in eachindex(start_location_names)
+            for k in eachindex(finish_location_names)
+                for l in eachindex(weather_names)
+                    for m in eachindex(boat_performance_names)
+                        push!(simulation_settings, [i, start_locations_lon[j], finish_locations_lon[k],
+                                                    start_locations_lat[j], finish_locations_lat[k],
+                                                    weather_paths[l], weather_times[l],
+                                                    boat_performance[m]])
+                        route_name = start_location_names[j]*"_to_"*finish_location_names[k]
+                        path = boat_performance_names[m]*"_routing_"*route_name*"_"*repr(weather_times[l][1])*"_to_"*repr(weather_times[l][end])*"_"*repr(i)*"_nm.txt"
+                        push!(save_paths, path)
+                    end
+                end
+            end
+        end
+    end
+    return simulation_settings, save_paths
+end
+
+
+"""Generate the parameters to simulate for all cases of the Polynesian routing simulation."""
+function high_fidelity_settings()
+    start_locations_lat = [-21.21]
+    start_locations_lon = [-175.15]
+    finish_locations_lat = [-19.59]
+    finish_locations_lon = [-158.07]
+    start_location_names = ["tongatapu"]
+    finish_location_names = ["atiu"]
+    boat_performance = [load_tong(), load_boeckv2()]
+    boat_performance_names = ["/tongiaki/", "/boeckv2/"]
+    t_inc = 12
+    t_low_start = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 5, 1, 12, 0, 0)
+    t_low_finish = Dates.DateTime(1976, 5, 2, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 12, 1, 0, 0, 0)
+    t_high_start = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 5, 1, 12, 0, 0)
+    t_high_finish = Dates.DateTime(1982, 1, 5, 2, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 12, 1, 0, 0, 0)
+    weather_times = [t_low_start, t_low_finish, t_high_start, t_high_finish]
+    weather_names = ["low_first", "low_end", "high_start", "high_end"]
+    weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
+    node_spacings = [7.5]
     simulation_settings = []
     save_paths = []
     for i in node_spacings

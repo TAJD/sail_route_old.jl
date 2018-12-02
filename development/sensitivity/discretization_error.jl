@@ -33,9 +33,10 @@ of convergence as the refinement ratio is not necessarily constant.
 
 This has been modified to the method of Celik (2008).
 """
-function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32, omega=0.5, tol=1.E-6)
+function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32,
+                              omega=0.9, tol=1.E-3)
     # Set a maximum residual and number of iterations
-    max_res = 1.E6
+    max_res = 10.0
     # calculate the epsilons.
     epsilon32 = float(value_3 - value_2)
     epsilon21 = float(value_2 - value_1)
@@ -52,6 +53,7 @@ function order_of_convergence(value_1, value_2, value_3, ratio_21, ratio_32, ome
         # Break if it's all gone bad
         if float(iterations) > max_res && residual > max_res
             println("Residual out of range or too many iterations")
+            break
         end
         # Get the last value
         p0 = p1
