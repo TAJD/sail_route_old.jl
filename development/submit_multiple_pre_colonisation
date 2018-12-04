@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#SBATCH --time=50:00:00
+#SBATCH --ntasks=21
+#SBATCH -J routing
+
+export PATH="/scratch/td7g11/julia/julia-1.0.2/bin/:${PATH}"
+
+cd $HOME/sail_route_old/development
+
+current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+fname=multiple_simulations.$current_time
+
+julia -p 21 polynesian/early_polynesian_voyages.jl $SLURM_ARRAY_TASK_ID
