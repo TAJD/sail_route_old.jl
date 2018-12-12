@@ -75,8 +75,7 @@ end
 
 """Run polynesian simulations based on arguments from command line. Two arguments used to set the lower and upper limits of a range to iterate over."""
 function run_simulations(i)
-    @everywhere settings = generate_settings()
-    # @everywhere settings = high_fidelity_settings()
+    @everywhere settings = generate_colonisation_voyage_settings()
     @everywhere vals = settings[1]
     @everywhere paths = settings[2]
     @everywhere path = paths[i]

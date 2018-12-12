@@ -95,14 +95,16 @@ function generate_colonisation_voyage_settings()
     finish_location_names = ["atiu", "moorea"]
     boat_performance = [load_tong(), load_boeckv2()]
     boat_performance_names = ["/tongiaki/", "/boeckv2/"]
-    t_inc = 12
+    t_inc = 6
     t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 12, 31, 0, 0, 0)
+    t_mid = Dates.DateTime(1985, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1985, 12, 31, 0, 0, 0)
     t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 12, 31, 0, 0, 0)
-    weather_times = [t_low, t_high]
-    weather_names = ["low", "high"]
-    weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/1976_polynesia.nc",
-                     ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/1982_polynesia.nc"]
-    node_spacings = [30.0, 17.5, 12.5]
+    weather_times = [t_low, t_mid, t_high]
+    weather_names = ["low", "mid", "high"]
+    weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/polynesia_1976.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/med/1985/polynesia_1985.nc",
+                     ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/polynesia_1982.nc"]
+    node_spacings = [20.0, 15.0, 12.5, 10.0]
     simulation_settings = []
     save_paths = []
     for i in node_spacings
@@ -134,9 +136,11 @@ function generate_early_voyaging_settings()
     finish_locations_lon = [-168.317, -178.45, -171.75, -175.15]
     start_location_names = ["solomons", "vanuatu", "fiji", "fiji"]
     finish_location_names = ["vanuatu", "fiji", "upolu", "tonga"]
-    boat_performance = [load_tong(), load_boeckv2(), load_boeckv2()]  #need to change this line here 
-    boat_performance_names = ["/tongiaki/", "/boeckv2/", "/hokolua/"]
-    t_inc = 12
+    # boat_performance = [load_tong(), load_boeckv2(), load_boeckv2()]  #need to change this line here 
+    # boat_performance_names = ["/tongiaki/", "/boeckv2/", "/hokolua/"]
+    boat_performance = [load_tong(), load_boeckv2()]  #need to change this line here 
+    boat_performance_names = ["/tongiaki/", "/boeckv2/"]
+    t_inc = 6
     t_low = Dates.DateTime(1976, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1976, 12, 31, 0, 0, 0)
     t_mid = Dates.DateTime(1985, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1985, 12, 31, 0, 0, 0)
     t_high = Dates.DateTime(1982, 1, 1, 0, 0, 0):Dates.Hour(t_inc):Dates.DateTime(1982, 12, 31, 0, 0, 0)
@@ -145,7 +149,7 @@ function generate_early_voyaging_settings()
     weather_paths = [ENV["HOME"]*"/weather_data/polynesia_weather/low/1976/polynesia_1976.nc",
                      ENV["HOME"]*"/weather_data/polynesia_weather/med/1985/polynesia_1985.nc",
                      ENV["HOME"]*"/weather_data/polynesia_weather/high/1982/polynesia_1982.nc"]
-    node_spacings = [20.0, 15.0, 10.0]
+    node_spacings = [20.0, 15.0, 12.5, 10.0]
     simulation_settings = []
     save_paths = []
     for i in eachindex(node_spacings)

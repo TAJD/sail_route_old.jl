@@ -89,29 +89,12 @@ Bearing is the angle between waypoints. Heading is the actual course followed.
 end
 
 
-# """Cost function not considering current."""
-# function cost_function_no_current(performance::Performance,
-#                        widi, wisp,
-#                        wadi, wahi,
-#                        bearing)
-#     if widi > 360.0
-#         return 0.0
-#     elseif wisp > 20.0 # 20 m/s is a gale. Not good news.
-#         return 0.0
-#     elseif  min_angle(wadi, bearing) < 45.0
-#         return 0.0
-#     else
-#         return perf_interp(performance, min_angle(widi, bearing), wisp, wahi, wadi)
-#     end
-# end
-
-
 """Check if the awa suggested is within the possible values for awa from the polar data."""
 @inline @fastmath function check_brackets(bearing, twa)
     awa = min_angle(bearing, twa[1])
     heading_awa = awa
-    max_awa = 160.0
-    min_awa = 40.0
+    max_awa = 170.0
+    min_awa = 20.0
     max_awa_delta = max_awa - awa
     min_awa_delta = awa - min_awa
     delta = 0.0
@@ -148,17 +131,17 @@ function cost_function_canoe(performance::Performance,
         phi = find_zero(resultant, (low_bearing, high_bearing), xatol=0.1)
         v = perf_interp(performance, min_angle(w_c_di, phi), w_c_sp, wahi, wadi)
         if min_angle(phi, bearing) > 60.0
-            return 0.05
+            return v*0.5  # this is where the sailing craft has to sail excessively away from the wind in order to overcome the current
         end
-        if v + cusp < 0.0
-            return 0.05
+        if v + cusp < 0.0  # if the speed is less than 0 then it is going backwards - return 0 
+            return 0.0
         elseif min_angle(bearing, wadi) < 40.0
-            return 0.5*(v+cusp)
+            return 0.5*(v+cusp) # reduce the speed by half if heading into waves
         else
             return v + cusp
         end
     catch ArgumentError
-        return 0.05
+        return 0.0
     end
 end
 
@@ -199,9 +182,8 @@ function cost_function_conventional(performance::Performance,
     end
 end
 
-
+# this wrapper determines the performance function used in the simulation
 @fastmath cost_function(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing) = cost_function_conventional(performance, cudi, cusp, widi, wisp, wadi, wahi, bearing)
-
 
 
 """Generate range of modified polars for performance uncertainty simulation."""
