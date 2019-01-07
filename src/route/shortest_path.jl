@@ -41,12 +41,23 @@ function get_locs(indx, sp, x_locs, y_locs)
     Y = []
     for k in sp[1:end-1]
         idx = findfirst(isequal(k), indx)
-        x_locs[idx]
-        y_locs[idx]
+        # x_locs[idx]
+        # y_locs[idx]
         append!(X, x_locs[idx])
         append!(Y, y_locs[idx])
     end
     return hcat(X, Y) 
+end
+
+
+"""Get the earliest times for a given path"""
+function get_path_et(indx, sp, earliest_times)
+    ET = []
+    for k in sp[1:end-1]
+        idx = findfirst(isequal(k), indx)
+        append!(ET, earliest_times[idx])
+    end
+    return ET
 end
 
 
@@ -174,7 +185,7 @@ function route_solve(route::Route, performance::Performance, start_time::DateTim
     end
     sp = shortest_path(node_indices, prev_node, [final_node])
     locs = get_locs(node_indices, sp, x, y)
-    return arrival_time, locs, earliest_times, x, y
+    return arrival_time, locs, earliest_times
 end
 
 

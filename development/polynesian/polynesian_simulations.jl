@@ -88,6 +88,6 @@ if isempty(ARGS) == false
     @show i = parse(Int64, ARGS[1]); sendto(workers(), i=i)
 end
 
-# i = 3; sendto(workers(), i=i)
+i = 3; sendto(workers(), i=i)
 
 run_simulations(i)

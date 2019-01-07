@@ -13,8 +13,10 @@ function myrange(q::SharedArray)
 end
 
 
-function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
-                            route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
+function route_solve_chunk!(results, t_range, p_range, 
+                            sim_times, perfs,
+                            route, time_indexes, x, y, 
+                            wisp, widi, wadi, wahi, cusp, cudi)
     for t in t_range, p in p_range
         output = sail_route.route_solve(route, perfs[p], sim_times[t], time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
         @show results[t, p] = output[1]
@@ -23,19 +25,27 @@ function route_solve_chunk!(results, t_range, p_range, sim_times, perfs,
 end
 
 
-# function discretize_chunk!(results, t_range, p_range, sim_times, perfs, route, 
-#                             weather)
-#     for t in t_range, p in p_range
-#         wisp, widi, wahi, wadi, wapr, time_indexes = sail_route.load_era20_weather(weather)
-#         @show sim_times[t]
-#         @show perfs[p]
-#         output = sail_route.discretization_routine(route, perfs[p], sim_times[t], times, 
-#                                                    wisp, widi, wahi, wadi)
-#         results[t, p, 1] = output[1] 
-#         results[t, p, 2] = output[2] 
-#         results[t, p, 3] = output[3] 
-#     end
-# end
+function route_solve_save_path_chunk!(results, t_range, p_range, 
+                                      sim_times, perfs, 
+                                      x_results, y_results, et_results,
+                                      route, time_indexes, x, y,
+                                      wisp, widi, wadi, wahi, cusp, cudi)
+    for t in t_range, p in p_range
+        output = sail_route.route_solve(route, perfs[p], sim_times[t],                                                                            time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
+        if output[1] == 20000
+            continue
+        else 
+            @show results[t, p] = output[1]
+            x_results[t, p, :] = output[2][:, 1]
+            y_results[t, p, :] = output[2][:, 2]
+            et_results[t, p, :, :] = output[3]
+            output = nothing
+        end
+    end
+end
+
+
+route_solve_shared_sp_chunk!(results, sim_times, perfs, x_results, y_results, et_results, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi) = route_solve_save_path_chunk!(results, myrange(results)..., sim_times, perfs, x_results, y_results, et_results, route, time_indexes, x, y, wisp, widi, wadi, wahi, cusp, cudi)
 
 
 function discretize_chunk!(results, t_range, p_range, sim_times, perfs, route, 
@@ -53,7 +63,7 @@ end
 function load_tong()
     path = ENV["HOME"]*"/sail_route_old/development/polynesian/performance/tongiaki_vpp.csv"
     df = CSV.read(path, delim=',', datarow=1)
-    perf = convert(Array{Float64}, df)
+    perf = convert(Matrix{Float64}, df)
     tws = Array{Float64}([0.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 14.0, 16.0, 20.0])
     twa = Array{Float64}([0.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0])
     return twa, tws, perf
@@ -63,7 +73,7 @@ end
 function load_boeckv2()
     path = ENV["HOME"]*"/sail_route_old/development/polynesian/performance/boeck_v2.csv"
     df = CSV.read(path, delim=',', datarow=1)
-    perf = convert(Array{Float64}, df)
+    perf = convert(Matrix{Float64}, df)
     tws = Array{Float64}([0.0,5.832037,7.77605,9.720062,11.66407,13.60809,15.5521,17.49611])
     twa = Array{Float64}([0.0, 60.0, 75.0, 90.0, 110.0, 120.0, 150.0, 170.0])
     return twa, tws, perf
