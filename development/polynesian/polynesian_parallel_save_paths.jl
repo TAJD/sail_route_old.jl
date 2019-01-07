@@ -55,6 +55,8 @@ using Distributed
             write(file, "x_results", x_results)
             write(file, "y_results", y_results)
             write(file, "et_results", et_results)
+            write(file, "x_locations", x)
+            write(file, "y_locations", y)
         end
         # return _results
     end
